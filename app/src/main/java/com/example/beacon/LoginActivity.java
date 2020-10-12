@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.beacon.models.Academico;
+import com.example.beacon.api.models.Academico;
 import com.example.beacon.services.AcademicoService;
 import com.example.beacon.utils.Util;
 

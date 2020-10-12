@@ -1,6 +1,6 @@
 package com.example.beacon.services;
 
-import com.example.beacon.models.Academico;
+import com.example.beacon.api.models.Academico;
 
 public class AcademicoService {
     public static AcademicoService Instance(){

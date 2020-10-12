@@ -1,19 +1,16 @@
 package com.example.beacon;
+
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
 
 import com.example.beacon.api.API;
 import com.example.beacon.api.models.Academico;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import retrofit2.Call;
