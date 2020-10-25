@@ -7,12 +7,17 @@
 
     <fragment
         android:id="@+id/menuProfile"
-        android:name="com.example.beacon.ProfileFragment"
+        android:name="com.example.beacon.StatusFragment"
         android:label="Profle"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_status" />
     <fragment
         android:id="@+id/menuNotifications"
-        android:name="com.example.beacon.NotificationsFragment"
-        android:label="Notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:name="com.example.beacon.PresencasFragment"
+        android:label="Presenças"
+        tools:layout="@layout/fragment_presencas" />
+    <fragment
+        android:id="@+id/menuAulas"
+        android:name="com.example.beacon.AulasFragment"
+        android:label="Aulas"
+        tools:layout="@layout/fragment_aulas" />
 </navigation>

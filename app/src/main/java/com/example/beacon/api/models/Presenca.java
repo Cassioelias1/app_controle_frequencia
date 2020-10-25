@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class Academico implements Serializable {
+public class Presenca implements Serializable {
     @SerializedName("nome")
     private String nome;
 
@@ -17,15 +17,18 @@ public class Academico implements Serializable {
     @SerializedName("email")
     private String email;
 
-    public Academico() {
+    @SerializedName("mensagemRetorno")
+    private String mensagemRetorno;
+
+    public Presenca() {
     }
 
-    public Academico(String nome, String codigo) {
+    public Presenca(String nome, String codigo) {
         this.nome = nome;
         this.codigo = codigo;
     }
 
-    public Academico(String nome, String codigo, String senha) {
+    public Presenca(String nome, String codigo, String senha) {
         this.nome = nome;
         this.codigo = codigo;
         this.senha = senha;
@@ -61,5 +64,13 @@ public class Academico implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getMensagemRetorno() {
+        return mensagemRetorno;
+    }
+
+    public void setMensagemRetorno(String mensagemRetorno) {
+        this.mensagemRetorno = mensagemRetorno;
     }
 }

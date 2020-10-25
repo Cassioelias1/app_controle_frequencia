@@ -17,16 +17,16 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProfileFragment extends Fragment {
+public class AulasFragment extends Fragment {
     private static final String KEY_SIMULATE_BEACON = "5F469-D4GG-4AHA-SA5U0";
 
-    public ProfileFragment() {
+    public AulasFragment() {
         // Required empty public constructor
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        final View view = inflater.inflate(R.layout.fragment_aulas, container, false);
         final Button button = (Button) view.findViewById(R.id.buttonTeste);
 
         if (button != null) {
@@ -36,12 +36,17 @@ public class ProfileFragment extends Fragment {
                     API.getAcademicos(new Callback<List<Academico>>() {
                         @Override
                         public void onResponse(Call<List<Academico>> call, Response<List<Academico>> response) {
-
+                            for (Academico academico : response.body()) {
+                                System.out.println(academico.getNome());
+                                System.out.println(academico.getCodigo());
+                                System.out.println("------------------------");
+                            }
                         }
 
                         @Override
                         public void onFailure(Call<List<Academico>> call, Throwable t) {
-
+                            System.out.println("Erro ao recuperar os acadêmicos.");
+                            System.out.println(t.getMessage());
                         }
                     });
                 }
