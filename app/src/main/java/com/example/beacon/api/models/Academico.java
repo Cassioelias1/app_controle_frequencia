@@ -5,6 +5,9 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 public class Academico implements Serializable {
+    @SerializedName("id")
+    private Integer id;//Implementar herança
+
     @SerializedName("nome")
     private String nome;
 
@@ -61,5 +64,13 @@ public class Academico implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }

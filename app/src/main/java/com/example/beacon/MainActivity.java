@@ -2,6 +2,7 @@ package com.example.beacon;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
@@ -71,18 +72,18 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
         buttonRegistro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//            Intent itImc = new Intent(MainActivity.this, RegistroActivity.class);
-//            startActivity(itImc);
-                startBeaconMonitoring();
+            Intent itImc = new Intent(MainActivity.this, RegistroActivity.class);
+            startActivity(itImc);
+//                startBeaconMonitoring();
             }
         });
         Button buttonLogin = findViewById(R.id.buttonLogin);
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//            Intent itImc = new Intent(MainActivity.this, LoginActivity.class);
-//            startActivity(itImc);
-                stopBeaconMonitoring();
+            Intent itImc = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(itImc);
+//                stopBeaconMonitoring();
             }
         });
     }

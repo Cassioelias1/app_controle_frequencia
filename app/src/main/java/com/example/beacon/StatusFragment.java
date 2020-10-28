@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.beacon.context.Context;
+
 public class StatusFragment extends Fragment {
     private static final String KEY_SIMULATE_BEACON = "5F469-D4GG-4AHA-SA5U0";
 
@@ -19,7 +21,7 @@ public class StatusFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_status, container, false);
-        final Button button = (Button) view.findViewById(R.id.buttonTeste);
+        final Button button = view.findViewById(R.id.buttonTeste);
         final TextView textView = view.findViewById(R.id.textViewTeste);
 
         if (button != null) {
@@ -28,7 +30,8 @@ public class StatusFragment extends Fragment {
                 public void onClick(View v) {
                     //Implementar algo do tipo Context para armazenar o academico logado
                     //String mensagemRetorno = StatusService.Instance().validarPresencaByBeacon("123", "1");
-                    String mensagemRetorno = "Sua presença foi validada";
+                    //Usar o SharedPreferences ??????
+                    String mensagemRetorno = Context.getAcademicoId().toString();
                     textView.setText(mensagemRetorno);
                 }
             });

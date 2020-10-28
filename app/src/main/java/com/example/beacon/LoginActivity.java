@@ -9,9 +9,16 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.beacon.api.API;
 import com.example.beacon.api.models.Academico;
-import com.example.beacon.services.AcademicoService;
+import com.example.beacon.context.Context;
 import com.example.beacon.utils.Util;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
     @Override
@@ -26,10 +33,13 @@ public class LoginActivity extends AppCompatActivity {
         buttonAuthLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                onAuthAcademico();
-                redirectToCentralApp();
+                onAuthAcademico();
             }
         });
+    }
+
+    private void showTextNotCredencials(){
+        Toast.makeText(this, "Não encontramos um usuário com essas credenciais.", Toast.LENGTH_LONG).show();
     }
 
     private void onAuthAcademico() {
@@ -38,13 +48,27 @@ public class LoginActivity extends AppCompatActivity {
         String email = editEmail.getText().toString();
         String senha = editSenha.getText().toString();
         if (!Util.isNullOrEmpty(email) && !Util.isNullOrEmpty(senha)) {
+            API.validarLogin(new Callback<List<Academico>>() {
+                @Override
+                public void onResponse(Call<List<Academico>> call, Response<List<Academico>> response) {
+                    if (!response.body().isEmpty()){
+                        Academico academico = response.body().get(0);
 
-            Academico academico = AcademicoService.Instance().findByCodigoAndSenha(email, senha);
-            if (academico != null) {
-                redirectToCentralApp();
-            } else {
-                Toast.makeText(this, "As credenciais não são válidas!", Toast.LENGTH_LONG).show();
-            }
+                        if (academico != null) {
+                            Context.setAcademicoId(academico.getId());
+                            redirectToCentralApp();
+                        }
+                    } else {
+                        showTextNotCredencials();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Academico>> call, Throwable t) {
+                    //Não faz nada
+                }
+            }, email, senha);
+
         } else {
             Toast.makeText(this, "Não foi informado o E-mail ou a Senha!", Toast.LENGTH_LONG).show();
         }

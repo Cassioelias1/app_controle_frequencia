@@ -7,8 +7,7 @@ public class AcademicoService {
         return new AcademicoService();
     }
 
-    public Academico findByCodigoAndSenha(String codigo, String senha) {
-
-        return new Academico("Nome Empty", codigo, senha);
+    public Academico findByCodigoAndSenha(String email, String senha) {
+        return null;
     }
 }
