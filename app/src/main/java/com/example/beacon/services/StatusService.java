@@ -16,7 +16,8 @@ public class StatusService {
         //Fazer um find no servidor por esse id afim de encontrar a sala que o beacon representa
         //validar a presença do aluno, retornar um boolean para confirmar o sucesso?
         final String[] messageReturn = {"Não foi possível validar sua presença"};
-        API.validarPresenca(new Callback<Presenca>() {
+        Presenca presenca = new Presenca();
+        API.validarPresenca(presenca, new Callback<Presenca>() {
             @Override
             public void onResponse(Call<Presenca> call, Response<Presenca> response) {
                 if (response.body() != null) {

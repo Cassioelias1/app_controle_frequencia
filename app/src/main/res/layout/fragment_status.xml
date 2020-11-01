@@ -16,19 +16,29 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <Button
-                android:id="@+id/buttonTeste"
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="50px"
-                android:layout_marginTop="40px"
-                android:layout_marginRight="50px"
-                android:background="#ACD3DA"
-                android:text="Validar presença" />
+                android:layout_weight="1"
+                android:layout_marginTop="200px"
+                android:text="Status da sua presença hoje"
+                android:textSize="60px"
+                android:textColor="@color/colorRed"
+                android:gravity="center" />
+
+<!--            <Button-->
+<!--                android:id="@+id/buttonTeste"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginLeft="50px"-->
+<!--                android:layout_marginTop="40px"-->
+<!--                android:layout_marginRight="50px"-->
+<!--                android:background="#ACD3DA"-->
+<!--                android:text="Validar presença" />-->
             <!-- Mostrar alerta de quanto tempo falta para computar a presença? -->
 
             <TextView
-                android:id="@+id/textViewTeste"
+                android:id="@+id/textViewStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

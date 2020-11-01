@@ -13,7 +13,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class API {
-    private static final String URL = "https://047e4fd69250.ngrok.io ";
+    private static final String URL = "https://24bf5b82e51c.ngrok.io";
 
     private static Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(URL)
@@ -28,11 +28,11 @@ public class API {
         call.enqueue(callback);
     }
 
-    public static void validarPresenca(final Callback<Presenca> callback) {
+    public static void validarPresenca(Presenca presenca, final Callback<Presenca> callback) {
         PresencaEndPoint endPoint = retrofit.create(PresencaEndPoint.class);
         Call<Presenca> call;
 
-        call = endPoint.getPresencas();
+        call = endPoint.validarPresenca(presenca);
         call.enqueue(callback);
     }
 

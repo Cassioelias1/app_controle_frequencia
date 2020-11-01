@@ -47,7 +47,8 @@ public class LoginActivity extends AppCompatActivity {
         EditText editSenha = findViewById(R.id.editPassword);
         String email = editEmail.getText().toString();
         String senha = editSenha.getText().toString();
-        if (!Util.isNullOrEmpty(email) && !Util.isNullOrEmpty(senha)) {
+        redirectToCentralApp();
+        /*if (!Util.isNullOrEmpty(email) && !Util.isNullOrEmpty(senha)) {
             API.validarLogin(new Callback<List<Academico>>() {
                 @Override
                 public void onResponse(Call<List<Academico>> call, Response<List<Academico>> response) {
@@ -71,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
 
         } else {
             Toast.makeText(this, "Não foi informado o E-mail ou a Senha!", Toast.LENGTH_LONG).show();
-        }
+        }*/
     }
 
     private void redirectToCentralApp() {

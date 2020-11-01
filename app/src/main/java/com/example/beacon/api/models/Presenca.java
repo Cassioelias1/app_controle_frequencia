@@ -5,17 +5,17 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 public class Presenca implements Serializable {
-    @SerializedName("nome")
-    private String nome;
+    @SerializedName("id_academico")
+    private String idAcademico;
 
-    @SerializedName("codigo")
-    private String codigo;
+    @SerializedName("id_beacon")
+    private String idBeacon;
 
-    @SerializedName("senha")
-    private String senha;
+    @SerializedName("id_turma")
+    private String idTurma;
 
-    @SerializedName("email")
-    private String email;
+    @SerializedName("data")
+    private String data;
 
     @SerializedName("mensagemRetorno")
     private String mensagemRetorno;
@@ -23,47 +23,42 @@ public class Presenca implements Serializable {
     public Presenca() {
     }
 
-    public Presenca(String nome, String codigo) {
-        this.nome = nome;
-        this.codigo = codigo;
+    public Presenca(String idAcademico, String idBeacon, String data) {
+        this.idAcademico = idAcademico;
+        this.idBeacon = idBeacon;
+        this.data = data;
     }
 
-    public Presenca(String nome, String codigo, String senha) {
-        this.nome = nome;
-        this.codigo = codigo;
-        this.senha = senha;
+    public String getIdAcademico() {
+        return idAcademico;
     }
 
-    public String getNome() {
-        return nome;
+    public void setIdAcademico(String idAcademico) {
+        this.idAcademico = idAcademico;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public String getIdBeacon() {
+        return idBeacon;
     }
 
-    public String getCodigo() {
-        return codigo;
+    public void setIdBeacon(String idBeacon) {
+        this.idBeacon = idBeacon;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public String getIdTurma() {
+        return idTurma;
     }
 
-    public String getSenha() {
-        return senha;
+    public void setIdTurma(String idTurma) {
+        this.idTurma = idTurma;
     }
 
-    public void setSenha(String senha) {
-        this.senha = senha;
+    public String getData() {
+        return data;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public void setData(String data) {
+        this.data = data;
     }
 
     public String getMensagemRetorno() {
