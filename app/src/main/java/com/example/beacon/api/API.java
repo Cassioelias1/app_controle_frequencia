@@ -13,7 +13,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class API {
-    private static final String URL = "https://24bf5b82e51c.ngrok.io";
+    private static final String URL = "https://2e98ce07e62f.ngrok.io";
 
     private static Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(URL)

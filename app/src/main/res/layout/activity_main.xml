@@ -40,27 +40,26 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="700px"
+            android:gravity="center"
+            android:layout_marginTop="150dp"
             android:orientation="vertical">
 
             <Button
                 android:id="@+id/buttonRegistro"
-                android:layout_width="match_parent"
+                style="@style/Widget.MaterialComponents.Button.Icon"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="50px"
-                android:layout_marginRight="50px"
-                android:background="#ACD3DA"
+                android:width="192dp"
                 android:text="Registro" />
 
             <Button
                 android:id="@+id/buttonLogin"
-                android:layout_width="match_parent"
+                style="@style/Widget.MaterialComponents.Button.Icon"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="50px"
-                android:layout_marginTop="40px"
-                android:layout_marginRight="50px"
-                android:background="#ACD3DA"
+                android:width="192dp"
                 android:text="Login" />
+
         </LinearLayout>
 
     </LinearLayout>

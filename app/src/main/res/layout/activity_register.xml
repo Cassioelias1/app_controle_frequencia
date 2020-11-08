@@ -40,6 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="200px"
+            android:gravity="center"
             android:orientation="vertical">
 
             <EditText
@@ -74,12 +75,11 @@
 
             <Button
                 android:id="@+id/buttonAuthRegister"
-                android:layout_width="match_parent"
+                style="@style/Widget.MaterialComponents.Button.Icon"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="180px"
-                android:layout_marginRight="180px"
-                android:layout_marginTop="200px"
-                android:background="#ACD3DA"
+                android:width="192dp"
+                android:layout_marginTop="30dp"
                 android:text="Registrar" />
         </LinearLayout>
     </LinearLayout>
