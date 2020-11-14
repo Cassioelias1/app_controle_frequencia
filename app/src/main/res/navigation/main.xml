@@ -11,7 +11,7 @@
         android:label="Profle"
         tools:layout="@layout/fragment_status" />
     <fragment
-        android:id="@+id/menuNotifications"
+        android:id="@+id/menuPresencas"
         android:name="com.example.beacon.PresencasFragment"
         android:label="Presenças"
         tools:layout="@layout/fragment_presencas" />

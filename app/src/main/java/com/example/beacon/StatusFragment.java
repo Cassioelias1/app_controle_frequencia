@@ -48,10 +48,10 @@ public class StatusFragment extends Fragment {
         MaterialCardView materialCardView2140 = view.findViewById(R.id.card4);
         TextView textView2140 = view.findViewById(R.id.textView2140);
 
-        onInitThread(materialCardView1915, textView1915, 23, 11);
-        onInitThread(materialCardView2015, textView2015, 23, 11);
-        onInitThread(materialCardView2100, textView2100, 23, 11);
-        onInitThread(materialCardView2140, textView2140, 23, 11);
+//        onInitThread(materialCardView1915, textView1915, 19, 15);
+//        onInitThread(materialCardView2015, textView2015, 23, 11);
+//        onInitThread(materialCardView2100, textView2100, 23, 11);
+//        onInitThread(materialCardView2140, textView2140, 23, 11);
 
         List<MaterialCardView> materialCardViews = new ArrayList<>();
         materialCardViews.add(materialCardView1915);
@@ -65,12 +65,12 @@ public class StatusFragment extends Fragment {
         textViews.add(textView2100);
         textViews.add(textView2140);
 
-        resetCardsPresencas(materialCardViews, textViews, 23, 7);
+//        resetCardsPresencas(materialCardViews, textViews, 23, 7);
 
         return view;
     }
 
-    public void onInitThread(final MaterialCardView materialCardView, final TextView textView, final Integer hour, final Integer minute) {
+    private void onInitThread(final MaterialCardView materialCardView, final TextView textView, final Integer hour, final Integer minute) {
         final boolean[] presencaValidada = {false};
         new Thread() {
             @Override

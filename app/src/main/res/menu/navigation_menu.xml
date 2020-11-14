@@ -4,7 +4,7 @@
         android:icon="@drawable/ic_person"
         android:title="Status"
         />
-    <item android:id="@+id/menuNotifications"
+    <item android:id="@+id/menuPresencas"
         android:icon="@drawable/ic_notifications"
         android:title="Presenças"
         />

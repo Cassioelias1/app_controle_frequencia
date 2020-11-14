@@ -2,8 +2,10 @@ package com.example.beacon.api;
 
 import com.example.beacon.api.endpoints.AcademicoEndPoint;
 import com.example.beacon.api.endpoints.PresencaEndPoint;
+import com.example.beacon.api.endpoints.TurmaEndPoint;
 import com.example.beacon.api.models.Academico;
 import com.example.beacon.api.models.Presenca;
+import com.example.beacon.api.models.Turma;
 
 import java.util.List;
 
@@ -13,7 +15,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class API {
-    private static final String URL = "https://2e98ce07e62f.ngrok.io";
+    private static final String URL = "https://a30f0fb1122a.ngrok.io";
 
     private static Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(URL)
@@ -41,6 +43,14 @@ public class API {
         Call<List<Academico>> call;
 
         call = endPoint.GetAcademicoByEmailSenha(email, senha);
+        call.enqueue(callback);
+    }
+
+    public static void getTurmasFromAcademicoId(final Callback<List<Turma>> callback, String academicoId){
+        TurmaEndPoint endPoint = retrofit.create(TurmaEndPoint.class);
+        Call<List<Turma>> call;
+
+        call = endPoint.getTurmas(academicoId);
         call.enqueue(callback);
     }
 
