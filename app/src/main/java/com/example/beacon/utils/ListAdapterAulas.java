@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.beacon.AulasActivity;
 import com.example.beacon.R;
 import com.example.beacon.api.models.Turma;
 
@@ -19,10 +20,12 @@ public class ListAdapterAulas extends ArrayAdapter<Turma> {
 
     private Context context;
     private List<Turma> itens;
-    public ListAdapterAulas(Context context, List<Turma> itens){
+    private AulasActivity aulasActivity;
+    public ListAdapterAulas(Context context, AulasActivity aulasActivity, List<Turma> itens){
         super(context, 0, itens);
         this.context = context;
         this.itens = itens;
+        this.aulasActivity = aulasActivity;
     }
 
     @NonNull
@@ -37,7 +40,8 @@ public class ListAdapterAulas extends ArrayAdapter<Turma> {
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View o) {
-                System.out.println(turma.getId());
+//                Intent itImc = new Intent(aulasActivity, DetalhamentoAulaActivity.class);
+//                aulasActivity.startActivity(itImc);
             }
         });
 

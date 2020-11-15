@@ -10,14 +10,20 @@
         android:name="com.example.beacon.StatusFragment"
         android:label="Profle"
         tools:layout="@layout/fragment_status" />
-    <fragment
-        android:id="@+id/menuPresencas"
-        android:name="com.example.beacon.PresencasFragment"
-        android:label="Presenças"
-        tools:layout="@layout/fragment_presencas" />
-    <fragment
+<!--    <activity-->
+<!--        android:id="@+id/menuPresencas"-->
+<!--        android:name="com.example.beacon.PresencasActivity"-->
+<!--        android:label="Presenças"-->
+<!--        tools:layout="@layout/activity_presencas" />-->
+    <activity
         android:id="@+id/menuAulas"
-        android:name="com.example.beacon.AulasFragment"
+        android:name="com.example.beacon.AulasActivity"
         android:label="Aulas"
-        tools:layout="@layout/fragment_aulas" />
+        tools:layout="@layout/activity_aulas" />
+    <activity
+        android:id="@+id/menuInbox"
+        android:name="com.example.beacon.MenuActivity"
+        android:label="Menus"
+        tools:layout="@layout/activity_menu" />
+
 </navigation>
