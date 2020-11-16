@@ -1,17 +1,18 @@
 package com.example.beacon;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.MenuItem;
 import android.widget.TextView;
 
-import androidx.fragment.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.beacon.api.API;
 import com.example.beacon.api.models.Presenca;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
 
 import java.time.LocalDateTime;
@@ -22,31 +23,33 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class StatusFragment extends Fragment {
+public class StatusActivity extends AppCompatActivity {
     private static final String KEY_SIMULATE_BEACON = "5F469-D4GG-4AHA-SA5U0";
     private static final String ID_SIMULATE_ACADEMICO = "2";
     private Handler handler;
 
-    public StatusFragment() {
+    public StatusActivity() {
         // Required empty public constructor
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_status, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_status);
+        initBottomNavigation();
         handler = new Handler();
 
-        MaterialCardView materialCardView1915 = view.findViewById(R.id.card);
-        TextView textView1915 = view.findViewById(R.id.textView1915);
+        MaterialCardView materialCardView1915 = findViewById(R.id.card);
+        TextView textView1915 = findViewById(R.id.textView1915);
 
-        MaterialCardView materialCardView2015 = view.findViewById(R.id.card2);
-        TextView textView2015 = view.findViewById(R.id.textView2015);
+        MaterialCardView materialCardView2015 = findViewById(R.id.card2);
+        TextView textView2015 = findViewById(R.id.textView2015);
 
-        MaterialCardView materialCardView2100 = view.findViewById(R.id.card3);
-        TextView textView2100 = view.findViewById(R.id.textView2100);
+        MaterialCardView materialCardView2100 = findViewById(R.id.card3);
+        TextView textView2100 = findViewById(R.id.textView2100);
 
-        MaterialCardView materialCardView2140 = view.findViewById(R.id.card4);
-        TextView textView2140 = view.findViewById(R.id.textView2140);
+        MaterialCardView materialCardView2140 = findViewById(R.id.card4);
+        TextView textView2140 = findViewById(R.id.textView2140);
 
 //        onInitThread(materialCardView1915, textView1915, 19, 15);
 //        onInitThread(materialCardView2015, textView2015, 23, 11);
@@ -67,8 +70,40 @@ public class StatusFragment extends Fragment {
 
 //        resetCardsPresencas(materialCardViews, textViews, 23, 7);
 
-        return view;
     }
+
+    private void initBottomNavigation(){
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.status);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()){
+                    case R.id.status:
+//                        startActivity(new Intent(getApplicationContext(), Dashboard.class));
+//                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.aulas:
+                        startActivity(new Intent(getApplicationContext(), AulasActivity.class));
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.presencas:
+                        startActivity(new Intent(getApplicationContext(), PresencasActivity.class));
+                        overridePendingTransition(0, 0);
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
+
+//    @Override
+//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+//        final View view = inflater.inflate(R.layout.activity_status, container, false);
+//
+//
+//        return view;
+//    }
 
     private void onInitThread(final MaterialCardView materialCardView, final TextView textView, final Integer hour, final Integer minute) {
         final boolean[] presencaValidada = {false};

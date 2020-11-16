@@ -17,6 +17,10 @@ public class Turma implements Serializable {
     public Turma() {
     }
 
+    public Turma(String descricao) {
+        this.descricao = descricao;
+    }
+
     public Turma(Integer id, String descricao, String periodo) {
         this.id = id;
         this.descricao = descricao;

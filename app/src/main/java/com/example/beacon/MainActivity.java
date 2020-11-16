@@ -1,6 +1,5 @@
 package com.example.beacon;
 
-import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
-import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.RangeNotifier;
@@ -41,10 +39,10 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
 
         initButtons();
         //onInit();
-        requestPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
-        beaconManager = BeaconManager.getInstanceForApplication(this);
-        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.ALTBEACON_LAYOUT));
-        beaconManager.bind(this);
+//        requestPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
+//        beaconManager = BeaconManager.getInstanceForApplication(this);
+//        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.ALTBEACON_LAYOUT));
+//        beaconManager.bind(this);
 
     }
 

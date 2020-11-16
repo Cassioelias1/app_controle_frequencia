@@ -1,6 +1,7 @@
 package com.example.beacon.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.beacon.AulasActivity;
+import com.example.beacon.DetalhamentoAulaActivity;
 import com.example.beacon.R;
 import com.example.beacon.api.models.Turma;
 
@@ -40,8 +42,7 @@ public class ListAdapterAulas extends ArrayAdapter<Turma> {
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View o) {
-//                Intent itImc = new Intent(aulasActivity, DetalhamentoAulaActivity.class);
-//                aulasActivity.startActivity(itImc);
+                aulasActivity.startActivity(new Intent(aulasActivity, DetalhamentoAulaActivity.class));
             }
         });
 

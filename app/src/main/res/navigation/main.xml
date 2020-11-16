@@ -5,11 +5,11 @@
     android:id="@+id/main"
     app:startDestination="@id/menuProfile">
 
-    <fragment
+    <activity
         android:id="@+id/menuProfile"
-        android:name="com.example.beacon.StatusFragment"
+        android:name="com.example.beacon.StatusActivity"
         android:label="Profle"
-        tools:layout="@layout/fragment_status" />
+        tools:layout="@layout/activity_status" />
 <!--    <activity-->
 <!--        android:id="@+id/menuPresencas"-->
 <!--        android:name="com.example.beacon.PresencasActivity"-->

@@ -9,17 +9,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.beacon.api.API;
-import com.example.beacon.api.models.Academico;
-import com.example.beacon.context.Context;
-import com.example.beacon.utils.Util;
-
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void redirectToCentralApp() {
-        Intent itImc = new Intent(LoginActivity.this, CentralActivity.class);
+        Intent itImc = new Intent(LoginActivity.this, StatusActivity.class);
         startActivity(itImc);
     }
 }
