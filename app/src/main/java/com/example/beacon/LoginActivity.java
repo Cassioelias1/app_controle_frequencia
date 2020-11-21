@@ -45,7 +45,7 @@ public class LoginActivity extends AppCompatActivity {
                         Academico academico = response.body().get(0);
 
                         if (academico != null) {
-                            Context.setAcademicoId(academico.getId());
+                            AppContext.setAcademicoId(academico.getId());
                             redirectToCentralApp();
                         }
                     } else {

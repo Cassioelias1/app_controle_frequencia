@@ -15,6 +15,7 @@ import com.example.beacon.AulasActivity;
 import com.example.beacon.DetalhamentoAulaActivity;
 import com.example.beacon.R;
 import com.example.beacon.api.models.Turma;
+import com.example.beacon.context.AppContext;
 
 import java.util.List;
 
@@ -42,6 +43,7 @@ public class ListAdapterAulas extends ArrayAdapter<Turma> {
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View o) {
+                AppContext.setAulaIdSelect(1);
                 aulasActivity.startActivity(new Intent(aulasActivity, DetalhamentoAulaActivity.class));
             }
         });
