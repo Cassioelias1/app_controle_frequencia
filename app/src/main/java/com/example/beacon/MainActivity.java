@@ -19,7 +19,6 @@ import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity implements BeaconConsumer {
@@ -44,25 +43,6 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer {
 //        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.ALTBEACON_LAYOUT));
 //        beaconManager.bind(this);
 
-    }
-
-    private void onInit() {
-        new Thread() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        LocalDateTime agora = LocalDateTime.now();
-                        LocalDateTime primeiroHorario = LocalDateTime.of(agora.getYear(), agora.getMonth(), agora.getDayOfMonth(), 23, 20);
-                        if (agora.getHour() == primeiroHorario.getHour() && agora.getMinute() == primeiroHorario.getMinute()){
-                            //
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }.start();
     }
 
     private void initButtons() {
