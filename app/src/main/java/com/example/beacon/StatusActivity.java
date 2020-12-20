@@ -117,7 +117,7 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
 
 //        resetCardsPresencas(materialCardViews, textViews, 23, 7);
 
-        initServiceFindBeacons();
+//        initServiceFindBeacons();
     }
 
     private void initBottomNavigation(){

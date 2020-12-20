@@ -9,5 +9,6 @@
     <color name="colorRed">#A30606</color>
     <color name="colorOrange">#E7731E</color>
     <color name="colorGreen">#11A33F</color>
+    <color name="colorGray">#2B2626</color>
     <color name="colorBlueNavBottom">#243F7C</color>
 </resources>
