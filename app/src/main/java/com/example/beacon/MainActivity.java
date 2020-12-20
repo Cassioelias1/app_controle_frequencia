@@ -21,6 +21,10 @@ import org.altbeacon.beacon.Region;
 
 import java.util.Collection;
 
+//isso estava no android manifest mas estava dando erro, nao sei porque
+//        android:networkSecurityConfig="@xml/network_security_config"
+//        android:usesCleartextTraffic="true"
+
 public class MainActivity extends AppCompatActivity implements BeaconConsumer {
     protected static final String TAG = "MonitoringActivity";
     private BeaconManager beaconManager = null;

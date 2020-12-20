@@ -20,13 +20,16 @@ public class Presenca implements Serializable {
     @SerializedName("mensagemRetorno")
     private String mensagemRetorno;
 
-    public Presenca() {
-    }
+    @SerializedName("idsBeacons")
+    private String idsBeacons;
 
-    public Presenca(String idAcademico, String idBeacon, String data) {
+    public Presenca() {}
+
+    public Presenca(String idAcademico, String idBeacon, String data, String idsBeacons) {
         this.idAcademico = idAcademico;
         this.idBeacon = idBeacon;
         this.data = data;
+        this.idsBeacons = idsBeacons;
     }
 
     public String getIdAcademico() {
@@ -67,5 +70,13 @@ public class Presenca implements Serializable {
 
     public void setMensagemRetorno(String mensagemRetorno) {
         this.mensagemRetorno = mensagemRetorno;
+    }
+
+    public String getIdsBeacons() {
+        return idsBeacons;
+    }
+
+    public void setIdsBeacons(String idsBeacons) {
+        this.idsBeacons = idsBeacons;
     }
 }

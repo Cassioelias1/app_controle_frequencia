@@ -4,9 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class Academico implements Serializable {
-    @SerializedName("id")
-    private Integer id;//Implementar herança
+public class Academico extends RepeatConstraint implements Serializable {
 
     @SerializedName("nome")
     private String nome;
@@ -66,11 +64,9 @@ public class Academico implements Serializable {
         this.email = email;
     }
 
+    //Verificar se isso funciona, duvido kkkk
+    @Override
     public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
+        return super.getId();
     }
 }

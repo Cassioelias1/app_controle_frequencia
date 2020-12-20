@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.beacon.api.API;
 import com.example.beacon.api.models.Presenca;
+import com.example.beacon.trilateracao.BeaconTrilateracao;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
 
@@ -41,7 +42,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -57,9 +60,12 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
     private static final int REQUEST_ENABLE_BLUETOOTH = 1;
     private static final long DEFAULT_SCAN_PERIOD_MS = 6000l;
     private static final String ALL_BEACONS_REGION = "AllBeaconsRegion";
+    private static final String I_BEACON = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24";
 
     private BeaconManager mBeaconManager;
     private Region mRegion;
+
+    private Set<Integer> identificadoresBeacons = new HashSet<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,10 +75,11 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
         handler = new Handler();
 
         mBeaconManager = BeaconManager.getInstanceForApplication(this);
-        // Fijar un protocolo beacon, Eddystone en este caso
+
         List<BeaconParser> beaconParsers = Arrays.asList(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_UID_LAYOUT),
                 new BeaconParser().setBeaconLayout(BeaconParser.URI_BEACON_LAYOUT), new BeaconParser().setBeaconLayout(BeaconParser.ALTBEACON_LAYOUT),
-                new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_TLM_LAYOUT), new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_URL_LAYOUT));
+                new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_TLM_LAYOUT), new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_URL_LAYOUT),
+                new BeaconParser().setBeaconLayout(I_BEACON));
         mBeaconManager.getBeaconParsers().addAll(beaconParsers);
 
         ArrayList<Identifier> identifiers = new ArrayList<>();
@@ -121,8 +128,6 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()){
                     case R.id.status:
-//                        startActivity(new Intent(getApplicationContext(), Dashboard.class));
-//                        overridePendingTransition(0, 0);
                         return true;
                     case R.id.aulas:
                         startActivity(new Intent(getApplicationContext(), AulasActivity.class));
@@ -150,12 +155,14 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
                         if (agora.getHour() == primeiroHorario.getHour() && agora.getMinute() == primeiroHorario.getMinute()){
                             presencaValidada[0] = true;
 
-                            Presenca presenca = new Presenca(ID_SIMULATE_ACADEMICO, KEY_SIMULATE_BEACON, LocalDateTime.now().toString());
+                            String idsBeacons = identificadoresBeacons.stream().map(i -> i.toString().join(",")).toString();
+
+                            //Se não tiver pelo menos 3 idsBeacon significa que o aluno não esta dentro da sala de aula, implementar outras validações (trilateração)
+                            Presenca presenca = new Presenca(ID_SIMULATE_ACADEMICO, KEY_SIMULATE_BEACON, LocalDateTime.now().toString(), idsBeacons);
                             API.validarPresenca(presenca, new Callback<Presenca>() {
                                 @Override
                                 public void onResponse(Call<Presenca> call, Response<Presenca> response) {
                                     if (response.body() != null){
-//                                        textView.setText(response.body().getMensagemRetorno());
                                         if (response.body().getMensagemRetorno() != null){
                                             handler.post(new Runnable(){
                                                 @Override
@@ -170,9 +177,7 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
 
                                 @Override
                                 public void onFailure(Call<Presenca> call, Throwable t) {
-//                                    textView.setText("Erro ao validar sua presença, iremos realizar uma nova tentativa em um minuto.");
-//                                    presencaValidada[0] = false;
-                                    System.out.println("DEU RUIM CARA AF");
+                                    System.out.println("Erro na requisicao");
                                 }
                             });
                         }
@@ -242,9 +247,10 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
 
         for (Beacon beacon : beacons) {
             showToastMessage(getString(R.string.beacon_detected, beacon.getId3()));
-//            beacon.getDistance();//Distância
+            beacon.getDistance();//Distância
 //            beacon.getRssi();//força do sinal recebido
-            //Implementar algo de teste com 3 distancia e considerar as 3 para realizar a localização.
+
+            identificadoresBeacons.add(beacon.getId3().toInt());//Verificar qual é o id correto assim que tiver o beacon em mãos
         }
     }
 
@@ -252,7 +258,7 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 askForLocationPermissions();
-                //Implementar algo que depois que conceder a permissão o processo de localização dos beacon inicie
+                //Implementar algo que depois que conceder a permissão o processo de localização dos beacon inicie, chamar a activity novamente?
             } else {
                 prepareDetection();
             }
@@ -262,7 +268,6 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
         stopDetectingBeacons();
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        // Desactivar bluetooth
         if (mBluetoothAdapter.isEnabled()) {
             mBluetoothAdapter.disable();
         }
@@ -292,6 +297,8 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
             public void onDismiss(DialogInterface dialog) {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                         PERMISSION_REQUEST_COARSE_LOCATION);
+
+                initServiceFindBeacons();
             }
         });
         builder.show();
@@ -308,7 +315,6 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
 
         mBeaconManager.removeAllRangeNotifiers();
 
-        // Desenlazar servicio de beacons
         mBeaconManager.unbind(this);
     }
 
@@ -368,10 +374,16 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
     }
 
     private void startDetectingBeacons() {
-        // Fijar un periodo de escaneo
         mBeaconManager.setForegroundScanPeriod(DEFAULT_SCAN_PERIOD_MS);
-
-        // Enlazar al servicio de beacons. Obtiene un callback cuando esté listo para ser usado
         mBeaconManager.bind(this);
+    }
+
+    //Implementar algo de teste com 3 distancia e considerar as 3 para realizar a localização.
+    public void testeTrilateracao(){
+        BeaconTrilateracao beacon1 = new BeaconTrilateracao(Double.valueOf("1.42"), Double.valueOf("800l"));
+        BeaconTrilateracao beacon2 = new BeaconTrilateracao(Double.valueOf("0.73"), Double.valueOf("2500"));
+        BeaconTrilateracao beacon3 = new BeaconTrilateracao(Double.valueOf("0.54"), Double.valueOf("3200"));
+
+
     }
 }

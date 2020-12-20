@@ -11,7 +11,7 @@
     <string name="location_access_needed">Precisamos da permissão para fazer o app funcionar</string>
     <string name="grant_location_access">O app precisa desta permissão para funcionar</string>
     <string name="stop_looking_for_beacons">Parando de buscar os beacons</string>
-    <string name="location_disabled">Localização de beacons ativada</string>
+    <string name="location_disabled">A Localização se encontra desativada</string>
     <string name="location_settings">Abrir ajustes de localização?</string>
     <string name="not_support_bluetooth_msg">Seu dispositivo não suporta o bluetooth</string>
     <string name="start_looking_for_beacons">Iniciando a localização de beacons</string>
