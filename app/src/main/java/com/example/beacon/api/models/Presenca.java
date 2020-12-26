@@ -23,6 +23,9 @@ public class Presenca implements Serializable {
     @SerializedName("idsBeacons")
     private String idsBeacons;
 
+    @SerializedName("status")
+    private String status;//transformar em enum
+
     public Presenca() {}
 
     public Presenca(String idAcademico, String idBeacon, String data, String idsBeacons) {
@@ -78,5 +81,13 @@ public class Presenca implements Serializable {
 
     public void setIdsBeacons(String idsBeacons) {
         this.idsBeacons = idsBeacons;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

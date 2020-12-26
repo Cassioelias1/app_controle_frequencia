@@ -26,7 +26,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.beacon.api.API;
 import com.example.beacon.api.models.Presenca;
-import com.example.beacon.trilateracao.BeaconTrilateracao;
+import com.example.beacon.tbmsp.Point;
+import com.example.beacon.tbmsp.Trilateration;
+import com.example.beacon.utils.BeaconUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
 
@@ -118,6 +120,7 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
 //        resetCardsPresencas(materialCardViews, textViews, 23, 7);
 
 //        initServiceFindBeacons();
+        testeTrilateracao();
     }
 
     private void initBottomNavigation(){
@@ -249,6 +252,7 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
             showToastMessage(getString(R.string.beacon_detected, beacon.getId3()));
             beacon.getDistance();//Distância
 //            beacon.getRssi();//força do sinal recebido
+            double distanciaBeacon = BeaconUtils.calculateBeaconDistance(beacon);
 
             identificadoresBeacons.add(beacon.getId3().toInt());//Verificar qual é o id correto assim que tiver o beacon em mãos
         }
@@ -380,10 +384,17 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
 
     //Implementar algo de teste com 3 distancia e considerar as 3 para realizar a localização.
     public void testeTrilateracao(){
-        BeaconTrilateracao beacon1 = new BeaconTrilateracao(Double.valueOf("1.42"), Double.valueOf("800l"));
-        BeaconTrilateracao beacon2 = new BeaconTrilateracao(Double.valueOf("0.73"), Double.valueOf("2500"));
-        BeaconTrilateracao beacon3 = new BeaconTrilateracao(Double.valueOf("0.54"), Double.valueOf("3200"));
+        System.out.println("----------------------------------------------------------------");
+//        BeaconTrilateracao beacon1 = new BeaconTrilateracao(Double.valueOf("1.42"), Double.valueOf("1420"));
+//        BeaconTrilateracao beacon2 = new BeaconTrilateracao(Double.valueOf("0.73"), Double.valueOf("730"));
+//        BeaconTrilateracao beacon3 = new BeaconTrilateracao(Double.valueOf("0.54"), Double.valueOf("540"));
 
+        Point p1=new Point(-19.6685,-69.1942,84);
+        Point p2=new Point(-20.2705,-70.1311,114);
+        Point p3=new Point(-20.5656,-70.1807,120);
+        double[] a = Trilateration.Compute(p1,p2,p3);
+        System.out.println("OIOIOIOIOIOIOIOIOIOIOIOIO");
+        System.out.println("LatLon: " +a[0]+ " - " +a[1]);
 
     }
 }
