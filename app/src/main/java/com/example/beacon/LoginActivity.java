@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void redirectToCentralApp() {
-        Intent itImc = new Intent(LoginActivity.this, StatusActivity.class);
+        Intent itImc = new Intent(LoginActivity.this, RequestPermissionActivity.class);
         startActivity(itImc);
     }
 }

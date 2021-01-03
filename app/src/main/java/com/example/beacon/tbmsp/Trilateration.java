@@ -23,7 +23,7 @@ public class Trilateration{
         double k;
         c = p2.glt()-p1.glt();
         d = p2.gln()-p1.gln();
-        f = (180/Math.PI)*Math.acos( Math.abs(c)/Math.abs(Math.sqrt(Math.pow(c,2)+Math.pow(d,2))));
+        f = (180/Math.PI) * Math.acos( Math.abs(c)/Math.abs(Math.sqrt(Math.pow(c,2)+Math.pow(d,2))));
 
         if ((c>0&&d>0)){
             f=360-f;

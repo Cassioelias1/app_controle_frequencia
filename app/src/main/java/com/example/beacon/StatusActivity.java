@@ -1,48 +1,30 @@
 package com.example.beacon;
 
-import android.Manifest;
-import android.app.AlertDialog;
-import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
-import android.content.DialogInterface;
+import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
-import android.provider.Settings;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.beacon.api.API;
 import com.example.beacon.api.models.Presenca;
-import com.example.beacon.tbmsp.Point;
-import com.example.beacon.tbmsp.Trilateration;
-import com.example.beacon.utils.BeaconUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
-import org.altbeacon.beacon.BeaconParser;
-import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -52,20 +34,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class StatusActivity extends AppCompatActivity implements BeaconConsumer, RangeNotifier {
+public class StatusActivity extends Activity implements BeaconConsumer {
     private static final String KEY_SIMULATE_BEACON = "5F469-D4GG-4AHA-SA5U0";
     private static final String ID_SIMULATE_ACADEMICO = "2";
     private Handler handler;
 
-    protected final String TAG = StatusActivity.this.getClass().getSimpleName();
-    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
-    private static final int REQUEST_ENABLE_BLUETOOTH = 1;
-    private static final long DEFAULT_SCAN_PERIOD_MS = 6000l;
-    private static final String ALL_BEACONS_REGION = "AllBeaconsRegion";
-    private static final String I_BEACON = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24";
-
-    private BeaconManager mBeaconManager;
-    private Region mRegion;
+    private BeaconManager beaconManager = BeaconManager.getInstanceForApplication(this);
 
     private Set<Integer> identificadoresBeacons = new HashSet<>();
 
@@ -75,18 +49,6 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
         setContentView(R.layout.activity_status);
         initBottomNavigation();
         handler = new Handler();
-
-        mBeaconManager = BeaconManager.getInstanceForApplication(this);
-
-        List<BeaconParser> beaconParsers = Arrays.asList(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_UID_LAYOUT),
-                new BeaconParser().setBeaconLayout(BeaconParser.URI_BEACON_LAYOUT), new BeaconParser().setBeaconLayout(BeaconParser.ALTBEACON_LAYOUT),
-                new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_TLM_LAYOUT), new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_URL_LAYOUT),
-                new BeaconParser().setBeaconLayout(I_BEACON));
-        mBeaconManager.getBeaconParsers().addAll(beaconParsers);
-
-        ArrayList<Identifier> identifiers = new ArrayList<>();
-
-        mRegion = new Region(ALL_BEACONS_REGION, identifiers);
 
 //        MaterialCardView materialCardView1915 = findViewById(R.id.card);
 //        TextView textView1915 = findViewById(R.id.textView1915);
@@ -119,9 +81,52 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
 
 //        resetCardsPresencas(materialCardViews, textViews, 23, 7);
 
-//        initServiceFindBeacons();
-        testeTrilateracao();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        beaconManager.unbind(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        beaconManager.bind(this);
+    }
+
+    @Override
+    public void onBeaconServiceConnect() {
+        StringBuilder builder = new StringBuilder();
+
+        RangeNotifier rangeNotifier = new RangeNotifier() {
+            @Override
+            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
+                if (beacons.size() > 0) {
+                    builder.append("Quantidade de beacons localizado: ").append(beacons.size()).append("\n");
+                    for (Beacon beacon : beacons) {
+                        builder.append("ID: "+beacon.getId1()).append("\n");
+                        builder.append("DISTANCIA: "+beacon.getDistance()).append("\n");
+                        builder.append("================================").append("\n");
+                    }
+                    showToastMessage(builder.toString());
+                }
+            }
+
+        };
+        try {
+            beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
+            beaconManager.addRangeNotifier(rangeNotifier);
+            beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
+            beaconManager.addRangeNotifier(rangeNotifier);
+        } catch (RemoteException e) {   }
+    }
+
 
     private void initBottomNavigation(){
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -226,56 +231,6 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
         }.start();
     }
 
-    @Override
-    public void onBeaconServiceConnect() {
-        try {
-            // Empezar a buscar los beacons que encajen con el el objeto Región pasado, incluyendo
-            // actualizaciones en la distancia estimada
-            mBeaconManager.startRangingBeaconsInRegion(mRegion);
-
-            showToastMessage(getString(R.string.start_looking_for_beacons));
-
-        } catch (RemoteException e) {
-            Log.d(TAG, "Se ha producido una excepción al empezar a buscar beacons " + e.getMessage());
-        }
-
-        mBeaconManager.addRangeNotifier(this);
-    }
-
-    @Override
-    public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-        if (beacons.size() == 0) {
-            showToastMessage(getString(R.string.no_beacons_detected));
-        }
-
-        for (Beacon beacon : beacons) {
-            showToastMessage(getString(R.string.beacon_detected, beacon.getId3()));
-            beacon.getDistance();//Distância
-//            beacon.getRssi();//força do sinal recebido
-            double distanciaBeacon = BeaconUtils.calculateBeaconDistance(beacon);
-
-            identificadoresBeacons.add(beacon.getId3().toInt());//Verificar qual é o id correto assim que tiver o beacon em mãos
-        }
-    }
-
-    private void initServiceFindBeacons(){
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                askForLocationPermissions();
-                //Implementar algo que depois que conceder a permissão o processo de localização dos beacon inicie, chamar a activity novamente?
-            } else {
-                prepareDetection();
-            }
-    }
-
-    private void stopServiceFindBeacons(){
-        stopDetectingBeacons();
-        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        if (mBluetoothAdapter.isEnabled()) {
-            mBluetoothAdapter.disable();
-        }
-    }
 
     private void showToastMessage (String message) {
         Toast toast = Toast.makeText(this, message, Toast.LENGTH_LONG);
@@ -283,118 +238,5 @@ public class StatusActivity extends AppCompatActivity implements BeaconConsumer,
         toast.show();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mBeaconManager.removeAllRangeNotifiers();
-        mBeaconManager.unbind(this);
-    }
 
-    private void askForLocationPermissions() {
-
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.location_access_needed);
-        builder.setMessage(R.string.grant_location_access);
-        builder.setPositiveButton(android.R.string.ok, null);
-        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            public void onDismiss(DialogInterface dialog) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                        PERMISSION_REQUEST_COARSE_LOCATION);
-
-                initServiceFindBeacons();
-            }
-        });
-        builder.show();
-    }
-
-    private void stopDetectingBeacons() {
-
-        try {
-            mBeaconManager.stopMonitoringBeaconsInRegion(mRegion);
-            showToastMessage(getString(R.string.stop_looking_for_beacons));
-        } catch (RemoteException e) {
-            Log.d(TAG, "Se ha producido una excepción al parar de buscar beacons " + e.getMessage());
-        }
-
-        mBeaconManager.removeAllRangeNotifiers();
-
-        mBeaconManager.unbind(this);
-    }
-
-    private void prepareDetection() {
-        if (!isLocationEnabled()) {
-            askToTurnOnLocation();
-
-        } else {
-            BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-            if (mBluetoothAdapter == null) {
-                showToastMessage(getString(R.string.not_support_bluetooth_msg));
-
-            } else if (mBluetoothAdapter.isEnabled()) {
-                startDetectingBeacons();
-
-            } else {
-                // Pedindo para que o usuário ative o Bluetooth
-                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BLUETOOTH);
-                //Implementar algo que depois que conceder a permissão o processo de localização dos beacon inicie
-            }
-        }
-    }
-
-    private boolean isLocationEnabled() {
-        LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-        boolean networkLocationEnabled = false;
-
-        boolean gpsLocationEnabled = false;
-
-        try {
-            networkLocationEnabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-            gpsLocationEnabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-        } catch (Exception ex) {
-            Log.d(TAG, "Excepción al obtener información de localización");
-        }
-
-        return networkLocationEnabled || gpsLocationEnabled;
-    }
-
-    private void askToTurnOnLocation() {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setMessage(R.string.location_disabled);
-        dialog.setPositiveButton(R.string.location_settings, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                // TODO Auto-generated method stub
-                Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(myIntent);
-            }
-        });
-        dialog.show();
-    }
-
-    private void startDetectingBeacons() {
-        mBeaconManager.setForegroundScanPeriod(DEFAULT_SCAN_PERIOD_MS);
-        mBeaconManager.bind(this);
-    }
-
-    //Implementar algo de teste com 3 distancia e considerar as 3 para realizar a localização.
-    public void testeTrilateracao(){
-        System.out.println("----------------------------------------------------------------");
-//        BeaconTrilateracao beacon1 = new BeaconTrilateracao(Double.valueOf("1.42"), Double.valueOf("1420"));
-//        BeaconTrilateracao beacon2 = new BeaconTrilateracao(Double.valueOf("0.73"), Double.valueOf("730"));
-//        BeaconTrilateracao beacon3 = new BeaconTrilateracao(Double.valueOf("0.54"), Double.valueOf("540"));
-
-        Point p1=new Point(-19.6685,-69.1942,84);
-        Point p2=new Point(-20.2705,-70.1311,114);
-        Point p3=new Point(-20.5656,-70.1807,120);
-        double[] a = Trilateration.Compute(p1,p2,p3);
-        System.out.println("OIOIOIOIOIOIOIOIOIOIOIOIO");
-        System.out.println("LatLon: " +a[0]+ " - " +a[1]);
-
-    }
 }
