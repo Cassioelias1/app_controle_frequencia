@@ -21,4 +21,7 @@ public class Point{
     public double glt(){return lt;}
     public double gln(){return ln;}
     public double gr(){return r;}
+
+    public Point() {
+    }
 }

@@ -25,7 +25,8 @@ import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,6 +43,7 @@ public class StatusActivity extends Activity implements BeaconConsumer {
     private BeaconManager beaconManager = BeaconManager.getInstanceForApplication(this);
 
     private Set<Integer> identificadoresBeacons = new HashSet<>();
+    private Thread thread = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +52,11 @@ public class StatusActivity extends Activity implements BeaconConsumer {
         initBottomNavigation();
         handler = new Handler();
 
-//        MaterialCardView materialCardView1915 = findViewById(R.id.card);
-//        TextView textView1915 = findViewById(R.id.textView1915);
+        List<HorarioValidacaoPresenca> horarioValidacaoPresencas = Arrays.asList(new HorarioValidacaoPresenca(19, 15),
+                new HorarioValidacaoPresenca(20, 15), new HorarioValidacaoPresenca(21, 00), new HorarioValidacaoPresenca(21, 40));
+
+        MaterialCardView materialCardView1915 = findViewById(R.id.card);
+        TextView textView1915 = findViewById(R.id.textView1915);
 //
 //        MaterialCardView materialCardView2015 = findViewById(R.id.card2);
 //        TextView textView2015 = findViewById(R.id.textView2015);
@@ -62,22 +67,19 @@ public class StatusActivity extends Activity implements BeaconConsumer {
 //        MaterialCardView materialCardView2140 = findViewById(R.id.card4);
 //        TextView textView2140 = findViewById(R.id.textView2140);
 
-//        onInitThread(materialCardView1915, textView1915, 19, 15);
-//        onInitThread(materialCardView2015, textView2015, 23, 11);
-//        onInitThread(materialCardView2100, textView2100, 23, 11);
-//        onInitThread(materialCardView2140, textView2140, 23, 11);
-
-//        List<MaterialCardView> materialCardViews = new ArrayList<>();
-//        materialCardViews.add(materialCardView1915);
+        List<MaterialCardView> materialCardViews = new ArrayList<>();
+        materialCardViews.add(materialCardView1915);
 //        materialCardViews.add(materialCardView2015);
 //        materialCardViews.add(materialCardView2100);
 //        materialCardViews.add(materialCardView2140);
-//
-//        List<TextView> textViews = new ArrayList<>();
-//        textViews.add(textView1915);
+
+        List<TextView> textViews = new ArrayList<>();
+        textViews.add(textView1915);
 //        textViews.add(textView2015);
 //        textViews.add(textView2100);
 //        textViews.add(textView2140);
+
+        onInitThread(materialCardViews, textViews, horarioValidacaoPresencas);
 
 //        resetCardsPresencas(materialCardViews, textViews, 23, 7);
 
@@ -102,28 +104,23 @@ public class StatusActivity extends Activity implements BeaconConsumer {
 
     @Override
     public void onBeaconServiceConnect() {
-        StringBuilder builder = new StringBuilder();
-
-        RangeNotifier rangeNotifier = new RangeNotifier() {
-            @Override
-            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-                if (beacons.size() > 0) {
-                    builder.append("Quantidade de beacons localizado: ").append(beacons.size()).append("\n");
-                    for (Beacon beacon : beacons) {
-                        builder.append("ID: "+beacon.getId1()).append("\n");
-                        builder.append("DISTANCIA: "+beacon.getDistance()).append("\n");
-                        builder.append("================================").append("\n");
-                    }
-                    showToastMessage(builder.toString());
+        RangeNotifier rangeNotifier = (beacons, region) -> {
+            StringBuilder builder = new StringBuilder();
+            if (beacons.size() > 0) {
+                builder.append("Quantidade de beacons localizados: ").append(beacons.size()).append("\n");
+                for (Beacon beacon : beacons) {
+                    builder.append("ID: "+beacon.getId1()).append("\n");
+                    builder.append("DISTANCIA: "+beacon.getDistance()).append("\n");
+                    builder.append("================================").append("\n");
                 }
+                showToastMessage(builder.toString());
             }
-
         };
         try {
             beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
-            beaconManager.addRangeNotifier(rangeNotifier);
+            beaconManager.addRangeNotifier(rangeNotifier);/*
             beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
-            beaconManager.addRangeNotifier(rangeNotifier);
+            beaconManager.addRangeNotifier(rangeNotifier);*/
         } catch (RemoteException e) {   }
     }
 
@@ -151,50 +148,75 @@ public class StatusActivity extends Activity implements BeaconConsumer {
         });
     }
 
-    private void onInitThread(final MaterialCardView materialCardView, final TextView textView, final Integer hour, final Integer minute) {
+
+    //Encaminhar uma lista com os horários e assim que passar de um horário (19:15 por exemplo) remove-lo da lista.
+    //No final verificar se a lista está vazia, se sim fechar a thread.
+    private void onInitThread(final List<MaterialCardView> materialCardViews, final List<TextView> textViews, List<HorarioValidacaoPresenca> horarioValidacaoPresencas) {
+        List<HorarioValidacaoPresenca> horarioValidacoes = horarioValidacaoPresencas;
         final boolean[] presencaValidada = {false};
-        new Thread() {
+        thread = new Thread() {
             @Override
             public void run() {
                 while (!presencaValidada[0]) {
                     try {
                         LocalDateTime agora = LocalDateTime.now();
-                        LocalDateTime primeiroHorario = LocalDateTime.of(agora.getYear(), agora.getMonth(), agora.getDayOfMonth(), hour, minute);
-                        if (agora.getHour() == primeiroHorario.getHour() && agora.getMinute() == primeiroHorario.getMinute()){
-                            presencaValidada[0] = true;
+                        for (HorarioValidacaoPresenca horarioValidacao : horarioValidacoes) {
+                            LocalDateTime horarioPresenca = LocalDateTime.of(agora.getYear(), agora.getMonth(), agora.getDayOfMonth(), horarioValidacao.getHora(), horarioValidacao.getMinuto());
+                            if (agora.getHour() == horarioPresenca.getHour() && agora.getMinute() == horarioPresenca.getMinute()){
+                                String idsBeacons = identificadoresBeacons.stream().map(i -> i.toString().join(",")).toString();
+                                //Se não tiver pelo menos 3 idsBeacon significa que o aluno não esta dentro da sala de aula, implementar outras validações (trilateração)
+                                Presenca presenca = new Presenca(ID_SIMULATE_ACADEMICO, KEY_SIMULATE_BEACON, LocalDateTime.now().toString(), idsBeacons);
+                                API.validarPresenca(presenca, new Callback<Presenca>() {
+                                    @Override
+                                    public void onResponse(Call<Presenca> call, Response<Presenca> response) {
+                                        if (response.body() != null){
+                                            if (response.body().getMensagemRetorno() != null){
+                                                handler.post(new Runnable(){
+                                                    @Override
+                                                    public void run() {
+                                                        materialCardViews.get(0).setBackgroundColor(Color.parseColor("#11A33F"));
+                                                        if (!materialCardViews.isEmpty()){
+                                                            materialCardViews.remove(materialCardViews.size() -1);
+                                                        }
+                                                        textViews.get(0).setText("Presença válidada!");
+                                                        if (!textViews.isEmpty()){
+                                                            textViews.remove(textViews.size() -1);
+                                                        }
 
-                            String idsBeacons = identificadoresBeacons.stream().map(i -> i.toString().join(",")).toString();
-
-                            //Se não tiver pelo menos 3 idsBeacon significa que o aluno não esta dentro da sala de aula, implementar outras validações (trilateração)
-                            Presenca presenca = new Presenca(ID_SIMULATE_ACADEMICO, KEY_SIMULATE_BEACON, LocalDateTime.now().toString(), idsBeacons);
-                            API.validarPresenca(presenca, new Callback<Presenca>() {
-                                @Override
-                                public void onResponse(Call<Presenca> call, Response<Presenca> response) {
-                                    if (response.body() != null){
-                                        if (response.body().getMensagemRetorno() != null){
-                                            handler.post(new Runnable(){
-                                                @Override
-                                                public void run() {
-                                                    materialCardView.setBackgroundColor(Color.parseColor("#11A33F"));
-                                                    textView.setText("Presença válidada!");
-                                                }
-                                            });
+                                                        horarioValidacoes.remove(horarioValidacao);
+                                                        validarThead(horarioValidacoes.size());
+                                                    }
+                                                });
+                                            }
                                         }
                                     }
-                                }
 
-                                @Override
-                                public void onFailure(Call<Presenca> call, Throwable t) {
-                                    System.out.println("Erro na requisicao");
-                                }
-                            });
+                                    @Override
+                                    public void onFailure(Call<Presenca> call, Throwable t) {
+                                        System.out.println("Erro na requisicao");
+                                    }
+                                });
+                            }
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             }
-        }.start();
+        };
+        startThreadValidacoes();
+    }
+
+    private void validarThead(int horariosPresencas){
+        if (horariosPresencas == 0){
+            thread.interrupt();
+        }
+    }
+
+    private void startThreadValidacoes(){
+        if (thread != null && !thread.isAlive()) {
+            thread.start();
+        }
     }
 
     private void resetCardsPresencas(final List<MaterialCardView> materialCardViews, final List<TextView> textViews, final Integer hour, final Integer minute){
