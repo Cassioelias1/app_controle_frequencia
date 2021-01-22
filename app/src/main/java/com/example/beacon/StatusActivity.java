@@ -107,12 +107,16 @@ public class StatusActivity extends Activity implements BeaconConsumer {
         RangeNotifier rangeNotifier = (beacons, region) -> {
             StringBuilder builder = new StringBuilder();
             if (beacons.size() > 0) {
-                builder.append("Quantidade de beacons localizados: ").append(beacons.size()).append("\n");
+//                builder.append("Quantidade de beacons localizados: ").append(beacons.size()).append("\n");
                 for (Beacon beacon : beacons) {
+                    double distancia = calculateDistance(beacon.getTxPower(), beacon.getRssi());
                     builder.append("ID: "+beacon.getId1()).append("\n");
-                    builder.append("DISTANCIA: "+beacon.getDistance()).append("\n");
-                    builder.append("================================").append("\n");
+                    builder.append("DISTANCIA 1: "+distancia).append("\n");
+                    builder.append("DISTANCIA 2: "+beacon.getDistance()).append("\n");
+                    builder.append("====================").append("\n");
                 }
+
+
                 showToastMessage(builder.toString());
             }
         };
@@ -122,6 +126,20 @@ public class StatusActivity extends Activity implements BeaconConsumer {
             beaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
             beaconManager.addRangeNotifier(rangeNotifier);*/
         } catch (RemoteException e) {   }
+    }
+
+    protected static double calculateDistance(int measuredPower, double rssi) {
+        if (rssi == 0) {
+            return -1.0; // if we cannot determine distance, return -1.
+        }
+        double ratio = rssi*1.0/measuredPower;
+        if (ratio < 1.0) {
+            return Math.pow(ratio,10);
+        }
+        else {
+            double distance =  (0.89976)*Math.pow(ratio,7.7095) + 0.111;
+            return distance;
+        }
     }
 
 

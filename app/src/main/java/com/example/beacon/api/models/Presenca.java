@@ -35,6 +35,16 @@ public class Presenca implements Serializable {
         this.idsBeacons = idsBeacons;
     }
 
+    public Presenca falta(){
+        this.status = "FALTA";
+        return this;
+    }
+
+    public Presenca presente(){
+        this.status = "PRESENTE";
+        return this;
+    }
+
     public String getIdAcademico() {
         return idAcademico;
     }
