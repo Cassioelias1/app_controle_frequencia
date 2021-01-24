@@ -78,6 +78,8 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     private boolean teste = true;
     private Context context = this;
 
+    private Map<String, double> beaconDistanceMap = new HashMap<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,9 +197,79 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
     //este método deve ser responsavel por aplicar a trilateração
     private boolean academicoEstaDentroSalaAula(){
+        //criar um map String, double = IDBEACON & DISTANCIA
+        
+        Map<String, double> map = getBeaconDistanceMap();
+        if(map.size() < 3){
+            return false;//se não está captando pelo menos 3 beacons significa que o academico não está em sala de aula.
+        }
+
+        BigDecimal distanciaE;
+        BigDecimal distanciaF;
+        BigDecimal distanciaG;
+
+        BigDecimal posicaoYBeacon2 = new BigDecimal("2");//rever este beacon e definir sua posição.
+        BigDecimal posicaoXBeacon3 = new BigDecimal("2");//rever este beacon e definir sua posição.
+        BigDecimal posicaoYBeacon3 = new BigDecimal("2");//rever este beacon e definir sua posição.
+
+        map.forEach((idBeacon, distancia) -> {
+            if(idBeacon.equals(ID_BEACON_POSICAO_15_0_25)){
+                distanciaE = new BigDecimal(distancia);
+            }
+            //criar o restante das constantes representantes de beacons
+        });
+
+        if(distanciaE == null || distanciaF == null || distanciaG == null){
+            return false;
+        }
+
+        BigDecimal posX = BigDecimal.valueOf(Math.pow(distanciaE, 2) - Math.pow(distanciaF, 2) + Math.pow(posicaoYBeacon2, 2))
+        .divide(new BigDecimal("2").multiply(posicaoYBeacon2));
+
+        BigDecimal posY = BigDecimal.valueOf(Math.pow(distanciaE, 2) - Math.pow(distanciaG, 2) + Math.pow(posicaoXBeacon3, 2) + Math.pow(posicaoYBeacon3, 2))
+        .divide(new BigDecimal("2").multiply(posicaoYBeacon3))
+        .subtract(posicaoXBeacon3.divide(posicaoYBeacon3))
+        .multiply(posX);
+
         teste = !teste;
         return teste;
     }
+
+    //testar melhor
+    private BigDecimal calcularDistanciaByRssi(double rssi){
+        BigDecimal txPower = new BigDecimal("-59");
+
+        if(rssi == 0){
+            return new BigDecimal("-1");
+        }
+
+        BigDecimal ratio = new BigDecimal(rssi).multiply(BigDecimal.ONE).divide(txPower);
+
+        if(ratio.compareTo(BigDecimal.ONE) < 0){
+            return Math.pow(ratio, 10);
+        } else {
+            return new BigDecimal("0.89976")
+            .multiply(Math.pow(ratio, 7.7095))
+            .add(new BigDecimal("0.111"));
+        }
+    }
+
+    /*
+    var txPower = -59 //hard coded power value. Usually ranges between -59 to -65
+  
+  if (rssi == 0) {
+    return -1.0; 
+  }
+
+  var ratio = rssi*1.0/txPower;
+  if (ratio < 1.0) {
+    return Math.pow(ratio,10);
+  }
+  else {
+    var distance =  (0.89976)*Math.pow(ratio,7.7095) + 0.111;    
+    return distance;
+  }
+    */
 
     private void validarPresencaApi(Presenca presenca, MaterialCardView materialCardView, TextView textView){
         API.validarPresenca(presenca, new Callback<Presenca>() {
@@ -467,12 +539,22 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                 if (beacons.size() > 0) {
                     builder.delete(0, builder.length());
                     builder.append("Quantidade de beacons localizado: ").append(beacons.size()).append("\n");
+
+                    Map<String, double> map = getBeaconDistanceMap();
+                    if(map == null){
+                        map = new HashMap<>();
+                    } else {
+                        map.clear();
+                    }
+
                     for (Beacon beacon : beacons) {
                         builder.append("ID1: "+beacon.getId1()).append("\n");
                         builder.append("DISTANCIA em METROS: "+BigDecimal.valueOf(beacon.getDistance()).setScale(2, RoundingMode.HALF_UP)).append("\n");
                         builder.append("DISTANCIA em CM: "+toCm(beacon.getDistance())).append("\n");
                         builder.append("====================").append("\n");
+                        map.put(beacon.getId1(), beacon.getDistance());
                     }
+                    setBeaconDistanceMap(map);
                     showToastMessage(builder.toString());
                 }
             }
@@ -503,5 +585,13 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
             }
         }, ID_SIMULATE_ACADEMICO);
+    }
+
+    public Map<String, double> getBeaconDistanceMap(){
+        return this.beaconDistanceMap;
+    }
+
+    public void setBeaconDistanceMap(Map<String, double> beaconDistanceMap){
+        this.beaconDistanceMap = beaconDistanceMap;
     }
 }
