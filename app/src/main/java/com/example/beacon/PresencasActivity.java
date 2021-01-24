@@ -26,7 +26,7 @@ public class PresencasActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()){
                     case R.id.status:
-                        startActivity(new Intent(getApplicationContext(), StatusActivity.class));
+                        startActivity(new Intent(getApplicationContext(), RequestPermissionActivity.class));
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.aulas:

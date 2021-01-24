@@ -8,8 +8,14 @@ public class Presenca implements Serializable {
     @SerializedName("id_academico")
     private String idAcademico;
 
-    @SerializedName("id_beacon")
-    private String idBeacon;
+    @SerializedName("id_beacon_1")
+    private String idBeacon1;
+
+    @SerializedName("id_beacon_2")
+    private String idBeacon2;
+
+    @SerializedName("id_beacon_3")
+    private String idBeacon3;
 
     @SerializedName("id_turma")
     private String idTurma;
@@ -26,23 +32,21 @@ public class Presenca implements Serializable {
     @SerializedName("status")
     private String status;//transformar em enum
 
+    @SerializedName("posicao_x")
+    private String posicaoX;
+
+    @SerializedName("posicao_y")
+    private String posicaoY;
+
     public Presenca() {}
 
-    public Presenca(String idAcademico, String idBeacon, String data, String idsBeacons) {
+    public Presenca(String idAcademico, String idBeacon1, String idBeacon2, String idBeacon3, String data) {
         this.idAcademico = idAcademico;
-        this.idBeacon = idBeacon;
+        this.idBeacon1 = idBeacon1;
+        this.idBeacon2 = idBeacon2;
+        this.idBeacon3 = idBeacon3;
+        this.idTurma = idTurma;
         this.data = data;
-        this.idsBeacons = idsBeacons;
-    }
-
-    public Presenca falta(){
-        this.status = "FALTA";
-        return this;
-    }
-
-    public Presenca presente(){
-        this.status = "PRESENTE";
-        return this;
     }
 
     public String getIdAcademico() {
@@ -53,12 +57,28 @@ public class Presenca implements Serializable {
         this.idAcademico = idAcademico;
     }
 
-    public String getIdBeacon() {
-        return idBeacon;
+    public String getIdBeacon1() {
+        return idBeacon1;
     }
 
-    public void setIdBeacon(String idBeacon) {
-        this.idBeacon = idBeacon;
+    public void setIdBeacon1(String idBeacon1) {
+        this.idBeacon1 = idBeacon1;
+    }
+
+    public String getIdBeacon2() {
+        return idBeacon2;
+    }
+
+    public void setIdBeacon2(String idBeacon2) {
+        this.idBeacon2 = idBeacon2;
+    }
+
+    public String getIdBeacon3() {
+        return idBeacon3;
+    }
+
+    public void setIdBeacon3(String idBeacon3) {
+        this.idBeacon3 = idBeacon3;
     }
 
     public String getIdTurma() {
@@ -99,5 +119,25 @@ public class Presenca implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getPosicaoX() {
+        return posicaoX;
+    }
+
+    public void setPosicaoX(String posicaoX) {
+        this.posicaoX = posicaoX;
+    }
+
+    public String getPosicaoY() {
+        return posicaoY;
+    }
+
+    public void setPosicaoY(String posicaoY) {
+        this.posicaoY = posicaoY;
+    }
+
+    public void setStatusTrilateracao(boolean estaDentroSalaAula){
+        this.status = estaDentroSalaAula ? "PRESENTE" : "AUSENTE";
     }
 }

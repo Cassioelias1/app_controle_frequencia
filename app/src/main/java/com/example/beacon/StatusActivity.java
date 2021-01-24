@@ -183,7 +183,7 @@ public class StatusActivity extends Activity implements BeaconConsumer {
                             if (agora.getHour() == horarioPresenca.getHour() && agora.getMinute() == horarioPresenca.getMinute()){
                                 String idsBeacons = identificadoresBeacons.stream().map(i -> i.toString().join(",")).toString();
                                 //Se não tiver pelo menos 3 idsBeacon significa que o aluno não esta dentro da sala de aula, implementar outras validações (trilateração)
-                                Presenca presenca = new Presenca(ID_SIMULATE_ACADEMICO, KEY_SIMULATE_BEACON, LocalDateTime.now().toString(), idsBeacons);
+                                Presenca presenca = null;
                                 API.validarPresenca(presenca, new Callback<Presenca>() {
                                     @Override
                                     public void onResponse(Call<Presenca> call, Response<Presenca> response) {

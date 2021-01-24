@@ -46,19 +46,23 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class RequestPermissionActivity extends AppCompatActivity implements BeaconConsumer, RangeNotifier {
-    //15 é em metros o ponto x
+    //y = 3,70 | x= 4,55 | z = 2,60
+    //0 é em metros o ponto x
     //0 é em metros o ponto y
-    //25 é em metros o ponto z
-    private static final String ID_BEACON_POSICAO_15_0_25 = "0x0077656c6c636f726573736407";
+    //2,6 é em metros o ponto z
+    //370 / 2 = 185
+    private static final String ID_BEACON_POSICAO_0_0_0 = "0x0077656c6c636f726573736407";
+    private static final String ID_BEACON_POSICAO_0_370_0 = "2";
+    private static final String ID_BEACON_POSICAO_455_185_260 = "3";
     private static final String ID_SIMULATE_ACADEMICO = "1";
     private Handler handler;
 
@@ -72,13 +76,12 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     private BeaconManager mBeaconManager;
     private Region mRegion;
 
-    private Set<Integer> identificadoresBeacons = new HashSet<>();
     private BackgroundPowerSaver backgroundPowerSaver;
     private RegionBootstrap regionBootstrap;
     private boolean teste = true;
     private Context context = this;
 
-    private Map<String, double> beaconDistanceMap = new HashMap<>();
+    private Map<String, Double> beaconDistanceMap = new HashMap<>();
 
 
     @Override
@@ -115,7 +118,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         MaterialCardView materialCardView2140 = findViewById(R.id.card4);
         TextView textView2140 = findViewById(R.id.textView2140);
 //
-        onInitThread(materialCardView1915, textView1915, 13, 35);
+        onInitThread(materialCardView1915, textView1915, 20, 11);
         onInitThread(materialCardView2015, textView2015, 13, 36);
         onInitThread(materialCardView2100, textView2100, 13, 37);
         onInitThread(materialCardView2140, textView2140, 13, 38);
@@ -171,20 +174,13 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                         LocalDateTime agora = LocalDateTime.now();
                         LocalDateTime primeiroHorario = LocalDateTime.of(agora.getYear(), agora.getMonth(), agora.getDayOfMonth(), hour, minute);
                         if (agora.getHour() == primeiroHorario.getHour() && agora.getMinute() == primeiroHorario.getMinute()){
-                            String idsBeacons = identificadoresBeacons.stream().map(i -> i.toString().join(",")).toString();
 
                             //Se não tiver pelo menos 3 idsBeacon significa que o aluno não esta dentro da sala de aula, implementar outras validações (trilateração)
-                            Presenca presenca = new Presenca(ID_SIMULATE_ACADEMICO, ID_BEACON_POSICAO_15_0_25, LocalDateTime.now().toString(), idsBeacons);
+                            Presenca presenca = new Presenca(ID_SIMULATE_ACADEMICO, ID_BEACON_POSICAO_0_0_0, ID_BEACON_POSICAO_0_370_0, ID_BEACON_POSICAO_455_185_260, LocalDateTime.now().toString());
 
+                            presenca.setStatusTrilateracao(academicoEstaDentroSalaAula());
+                            validarPresencaApi(presenca, materialCardView, textView);
 
-
-                            if (academicoEstaDentroSalaAula()) {
-                                presenca.presente();
-                                validarPresencaApi(presenca, materialCardView, textView);
-                            } else {
-                                presenca.falta();
-                                validarPresencaApi(presenca, materialCardView, textView);
-                            }
                             presencaValidada[0] = true;
                         }
                     } catch (Exception e) {
@@ -197,79 +193,52 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
     //este método deve ser responsavel por aplicar a trilateração
     private boolean academicoEstaDentroSalaAula(){
-        //criar um map String, double = IDBEACON & DISTANCIA
-        
-        Map<String, double> map = getBeaconDistanceMap();
+
+        Map<String, Double> map = beaconDistanceMap;
         if(map.size() < 3){
             return false;//se não está captando pelo menos 3 beacons significa que o academico não está em sala de aula.
         }
 
-        BigDecimal distanciaE;
-        BigDecimal distanciaF;
-        BigDecimal distanciaG;
+        BigDecimal distanciaBeacon1 = null;
+        BigDecimal distanciaBeacon2 = null;
+        BigDecimal distanciaBeacon3 = null;
 
-        BigDecimal posicaoYBeacon2 = new BigDecimal("2");//rever este beacon e definir sua posição.
-        BigDecimal posicaoXBeacon3 = new BigDecimal("2");//rever este beacon e definir sua posição.
-        BigDecimal posicaoYBeacon3 = new BigDecimal("2");//rever este beacon e definir sua posição.
+        //beacon 1 = (0,0)
+        //beacon 2 = (0,3.7)
+        //beacon 3 = (4.55,1.85)
+        BigDecimal posicaoYBeacon2 = new BigDecimal("3.7");
+        BigDecimal posicaoXBeacon3 = new BigDecimal("4.55");
+        BigDecimal posicaoYBeacon3 = new BigDecimal("1.85");
 
-        map.forEach((idBeacon, distancia) -> {
-            if(idBeacon.equals(ID_BEACON_POSICAO_15_0_25)){
-                distanciaE = new BigDecimal(distancia);
-            }
-            //criar o restante das constantes representantes de beacons
-        });
-
-        if(distanciaE == null || distanciaF == null || distanciaG == null){
+        if (true){
             return false;
         }
 
-        BigDecimal posX = BigDecimal.valueOf(Math.pow(distanciaE, 2) - Math.pow(distanciaF, 2) + Math.pow(posicaoYBeacon2, 2))
-        .divide(new BigDecimal("2").multiply(posicaoYBeacon2));
+        for (Map.Entry<String, Double> m : map.entrySet()) {
+            if (m.getKey().equals(ID_BEACON_POSICAO_0_0_0)){
+                distanciaBeacon1 = new BigDecimal(m.getValue());
+            } else if(m.getKey().equals(ID_BEACON_POSICAO_0_370_0)){
+                distanciaBeacon2 = new BigDecimal(m.getValue());
+            } else if(m.getKey().equals(ID_BEACON_POSICAO_455_185_260)) {
+                distanciaBeacon3 = new BigDecimal(m.getValue());
+            }
+        }
 
-        BigDecimal posY = BigDecimal.valueOf(Math.pow(distanciaE, 2) - Math.pow(distanciaG, 2) + Math.pow(posicaoXBeacon3, 2) + Math.pow(posicaoYBeacon3, 2))
-        .divide(new BigDecimal("2").multiply(posicaoYBeacon3))
-        .subtract(posicaoXBeacon3.divide(posicaoYBeacon3))
-        .multiply(posX);
+        if(distanciaBeacon1 == null || distanciaBeacon2 == null || distanciaBeacon3 == null){
+            return false;
+        }
+
+        final BigDecimal DOIS = new BigDecimal("2");
+
+        BigDecimal posX = distanciaBeacon1.pow(2).subtract(distanciaBeacon2.pow(2)).add(posicaoYBeacon2.pow(2))
+                .divide(DOIS.multiply(posicaoYBeacon2), RoundingMode.HALF_UP);
+
+        BigDecimal posY = distanciaBeacon1.pow(2).subtract(distanciaBeacon3.pow(2)).add(posicaoXBeacon3.pow(2)).add(posicaoYBeacon3.pow(2))
+                .divide(DOIS.multiply(posicaoYBeacon3), RoundingMode.HALF_UP).subtract(posicaoXBeacon3.divide(posicaoYBeacon3, RoundingMode.HALF_UP)).multiply(posX);
 
         teste = !teste;
         return teste;
     }
-
-    //testar melhor
-    private BigDecimal calcularDistanciaByRssi(double rssi){
-        BigDecimal txPower = new BigDecimal("-59");
-
-        if(rssi == 0){
-            return new BigDecimal("-1");
-        }
-
-        BigDecimal ratio = new BigDecimal(rssi).multiply(BigDecimal.ONE).divide(txPower);
-
-        if(ratio.compareTo(BigDecimal.ONE) < 0){
-            return Math.pow(ratio, 10);
-        } else {
-            return new BigDecimal("0.89976")
-            .multiply(Math.pow(ratio, 7.7095))
-            .add(new BigDecimal("0.111"));
-        }
-    }
-
-    /*
-    var txPower = -59 //hard coded power value. Usually ranges between -59 to -65
-  
-  if (rssi == 0) {
-    return -1.0; 
-  }
-
-  var ratio = rssi*1.0/txPower;
-  if (ratio < 1.0) {
-    return Math.pow(ratio,10);
-  }
-  else {
-    var distance =  (0.89976)*Math.pow(ratio,7.7095) + 0.111;    
-    return distance;
-  }
-    */
 
     private void validarPresencaApi(Presenca presenca, MaterialCardView materialCardView, TextView textView){
         API.validarPresenca(presenca, new Callback<Presenca>() {
@@ -334,44 +303,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         }.start();
     }
 
-//    @Override
-//    public void onBeaconServiceConnect() {
-//        showToastMessage(getString(R.string.start_looking_for_beacons));
-//
-//        RangeNotifier rangeNotifier = new RangeNotifier() {
-//            @Override
-//            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-//                if (beacons.size() > 0) {
-//                    //Log.d(TAG, "didRangeBeaconsInRegion called with beacon count:  "+beacons.size());
-//                    Beacon firstBeacon = beacons.iterator().next();
-//                    showToastMessage("The first beacon " + firstBeacon.toString() + " is about " + firstBeacon.getDistance() + " meters away.");
-//                } else {
-//                    showToastMessage("NAO ENCONTREI NADA");
-//                }
-//            }
-//
-//        };
-//        try {
-//            mBeaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
-//            mBeaconManager.addRangeNotifier(rangeNotifier);
-//            mBeaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
-//            mBeaconManager.addRangeNotifier(rangeNotifier);
-//        } catch (RemoteException e) {   }
-//
-////        try {
-////            // Empezar a buscar los beacons que encajen con el el objeto Región pasado, incluyendo
-////            // actualizaciones en la distancia estimada
-////            mBeaconManager.startRangingBeaconsInRegion(mRegion);
-////
-////            showToastMessage(getString(R.string.start_looking_for_beacons));
-////
-////        } catch (RemoteException e) {
-////            Log.d(TAG, "Se ha producido una excepción al empezar a buscar beacons " + e.getMessage());
-////        }
-////
-////        mBeaconManager.addRangeNotifier(this);
-//    }
-
     @Override
     public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
         if (beacons.size() == 0) {
@@ -385,10 +316,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
             showToastMessage(getString(R.string.beacon_detected, beacon.getId3()));
 
-            //calcula a distancia a partida do rssi
-            double distanciaBeacon = BeaconUtils.calculateBeaconDistance(beacon);
-
-            identificadoresBeacons.add(beacon.getId3().toInt());//Verificar qual é o id correto assim que tiver o beacon em mãos
         }
     }
 
@@ -540,22 +467,18 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                     builder.delete(0, builder.length());
                     builder.append("Quantidade de beacons localizado: ").append(beacons.size()).append("\n");
 
-                    Map<String, double> map = getBeaconDistanceMap();
-                    if(map == null){
-                        map = new HashMap<>();
-                    } else {
-                        map.clear();
+                    if (!beaconDistanceMap.isEmpty()){
+                        beaconDistanceMap.clear();
                     }
 
                     for (Beacon beacon : beacons) {
                         builder.append("ID1: "+beacon.getId1()).append("\n");
                         builder.append("DISTANCIA em METROS: "+BigDecimal.valueOf(beacon.getDistance()).setScale(2, RoundingMode.HALF_UP)).append("\n");
-                        builder.append("DISTANCIA em CM: "+toCm(beacon.getDistance())).append("\n");
+                        builder.append("DISTANCIA NOVO: "+BeaconUtils.calcularDistanciaByRssi(beacon)).append("\n");
                         builder.append("====================").append("\n");
-                        map.put(beacon.getId1(), beacon.getDistance());
+                        //beaconDistanceMap.put(beacon.getId1().toString(), beacon.getDistance());
                     }
-                    setBeaconDistanceMap(map);
-                    showToastMessage(builder.toString());
+                    //showToastMessage(builder.toString());
                 }
             }
 
@@ -569,7 +492,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     }
 
     private BigDecimal toCm(double valor){
-
         return BigDecimal.valueOf(valor * 100).setScale(2, RoundingMode.HALF_UP);
     }
 
@@ -585,13 +507,5 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
             }
         }, ID_SIMULATE_ACADEMICO);
-    }
-
-    public Map<String, double> getBeaconDistanceMap(){
-        return this.beaconDistanceMap;
-    }
-
-    public void setBeaconDistanceMap(Map<String, double> beaconDistanceMap){
-        this.beaconDistanceMap = beaconDistanceMap;
     }
 }

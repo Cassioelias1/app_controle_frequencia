@@ -4,8 +4,6 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,29 +11,79 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-
-import com.example.beacon.context.AppContext;
-import com.example.beacon.utils.Util;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import org.altbeacon.beacon.BeaconManager;
 
 public class MainActivity extends Activity {
-    protected static final String TAG = "MonitoringActivity";
     private static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
     private static final int PERMISSION_REQUEST_BACKGROUND_LOCATION = 2;
-    Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login);
 
-        initButtons();
         verificarBluetooth();
         verificarDemaisPermission();
 
         //Variavel responsável pelo serviço de notificações
-        AppContext.setNotificationManager((NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE));
+        //AppContext.setNotificationManager((NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE));
+
+        initButtons();
+    }
+
+    private void initButtons(){
+        Button buttonAuthLogin = findViewById(R.id.buttonAuthLogin);
+        buttonAuthLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onAuthAcademico();
+            }
+        });
+    }
+
+    private void showTextNotCredencials(){
+        Toast.makeText(this, "Não encontramos um usuário com essas credenciais.", Toast.LENGTH_LONG).show();
+    }
+
+    private void onAuthAcademico() {
+        EditText editEmail = findViewById(R.id.editEmail);
+        EditText editSenha = findViewById(R.id.editPassword);
+        String email = editEmail.getText().toString();
+        String senha = editSenha.getText().toString();
+        redirectToCentralApp();
+        /*if (!Util.isNullOrEmpty(email) && !Util.isNullOrEmpty(senha)) {
+            API.validarLogin(new Callback<List<Academico>>() {
+                @Override
+                public void onResponse(Call<List<Academico>> call, Response<List<Academico>> response) {
+                    if (!response.body().isEmpty()){
+                        Academico academico = response.body().get(0);
+
+                        if (academico != null) {
+                            AppContext.setAcademicoId(academico.getId());
+                            redirectToCentralApp();
+                        }
+                    } else {
+                        showTextNotCredencials();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Academico>> call, Throwable t) {
+                    //Não faz nada
+                }
+            }, email, senha);
+
+        } else {
+            Toast.makeText(this, "Não foi informado o E-mail ou a Senha!", Toast.LENGTH_LONG).show();
+        }*/
+    }
+
+    private void redirectToCentralApp() {
+        Intent itImc = new Intent(MainActivity.this, RequestPermissionActivity.class);
+        startActivity(itImc);
     }
 
     private void verificarDemaisPermission() {
@@ -136,41 +184,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        BeaconReferenceApplication application = (BeaconReferenceApplication) this.getApplicationContext();
-        application.setMonitoringActivity(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        ((BeaconReferenceApplication) this.getApplicationContext()).setMonitoringActivity(null);
-    }
-
-    private void initButtons() {
-        Button buttonRegistro = findViewById(R.id.buttonRegistro);
-        buttonRegistro.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            Intent itImc = new Intent(MainActivity.this, RegistroActivity.class);
-//            startActivity(itImc);
-                NotificationManager notificationManager = AppContext.getNotificationManager();
-                if (notificationManager != null){
-                    Util.sendNotification("Teste", "Teste", notificationManager, context);
-                }
-            }
-        });
-        Button buttonLogin = findViewById(R.id.buttonLogin);
-        buttonLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            Intent itImc = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(itImc);
-            }
-        });
-    }
 
     private void verificarBluetooth() {
         try {
@@ -201,11 +214,8 @@ public class MainActivity extends Activity {
                     //finish();
                     //System.exit(0);
                 }
-
             });
             builder.show();
-
         }
-
     }
 }
