@@ -42,6 +42,7 @@ import org.altbeacon.beacon.startup.RegionBootstrap;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,16 +107,16 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
         backgroundPowerSaver = new BackgroundPowerSaver(this);
 
-        MaterialCardView materialCardView1915 = findViewById(R.id.card);
+        MaterialCardView materialCardView1915 = findViewById(R.id.card_19_15);
         TextView textView1915 = findViewById(R.id.textView1915);
 
-        MaterialCardView materialCardView2015 = findViewById(R.id.card2);
+        MaterialCardView materialCardView2015 = findViewById(R.id.card_20_15);
         TextView textView2015 = findViewById(R.id.textView2015);
 
-        MaterialCardView materialCardView2100 = findViewById(R.id.card3);
+        MaterialCardView materialCardView2100 = findViewById(R.id.card_21_00);
         TextView textView2100 = findViewById(R.id.textView2100);
 
-        MaterialCardView materialCardView2140 = findViewById(R.id.card4);
+        MaterialCardView materialCardView2140 = findViewById(R.id.card_21_40);
         TextView textView2140 = findViewById(R.id.textView2140);
 //
         onInitThread(materialCardView1915, textView1915, 20, 11);
@@ -165,6 +166,8 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     }
 
     private void onInitThread(final MaterialCardView materialCardView, final TextView textView, final Integer hour, final Integer minute) {
+//        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+//        Util.sendNotification("Noti", textView.getId()+"", notificationManager, context);
         final boolean[] presencaValidada = {false};
         new Thread() {
             @Override
@@ -176,7 +179,8 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                         if (agora.getHour() == primeiroHorario.getHour() && agora.getMinute() == primeiroHorario.getMinute()){
 
                             //Se não tiver pelo menos 3 idsBeacon significa que o aluno não esta dentro da sala de aula, implementar outras validações (trilateração)
-                            Presenca presenca = new Presenca(ID_SIMULATE_ACADEMICO, ID_BEACON_POSICAO_0_0_0, ID_BEACON_POSICAO_0_370_0, ID_BEACON_POSICAO_455_185_260, LocalDateTime.now().toString());
+                            Presenca presenca = new Presenca(ID_SIMULATE_ACADEMICO, ID_BEACON_POSICAO_0_0_0, ID_BEACON_POSICAO_0_370_0, ID_BEACON_POSICAO_455_185_260,
+                                    LocalDateTime.now().toString(), materialCardView.getId()+"", textView.getId()+"");
 
                             presenca.setStatusTrilateracao(academicoEstaDentroSalaAula());
                             validarPresencaApi(presenca, materialCardView, textView);
@@ -209,10 +213,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         BigDecimal posicaoYBeacon2 = new BigDecimal("3.7");
         BigDecimal posicaoXBeacon3 = new BigDecimal("4.55");
         BigDecimal posicaoYBeacon3 = new BigDecimal("1.85");
-
-        if (true){
-            return false;
-        }
 
         for (Map.Entry<String, Double> m : map.entrySet()) {
             if (m.getKey().equals(ID_BEACON_POSICAO_0_0_0)){
@@ -458,25 +458,27 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
     @Override
     public void onBeaconServiceConnect() {
-        StringBuilder builder = new StringBuilder();
+//        StringBuilder builder = new StringBuilder();
 
         RangeNotifier rangeNotifier = new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
                 if (beacons.size() > 0) {
-                    builder.delete(0, builder.length());
-                    builder.append("Quantidade de beacons localizado: ").append(beacons.size()).append("\n");
+//                    builder.delete(0, builder.length());
+//                    builder.append("Quantidade de beacons localizado: ").append(beacons.size()).append("\n");
 
                     if (!beaconDistanceMap.isEmpty()){
                         beaconDistanceMap.clear();
                     }
 
                     for (Beacon beacon : beacons) {
-                        builder.append("ID1: "+beacon.getId1()).append("\n");
-                        builder.append("DISTANCIA em METROS: "+BigDecimal.valueOf(beacon.getDistance()).setScale(2, RoundingMode.HALF_UP)).append("\n");
-                        builder.append("DISTANCIA NOVO: "+BeaconUtils.calcularDistanciaByRssi(beacon)).append("\n");
-                        builder.append("====================").append("\n");
-                        //beaconDistanceMap.put(beacon.getId1().toString(), beacon.getDistance());
+//                        builder.append("ID1: "+beacon.getId1()).append("\n");
+//                        builder.append("DISTANCIA em METROS: "+BigDecimal.valueOf(beacon.getDistance()).setScale(2, RoundingMode.HALF_UP)).append("\n");
+//                        builder.append("DISTANCIA NOVO: "+BeaconUtils.calcularDistanciaByRssi(beacon)).append("\n");
+//                        builder.append("====================").append("\n");
+
+                        Double distance = BeaconUtils.calcularDistanciaByRssi(beacon);
+                        beaconDistanceMap.put(beacon.getId1().toString(), distance);
                     }
                     //showToastMessage(builder.toString());
                 }
@@ -499,13 +501,35 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         API.getPresencaDiaAcademico(new Callback<List<Presenca>>() {
             @Override
             public void onResponse(Call<List<Presenca>> call, Response<List<Presenca>> response) {
+                List<Presenca> presencas = response.body();
 
+                if (presencas != null) {
+                    for (Presenca presenca : presencas) {
+                        String idMaterialCard = presenca.getMaterialCardId();
+                        String idTextView = presenca.getTextViewId();
+                        if (idMaterialCard != null && idTextView != null) {
+                            MaterialCardView materialCardView = findViewById(Integer.parseInt(presenca.getMaterialCardId()));
+                            TextView textView = findViewById(Integer.parseInt(idTextView));
+                            if (materialCardView != null && textView != null) {
+                                if ("PRESENTE".equals(presenca.getStatus())) {
+                                    materialCardView.setBackgroundColor(Color.parseColor("#11A33F"));
+                                    textView.setText("Presença válidada!");
+                                } else if ("FALTA".equals(presenca.getStatus())) {
+                                    materialCardView.setBackgroundColor(Color.parseColor("#b00e29"));
+                                    textView.setText("Falta computada!");
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    showToastMessage("NAO DEU, FALHA NO SERVIDOR");
+                }
             }
 
             @Override
             public void onFailure(Call<List<Presenca>> call, Throwable t) {
-
+                showToastMessage("ERRO REQUISICAO-> "+t.getMessage());
             }
-        }, ID_SIMULATE_ACADEMICO);
+        }, ID_SIMULATE_ACADEMICO, LocalDate.now().toString());
     }
 }

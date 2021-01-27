@@ -38,15 +38,22 @@ public class Presenca implements Serializable {
     @SerializedName("posicao_y")
     private String posicaoY;
 
+    @SerializedName("material_card_id")
+    private String materialCardId;
+
+    @SerializedName("text_view_id")
+    private String textViewId;
+
     public Presenca() {}
 
-    public Presenca(String idAcademico, String idBeacon1, String idBeacon2, String idBeacon3, String data) {
+    public Presenca(String idAcademico, String idBeacon1, String idBeacon2, String idBeacon3, String data, String materialCardId, String textViewId) {
         this.idAcademico = idAcademico;
         this.idBeacon1 = idBeacon1;
         this.idBeacon2 = idBeacon2;
         this.idBeacon3 = idBeacon3;
-        this.idTurma = idTurma;
         this.data = data;
+        this.materialCardId = materialCardId;
+        this.textViewId = textViewId;
     }
 
     public String getIdAcademico() {
@@ -139,5 +146,21 @@ public class Presenca implements Serializable {
 
     public void setStatusTrilateracao(boolean estaDentroSalaAula){
         this.status = estaDentroSalaAula ? "PRESENTE" : "AUSENTE";
+    }
+
+    public String getMaterialCardId() {
+        return materialCardId;
+    }
+
+    public void setMaterialCardId(String materialCardId) {
+        this.materialCardId = materialCardId;
+    }
+
+    public String getTextViewId() {
+        return textViewId;
+    }
+
+    public void setTextViewId(String textViewId) {
+        this.textViewId = textViewId;
     }
 }

@@ -43,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/card"
+                        android:id="@+id/card_19_15"
                         android:layout_width="178dp"
                         android:layout_height="wrap_content"
                         app:cardBackgroundColor="@color/colorOrange"
@@ -78,7 +78,7 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/card2"
+                        android:id="@+id/card_20_15"
                         android:layout_width="178dp"
                         android:layout_height="wrap_content"
                         app:cardBackgroundColor="@color/colorOrange"
@@ -117,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card3"
+                    android:id="@+id/card_21_00"
                     android:layout_width="178dp"
                     android:layout_height="wrap_content"
                     app:cardBackgroundColor="@color/colorOrange"
@@ -152,7 +152,7 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card4"
+                    android:id="@+id/card_21_40"
                     android:layout_width="178dp"
                     android:layout_height="wrap_content"
                     app:cardBackgroundColor="@color/colorOrange"

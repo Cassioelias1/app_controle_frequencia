@@ -55,8 +55,8 @@ public class StatusActivity extends Activity implements BeaconConsumer {
         List<HorarioValidacaoPresenca> horarioValidacaoPresencas = Arrays.asList(new HorarioValidacaoPresenca(19, 15),
                 new HorarioValidacaoPresenca(20, 15), new HorarioValidacaoPresenca(21, 00), new HorarioValidacaoPresenca(21, 40));
 
-        MaterialCardView materialCardView1915 = findViewById(R.id.card);
-        TextView textView1915 = findViewById(R.id.textView1915);
+//        MaterialCardView materialCardView1915 = findViewById(R.id.card);
+//        TextView textView1915 = findViewById(R.id.textView1915);
 //
 //        MaterialCardView materialCardView2015 = findViewById(R.id.card2);
 //        TextView textView2015 = findViewById(R.id.textView2015);
@@ -68,13 +68,13 @@ public class StatusActivity extends Activity implements BeaconConsumer {
 //        TextView textView2140 = findViewById(R.id.textView2140);
 
         List<MaterialCardView> materialCardViews = new ArrayList<>();
-        materialCardViews.add(materialCardView1915);
+//        materialCardViews.add(materialCardView1915);
 //        materialCardViews.add(materialCardView2015);
 //        materialCardViews.add(materialCardView2100);
 //        materialCardViews.add(materialCardView2140);
 
         List<TextView> textViews = new ArrayList<>();
-        textViews.add(textView1915);
+//        textViews.add(textView1915);
 //        textViews.add(textView2015);
 //        textViews.add(textView2100);
 //        textViews.add(textView2140);

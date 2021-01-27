@@ -18,5 +18,5 @@ public interface PresencaEndPoint {
     Call<Presenca> validarPresenca(@Body Presenca presenca);
 
     @GET("/api/presencas/getbyacademico")
-    Call<List<Presenca>> getPresencasValidadas(@Query("academicoId") final String academicoId);
+    Call<List<Presenca>> getPresencasValidadas(@Query("academico_id") final String academicoId, @Query("data_presenca") final String dataPresenca);
 }
