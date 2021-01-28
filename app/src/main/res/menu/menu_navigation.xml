@@ -9,8 +9,8 @@
         android:title="Aulas"
         android:icon="@drawable/ic_menu" />
     <item
-        android:id="@+id/presencas"
-        android:title="Presencas"
+        android:id="@+id/sincronizacao"
+        android:title="Sincronização"
         android:icon="@drawable/ic_notifications" />
 <!--    <item-->
 <!--        android:id="@+id/registro"-->

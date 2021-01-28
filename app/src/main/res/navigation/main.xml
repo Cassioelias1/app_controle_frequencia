@@ -8,13 +8,14 @@
     <activity
         android:id="@+id/menuProfile"
         android:name="com.example.beacon.StatusActivity"
-        android:label="Profle"
+        android:label="Profile"
         tools:layout="@layout/activity_status" />
+<!--  ISSO NAO É MAIS UTILIZADO  -->
 <!--    <activity-->
 <!--        android:id="@+id/menuPresencas"-->
-<!--        android:name="com.example.beacon.PresencasActivity"-->
+<!--        android:name="com.example.beacon.SincronizacaoActivityvity"-->
 <!--        android:label="Presenças"-->
-<!--        tools:layout="@layout/activity_presencas" />-->
+<!--        tools:layout="@layout/activity_sincronizacao" />-->
     <activity
         android:id="@+id/menuAulas"
         android:name="com.example.beacon.AulasActivity"

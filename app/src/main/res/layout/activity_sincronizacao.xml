@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="CUA CUACAUA" />
+            android:text="Construir aqui uma tela para sincronização de frequencias e implementar um banco interno (sqlite)" />
 <!--        <ListView-->
 <!--            android:id="@+id/listAulas"-->
 <!--            android:layout_width="wrap_content"-->

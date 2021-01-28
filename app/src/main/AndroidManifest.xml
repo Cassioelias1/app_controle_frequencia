@@ -27,7 +27,7 @@
         <activity android:name=".AulasActivity"></activity>
         <activity android:name=".DetalhamentoAulaActivity"></activity>
         <activity android:name=".StatusActivity"></activity>
-        <activity android:name=".PresencasActivity"></activity>
+        <activity android:name=".SincronizacaoActivity"></activity>
         <activity android:name=".RequestPermissionActivity"></activity>
         <service android:name="org.altbeacon.beacon.service.BeaconService"
             tools:node="replace">

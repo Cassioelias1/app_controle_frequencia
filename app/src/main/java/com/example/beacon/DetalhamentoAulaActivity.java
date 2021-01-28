@@ -40,8 +40,8 @@ public class DetalhamentoAulaActivity extends AppCompatActivity {
 //                        startActivity(new Intent(getApplicationContext(), AulasActivity.class));
 //                        overridePendingTransition(0, 0);
                         return true;
-                    case R.id.presencas:
-                        startActivity(new Intent(getApplicationContext(), PresencasActivity.class));
+                    case R.id.sincronizacao:
+                        startActivity(new Intent(getApplicationContext(), SincronizacaoActivity.class));
                         overridePendingTransition(0, 0);
                         return true;
                 }

@@ -155,8 +155,8 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                         startActivity(new Intent(getApplicationContext(), AulasActivity.class));
                         overridePendingTransition(0, 0);
                         return true;
-                    case R.id.presencas:
-                        startActivity(new Intent(getApplicationContext(), PresencasActivity.class));
+                    case R.id.sincronizacao:
+                        startActivity(new Intent(getApplicationContext(), SincronizacaoActivity.class));
                         overridePendingTransition(0, 0);
                         return true;
                 }
@@ -264,7 +264,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
             @Override
             public void onFailure(Call<Presenca> call, Throwable t) {
-                System.out.println("Erro na requisicao");
+                //TODO: Salvar o objeto Presenca dentro de um banco interno como o sqLite para que posteriormente seja possível fazer a sincronização.
             }
         });
     }

@@ -26,7 +26,7 @@ public class AulasActivity extends AppCompatActivity {
         final AulasActivity aulasActivity = this;
         initBottomNavigation();
 
-        List<Turma> turmas = Arrays.asList(new Turma("Teste"), new Turma("teste2"), new Turma("teste3"), new Turma("teste4"), new Turma("teste2"),new Turma("teste2"),new Turma("teste2"),new Turma("teste2"),new Turma("teste2"),new Turma("teste2"),new Turma("teste2"),new Turma("teste2"),new Turma("teste2"),new Turma("teste2"),new Turma("teste2"),new Turma("teste2"),new Turma("teste2"),new Turma("teste2"),new Turma("teste2"),new Turma("teste2"),new Turma("teste2"),new Turma("teste2"));
+        List<Turma> turmas = Arrays.asList(new Turma("Frequência Aula 1"), new Turma("Frequência Aula 2"));
 
         listAdapterTeste = new ListAdapterAulas(getApplicationContext(), aulasActivity, turmas);
         listAulas.setAdapter(listAdapterTeste);
@@ -63,8 +63,8 @@ public class AulasActivity extends AppCompatActivity {
 //                        startActivity(new Intent(getApplicationContext(), AulasActivity.class));
 //                        overridePendingTransition(0, 0);
                         return true;
-                    case R.id.presencas:
-                        startActivity(new Intent(getApplicationContext(), PresencasActivity.class));
+                    case R.id.sincronizacao:
+                        startActivity(new Intent(getApplicationContext(), SincronizacaoActivity.class));
                         overridePendingTransition(0, 0);
                         return true;
                 }
