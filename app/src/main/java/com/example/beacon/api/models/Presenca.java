@@ -44,6 +44,8 @@ public class Presenca implements Serializable {
     @SerializedName("text_view_id")
     private String textViewId;
 
+    private Integer idSqlite;
+
     public Presenca() {}
 
     public Presenca(String idAcademico, String idBeacon1, String idBeacon2, String idBeacon3, String data, String materialCardId, String textViewId) {
@@ -162,5 +164,13 @@ public class Presenca implements Serializable {
 
     public void setTextViewId(String textViewId) {
         this.textViewId = textViewId;
+    }
+
+    public Integer getIdSqlite() {
+        return idSqlite;
+    }
+
+    public void setIdSqlite(Integer idSqlite) {
+        this.idSqlite = idSqlite;
     }
 }

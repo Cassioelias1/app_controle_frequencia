@@ -2,6 +2,7 @@ package com.example.beacon;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,7 +27,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.beacon.api.API;
 import com.example.beacon.api.models.Presenca;
+import com.example.beacon.sqlite.BancoController;
 import com.example.beacon.utils.BeaconUtils;
+import com.example.beacon.utils.Util;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
 
@@ -140,6 +143,23 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
         initServiceFindBeacons();
         getPresencasJaValidadas();
+        initSqLite();
+    }
+
+    private void initSqLite() {
+        BancoController controller = new BancoController(context);
+//        String result = controller.save(LocalDateTime.now().toString(), 1, 1, "FALTA", 12345, 54321);
+        List<Presenca> presencas = controller.list();
+        controller.delete(1);
+
+        String a = "VAZIO";
+        for (Presenca presenca : presencas) {
+            a = presenca.getIdSqlite() + " - " + presenca.getStatus();
+        }
+
+        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+        Util.sendNotification("Noti", a, notificationManager, context);
+
     }
 
     private void initBottomNavigation(){
