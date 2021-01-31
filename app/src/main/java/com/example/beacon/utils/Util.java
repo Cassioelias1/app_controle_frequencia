@@ -8,6 +8,8 @@ import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.view.Gravity;
+import android.widget.Toast;
 
 import com.example.beacon.MainActivity;
 import com.example.beacon.R;
@@ -41,6 +43,12 @@ public class Util {
         builder.setContentText(contentNotificacao);
         builder.setContentIntent(resultPendingIntent);
         notificationManager.notify(1, builder.build());
+    }
+
+    public static void showToastMessage(Context context, String message) {
+        Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
 }

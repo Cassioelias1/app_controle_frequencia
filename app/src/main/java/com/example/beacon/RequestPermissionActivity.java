@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.beacon.api.API;
 import com.example.beacon.api.models.Presenca;
+import com.example.beacon.context.AppContext;
 import com.example.beacon.sqlite.BancoController;
 import com.example.beacon.utils.BeaconUtils;
 import com.example.beacon.utils.Util;
@@ -86,7 +87,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     private Context context = this;
 
     private Map<String, Double> beaconDistanceMap = new HashMap<>();
-
+    private BancoController controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,10 +123,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         MaterialCardView materialCardView2140 = findViewById(R.id.card_21_40);
         TextView textView2140 = findViewById(R.id.textView2140);
 //
-        onInitThread(materialCardView1915, textView1915, 20, 11);
-        onInitThread(materialCardView2015, textView2015, 13, 36);
-        onInitThread(materialCardView2100, textView2100, 13, 37);
-        onInitThread(materialCardView2140, textView2140, 13, 38);
+        onInitThread(materialCardView1915, textView1915, 14, 48, AppContext.getThread1915(), "1915");
+//        onInitThread(materialCardView2015, textView2015, 13, 36);
+//        onInitThread(materialCardView2100, textView2100, 13, 37);
+//        onInitThread(materialCardView2140, textView2140, 13, 38);
 
 //        List<MaterialCardView> materialCardViews = new ArrayList<>();
 //        materialCardViews.add(materialCardView1915);
@@ -143,23 +144,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
         initServiceFindBeacons();
         getPresencasJaValidadas();
-        initSqLite();
-    }
-
-    private void initSqLite() {
-        BancoController controller = new BancoController(context);
-//        String result = controller.save(LocalDateTime.now().toString(), 1, 1, "FALTA", 12345, 54321);
-        List<Presenca> presencas = controller.list();
-        controller.delete(1);
-
-        String a = "VAZIO";
-        for (Presenca presenca : presencas) {
-            a = presenca.getIdSqlite() + " - " + presenca.getStatus();
-        }
-
-        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-        Util.sendNotification("Noti", a, notificationManager, context);
-
     }
 
     private void initBottomNavigation(){
@@ -185,34 +169,51 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         });
     }
 
-    private void onInitThread(final MaterialCardView materialCardView, final TextView textView, final Integer hour, final Integer minute) {
-//        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-//        Util.sendNotification("Noti", textView.getId()+"", notificationManager, context);
+    private void onInitThread(final MaterialCardView materialCardView, final TextView textView, final Integer hour, final Integer minute, Thread thread, String enumThread) {
+        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         final boolean[] presencaValidada = {false};
-        new Thread() {
-            @Override
-            public void run() {
-                while (!presencaValidada[0]) {
-                    try {
-                        LocalDateTime agora = LocalDateTime.now();
-                        LocalDateTime primeiroHorario = LocalDateTime.of(agora.getYear(), agora.getMonth(), agora.getDayOfMonth(), hour, minute);
-                        if (agora.getHour() == primeiroHorario.getHour() && agora.getMinute() == primeiroHorario.getMinute()){
 
-                            //Se não tiver pelo menos 3 idsBeacon significa que o aluno não esta dentro da sala de aula, implementar outras validações (trilateração)
-                            Presenca presenca = new Presenca(ID_SIMULATE_ACADEMICO, ID_BEACON_POSICAO_0_0_0, ID_BEACON_POSICAO_0_370_0, ID_BEACON_POSICAO_455_185_260,
-                                    LocalDateTime.now().toString(), materialCardView.getId()+"", textView.getId()+"");
+        if (thread == null){
+            Util.sendNotification("TITULO", "THREADNULA", notificationManager, context);
+            thread = new Thread() {
+                @Override
+                public void run() {
+                    while (!presencaValidada[0]) {
+                        try {
+                            LocalDateTime agora = LocalDateTime.now();
+                            LocalDateTime primeiroHorario = LocalDateTime.of(agora.getYear(), agora.getMonth(), agora.getDayOfMonth(), hour, minute);
+                            if (agora.getHour() == primeiroHorario.getHour() && agora.getMinute() == primeiroHorario.getMinute()){
 
-                            presenca.setStatusTrilateracao(academicoEstaDentroSalaAula());
-                            validarPresencaApi(presenca, materialCardView, textView);
+                                //Se não tiver pelo menos 3 idsBeacon significa que o aluno não esta dentro da sala de aula, implementar outras validações (trilateração)
+                                //salvar turmaId no Context.
+                                Presenca presenca = new Presenca(ID_SIMULATE_ACADEMICO, "1",ID_BEACON_POSICAO_0_0_0, ID_BEACON_POSICAO_0_370_0, ID_BEACON_POSICAO_455_185_260,
+                                        LocalDateTime.now().toString(), materialCardView.getId()+"", textView.getId()+"");
 
-                            presencaValidada[0] = true;
+                                presenca.setStatusTrilateracao(academicoEstaDentroSalaAula());
+                                validarPresencaApi(presenca, materialCardView, textView);
+
+                                presencaValidada[0] = true;
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
                 }
+            };
+
+            switch (enumThread) {
+                case "1915":
+                    AppContext.setThread1915(thread);
+                    break;
+                case "2015":
+                    AppContext.setThread2015(thread);
+                    break;
             }
-        }.start();
+
+            if (!thread.isAlive()){
+                thread.start();
+            }
+        }
     }
 
     //este método deve ser responsavel por aplicar a trilateração
@@ -272,21 +273,30 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                                 if ("PRESENTE".equals(response.body().getStatus())){
                                     materialCardView.setBackgroundColor(Color.parseColor("#11A33F"));
                                     textView.setText("Presença válidada!");
-                                } else if("FALTA".equals(response.body().getStatus())) {
+                                } else if("AUSENTE".equals(response.body().getStatus())) {
                                     materialCardView.setBackgroundColor(Color.parseColor("#b00e29"));
                                     textView.setText("Falta computada!");
                                 }
                             }
                         });
                     }
+                } else {
+                    savePresencaNaoComputada(presenca, materialCardView.getId(), textView.getId());
                 }
             }
 
             @Override
             public void onFailure(Call<Presenca> call, Throwable t) {
-                //TODO: Salvar o objeto Presenca dentro de um banco interno como o sqLite para que posteriormente seja possível fazer a sincronização.
+                savePresencaNaoComputada(presenca, materialCardView.getId(), textView.getId());
             }
         });
+    }
+
+    private boolean savePresencaNaoComputada(Presenca presenca, Integer materialCardId, Integer textViewId){
+        if (controller == null) {
+            controller = new BancoController(context);
+        }
+        return controller.save(presenca.getData(), presenca.getIdAcademico(), presenca.getIdTurma(), presenca.getStatus(), materialCardId, textViewId);
     }
 
     private void resetCardsPresencas(final List<MaterialCardView> materialCardViews, final List<TextView> textViews, final Integer hour, final Integer minute){
@@ -335,7 +345,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
             }
 
             showToastMessage(getString(R.string.beacon_detected, beacon.getId3()));
-
         }
     }
 
@@ -541,8 +550,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                             }
                         }
                     }
-                } else {
-                    showToastMessage("NAO DEU, FALHA NO SERVIDOR");
                 }
             }
 

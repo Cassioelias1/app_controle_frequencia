@@ -15,7 +15,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class API {
-    private static final String URL = "https://a3e3f6f612ec.ngrok.io";
+    private static final String URL = "https://7196b3ec1e1e.ngrok.io";
 
     private static Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(URL)
@@ -35,6 +35,14 @@ public class API {
         Call<Presenca> call;
 
         call = endPoint.validarPresenca(presenca);
+        call.enqueue(callback);
+    }
+
+    public static void validarPresencasNaoComputadas(List<Presenca> presencas, final Callback<List<Presenca>> callback) {
+        PresencaEndPoint endPoint = retrofit.create(PresencaEndPoint.class);
+        Call<List<Presenca>> call;
+
+        call = endPoint.validarPresencaNaoComputadas(presencas);
         call.enqueue(callback);
     }
 

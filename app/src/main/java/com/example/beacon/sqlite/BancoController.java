@@ -19,7 +19,10 @@ public class BancoController {
         banco = new Banco(context);
     }
 
-    public String save(String data, Integer academicoId, Integer turmaId, String status, Integer materialCardId, Integer textViewId){
+    public boolean save(String data, String academicoId, String turmaId, String status, Integer materialCardId, Integer textViewId){
+        System.out.println("----------------------------------------------------------------------");
+        System.out.println("FAZENDO SAVE NO SQLITE");
+        System.out.println("----------------------------------------------------------------------");
         ContentValues valores;
         long result;
 
@@ -35,15 +38,10 @@ public class BancoController {
         result = db.insert("frequencias", null, valores);
         db.close();
 
-        if (result == -1) {
-            return "Erro ao inserir registro";
-        }
-
-        return "Registro Inserido com sucesso";
+        return result != -1;
     }
 
     public List<Presenca> list(){
-        String[] campos =  {"id", "data", "academico_id", "turma_id", "status", "material_card_id", "text_view_id"};
         db = banco.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM frequencias;", null);
 

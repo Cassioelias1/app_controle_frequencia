@@ -20,9 +20,12 @@ public class Banco extends SQLiteOpenHelper {
         sql.append("CREATE TABLE IF NOT EXISTS frequencias (");
         sql.append("id integer primary key autoincrement,");
         sql.append("data text,");
-        sql.append("academico_id integer,");
-        sql.append("turma_id integer,");
+        sql.append("academico_id text,");
+        sql.append("turma_id text,");
         sql.append("status text,");
+//        sql.append("id_beacon_1 text,");
+//        sql.append("id_beacon_2 text,");
+//        sql.append("id_beacon_3 text,");
         sql.append("material_card_id integer,");
         sql.append("text_view_id integer);");
 

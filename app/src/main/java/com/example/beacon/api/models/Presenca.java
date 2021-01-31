@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 public class Presenca implements Serializable {
-    @SerializedName("id_academico")
+    @SerializedName("academico_id")
     private String idAcademico;
 
     @SerializedName("id_beacon_1")
@@ -17,7 +17,7 @@ public class Presenca implements Serializable {
     @SerializedName("id_beacon_3")
     private String idBeacon3;
 
-    @SerializedName("id_turma")
+    @SerializedName("turma_id")
     private String idTurma;
 
     @SerializedName("data")
@@ -48,8 +48,9 @@ public class Presenca implements Serializable {
 
     public Presenca() {}
 
-    public Presenca(String idAcademico, String idBeacon1, String idBeacon2, String idBeacon3, String data, String materialCardId, String textViewId) {
+    public Presenca(String idAcademico, String turmaId, String idBeacon1, String idBeacon2, String idBeacon3, String data, String materialCardId, String textViewId) {
         this.idAcademico = idAcademico;
+        this.idTurma = turmaId;
         this.idBeacon1 = idBeacon1;
         this.idBeacon2 = idBeacon2;
         this.idBeacon3 = idBeacon3;
