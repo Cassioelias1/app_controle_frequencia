@@ -7,7 +7,6 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.beacon.context.AppContext;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class DetalhamentoAulaActivity extends AppCompatActivity {
@@ -17,11 +16,9 @@ public class DetalhamentoAulaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detalhamento_aula);
         initBottomNavigation();
-        Integer aulaId = AppContext.getAulaIdSelect();
-        if (aulaId == null) {
-            startActivity(new Intent(getApplicationContext(), AulasActivity.class));
-        }
         //Fazer o find no servidor para trazer as presenças validadas do aluno
+        //O find deve ser feito pelo id do academico e da turma onde ele está logado.
+        //Futuramente após implementar o login salvar o id da turma e do acamido no AppContext ou naquele SharedPreferences.
 
     }
 

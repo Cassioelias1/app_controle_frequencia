@@ -14,27 +14,27 @@ import androidx.annotation.Nullable;
 import com.example.beacon.AulasActivity;
 import com.example.beacon.DetalhamentoAulaActivity;
 import com.example.beacon.R;
-import com.example.beacon.api.models.Turma;
+import com.example.beacon.api.wrappers.PresencasAulasWrapper;
 import com.example.beacon.context.AppContext;
 
 import java.util.List;
 
-public class ListAdapterAulas extends ArrayAdapter<Turma> {
+public class ListAdapterAulas extends ArrayAdapter<PresencasAulasWrapper> {
 
     private Context context;
-    private List<Turma> itens;
+    private List<PresencasAulasWrapper> presencas;
     private AulasActivity aulasActivity;
-    public ListAdapterAulas(Context context, AulasActivity aulasActivity, List<Turma> itens){
-        super(context, 0, itens);
+    public ListAdapterAulas(Context context, AulasActivity aulasActivity, List<PresencasAulasWrapper> presencas){
+        super(context, 0, presencas);
         this.context = context;
-        this.itens = itens;
+        this.presencas = presencas;
         this.aulasActivity = aulasActivity;
     }
 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        final Turma turma = itens.get(position);
+        final PresencasAulasWrapper presenca = presencas.get(position);
 
         if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.list_item_aulas, null);
@@ -49,7 +49,7 @@ public class ListAdapterAulas extends ArrayAdapter<Turma> {
         });
 
         TextView dataSaida = convertView.findViewById(R.id.nome_item);
-        dataSaida.setText(turma.getDescricao());
+        dataSaida.setText(presenca.getDataPresenca() + " - " + presenca.getNomeTurma());
 
         return convertView;
     }

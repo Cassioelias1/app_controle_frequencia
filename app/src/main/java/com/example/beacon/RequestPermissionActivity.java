@@ -124,10 +124,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         TextView textView2140 = findViewById(R.id.textView2140);
 //
         onInitThread(materialCardView1915, textView1915, 14, 48, AppContext.getThread1915(), "1915");
-//        onInitThread(materialCardView2015, textView2015, 13, 36);
-//        onInitThread(materialCardView2100, textView2100, 13, 37);
-//        onInitThread(materialCardView2140, textView2140, 13, 38);
-
+        onInitThread(materialCardView2015, textView2015, 13, 36, AppContext.getThread2015(), "2015");
+        onInitThread(materialCardView2100, textView2100, 13, 37, AppContext.getThread2100(), "2100");
+        onInitThread(materialCardView2140, textView2140, 13, 38, AppContext.getThread2140(), "2140");
+//
 //        List<MaterialCardView> materialCardViews = new ArrayList<>();
 //        materialCardViews.add(materialCardView1915);
 //        materialCardViews.add(materialCardView2015);
@@ -207,6 +207,12 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                     break;
                 case "2015":
                     AppContext.setThread2015(thread);
+                    break;
+                case "2100":
+                    AppContext.setThread2100(thread);
+                    break;
+                case "2140":
+                    AppContext.setThread2140(thread);
                     break;
             }
 

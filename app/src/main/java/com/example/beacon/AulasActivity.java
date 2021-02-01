@@ -8,7 +8,7 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.beacon.api.models.Turma;
+import com.example.beacon.api.wrappers.PresencasAulasWrapper;
 import com.example.beacon.utils.ListAdapterAulas;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -16,8 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class AulasActivity extends AppCompatActivity {
-    private static final String ID_SIMULATE_ACADEMICO = "2";
-    private ListAdapterAulas listAdapterTeste;
+    private ListAdapterAulas listAdapterAulas;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,26 +25,13 @@ public class AulasActivity extends AppCompatActivity {
         final AulasActivity aulasActivity = this;
         initBottomNavigation();
 
-        List<Turma> turmas = Arrays.asList(new Turma("Frequência Aula 1"), new Turma("Frequência Aula 2"));
 
-        listAdapterTeste = new ListAdapterAulas(getApplicationContext(), aulasActivity, turmas);
-        listAulas.setAdapter(listAdapterTeste);
+        //Fazer um get no servidor para retornar todas as presencas agrupadas, o retorno na verdade vai ser um wrapper
+        //pois alguns informações estão em duas tabelas diferentes;
+        List<PresencasAulasWrapper> presencas = Arrays.asList(new PresencasAulasWrapper("31/10/2021", "Geografia"));
 
-//        API.getTurmasFromAcademicoId(new Callback<List<Turma>>() {
-//            @Override
-//            public void onResponse(Call<List<Turma>> call, Response<List<Turma>> response) {
-//                List<Turma> turmas = response.body();
-//                if (turmas != null && !turmas.isEmpty()) {
-//                    listAdapterTeste = new ListAdapterAulas(getApplicationContext(), aulasActivity, turmas);
-//                    listAulas.setAdapter(listAdapterTeste);
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<List<Turma>> call, Throwable t) {
-//                //Implementar tratamento?
-//            }
-//        }, ID_SIMULATE_ACADEMICO);
+        listAdapterAulas = new ListAdapterAulas(getApplicationContext(), aulasActivity, presencas);
+        listAulas.setAdapter(listAdapterAulas);
     }
 
     private void initBottomNavigation(){
