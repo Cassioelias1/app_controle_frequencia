@@ -3,8 +3,9 @@ package com.example.beacon.context;
 import android.app.NotificationManager;
 
 public class AppContext {
-    private static Integer ACADEMICO_ID = null;
-    private static Integer AULA_ID_SELECT = null;
+    private static String ACADEMICO_ID = null;
+    private static String TURMA_ID = null;
+    private static String NOME_TURMA = null;
     private static NotificationManager notificationManager = null;
 
     //thread
@@ -13,20 +14,28 @@ public class AppContext {
     private static Thread thread2100 = null;
     private static Thread thread2140 = null;
 
-    public static Integer getAcademicoId() {
+    public static String getNomeTurma() {
+        return NOME_TURMA;
+    }
+
+    public static void setNomeTurma(String nomeTurma) {
+        NOME_TURMA = nomeTurma;
+    }
+
+    public static String getAcademicoId() {
         return ACADEMICO_ID;
     }
 
-    public static void setAcademicoId(Integer academicoId) {
+    public static void setAcademicoId(String academicoId) {
         ACADEMICO_ID = academicoId;
     }
 
-    public static Integer getAulaIdSelect() {
-        return AULA_ID_SELECT;
+    public static String getTurmaId() {
+        return TURMA_ID;
     }
 
-    public static void setAulaIdSelect(Integer aulaIdSelect) {
-        AULA_ID_SELECT = aulaIdSelect;
+    public static void setTurmaId(String turmaId) {
+        TURMA_ID = turmaId;
     }
 
     public static NotificationManager getNotificationManager() {

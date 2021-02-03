@@ -15,7 +15,6 @@ import com.example.beacon.AulasActivity;
 import com.example.beacon.DetalhamentoAulaActivity;
 import com.example.beacon.R;
 import com.example.beacon.api.wrappers.PresencasAulasWrapper;
-import com.example.beacon.context.AppContext;
 
 import java.util.List;
 
@@ -35,21 +34,29 @@ public class ListAdapterAulas extends ArrayAdapter<PresencasAulasWrapper> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         final PresencasAulasWrapper presenca = presencas.get(position);
-
         if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.list_item_aulas, null);
         }
 
-        convertView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View o) {
-                AppContext.setAulaIdSelect(1);
-                aulasActivity.startActivity(new Intent(aulasActivity, DetalhamentoAulaActivity.class));
-            }
-        });
-
         TextView dataSaida = convertView.findViewById(R.id.nome_item);
-        dataSaida.setText(presenca.getDataPresenca() + " - " + presenca.getNomeTurma());
+
+        //Format formatter = new SimpleDateFormat("dd/MM/yy");
+        //String dataFormatada = formatter.format(presenca.getDataValidacao());
+
+        String text = presenca.getDataValidacao();
+        if (!presenca.isWithError()){
+            convertView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View o) {
+                    aulasActivity.startActivity(new Intent(aulasActivity, DetalhamentoAulaActivity.class));
+                }
+            });
+            text += " - " + presenca.getNomeTurma();
+        } else {
+            dataSaida.setEnabled(false);
+        }
+
+        dataSaida.setText(text);
 
         return convertView;
     }

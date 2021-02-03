@@ -1,6 +1,7 @@
 package com.example.beacon.api.endpoints;
 
 import com.example.beacon.api.models.Presenca;
+import com.example.beacon.api.wrappers.PresencasAulasWrapper;
 
 import java.util.List;
 
@@ -22,4 +23,7 @@ public interface PresencaEndPoint {
 
     @GET("/api/presencas/getbyacademico")
     Call<List<Presenca>> getPresencasValidadas(@Query("academico_id") final String academicoId, @Query("data_presenca") final String dataPresenca);
+
+    @GET("/api/presencas/getallbyacademico")
+    Call<List<PresencasAulasWrapper>> getAllPresencas(@Query("academico_id") final String academicoId);
 }

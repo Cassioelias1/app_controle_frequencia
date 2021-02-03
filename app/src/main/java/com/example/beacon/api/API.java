@@ -6,6 +6,8 @@ import com.example.beacon.api.endpoints.TurmaEndPoint;
 import com.example.beacon.api.models.Academico;
 import com.example.beacon.api.models.Presenca;
 import com.example.beacon.api.models.Turma;
+import com.example.beacon.api.wrappers.AcademicoTurmaWrapper;
+import com.example.beacon.api.wrappers.PresencasAulasWrapper;
 
 import java.util.List;
 
@@ -15,7 +17,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class API {
-    private static final String URL = "https://7196b3ec1e1e.ngrok.io";
+    private static final String URL = "https://e037769bd548.ngrok.io";
 
     private static Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(URL)
@@ -46,9 +48,9 @@ public class API {
         call.enqueue(callback);
     }
 
-    public static void validarLogin(final Callback<List<Academico>> callback, String email, String senha){
+    public static void validarLogin(final Callback<AcademicoTurmaWrapper> callback, String email, String senha){
         AcademicoEndPoint endPoint = retrofit.create(AcademicoEndPoint.class);
-        Call<List<Academico>> call;
+        Call<AcademicoTurmaWrapper> call;
 
         call = endPoint.GetAcademicoByEmailSenha(email, senha);
         call.enqueue(callback);
@@ -67,6 +69,14 @@ public class API {
         Call<List<Presenca>> call;
 
         call = endPoint.getPresencasValidadas(academicoId, dataPresenca);
+        call.enqueue(callback);
+    }
+
+    public static void getAllPresencas(final Callback<List<PresencasAulasWrapper>> callback, String academicoId) {
+        PresencaEndPoint endPoint = retrofit.create(PresencaEndPoint.class);
+        Call<List<PresencasAulasWrapper>> call;
+
+        call = endPoint.getAllPresencas(academicoId);
         call.enqueue(callback);
     }
 

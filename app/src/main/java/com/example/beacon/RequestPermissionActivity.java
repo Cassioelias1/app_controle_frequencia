@@ -123,10 +123,13 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         MaterialCardView materialCardView2140 = findViewById(R.id.card_21_40);
         TextView textView2140 = findViewById(R.id.textView2140);
 //
-        onInitThread(materialCardView1915, textView1915, 14, 48, AppContext.getThread1915(), "1915");
-        onInitThread(materialCardView2015, textView2015, 13, 36, AppContext.getThread2015(), "2015");
-        onInitThread(materialCardView2100, textView2100, 13, 37, AppContext.getThread2100(), "2100");
-        onInitThread(materialCardView2140, textView2140, 13, 38, AppContext.getThread2140(), "2140");
+        onInitThread(materialCardView1915, textView1915, 19, 0, AppContext.getThread1915(), "1915");
+        onInitThread(materialCardView2015, textView2015, 19, 1, AppContext.getThread2015(), "2015");
+        onInitThread(materialCardView2100, textView2100, 19, 2, AppContext.getThread2100(), "2100");
+        onInitThread(materialCardView2140, textView2140, 19, 3, AppContext.getThread2140(), "2140");
+
+        TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
+        textViewNomeDisciplica.setText(AppContext.getNomeTurma());
 //
 //        List<MaterialCardView> materialCardViews = new ArrayList<>();
 //        materialCardViews.add(materialCardView1915);
@@ -186,8 +189,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
                                 //Se não tiver pelo menos 3 idsBeacon significa que o aluno não esta dentro da sala de aula, implementar outras validações (trilateração)
                                 //salvar turmaId no Context.
-                                Presenca presenca = new Presenca(ID_SIMULATE_ACADEMICO, "1",ID_BEACON_POSICAO_0_0_0, ID_BEACON_POSICAO_0_370_0, ID_BEACON_POSICAO_455_185_260,
-                                        LocalDateTime.now().toString(), materialCardView.getId()+"", textView.getId()+"");
+                                Presenca presenca = new Presenca(ID_SIMULATE_ACADEMICO, "1", LocalDateTime.now().toString(), materialCardView.getId()+"", textView.getId()+"");
 
                                 presenca.setStatusTrilateracao(academicoEstaDentroSalaAula());
                                 validarPresencaApi(presenca, materialCardView, textView);
@@ -528,10 +530,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         } catch (RemoteException e) {   }
     }
 
-    private BigDecimal toCm(double valor){
-        return BigDecimal.valueOf(valor * 100).setScale(2, RoundingMode.HALF_UP);
-    }
-
     private void getPresencasJaValidadas(){
         API.getPresencaDiaAcademico(new Callback<List<Presenca>>() {
             @Override
@@ -549,7 +547,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                                 if ("PRESENTE".equals(presenca.getStatus())) {
                                     materialCardView.setBackgroundColor(Color.parseColor("#11A33F"));
                                     textView.setText("Presença válidada!");
-                                } else if ("FALTA".equals(presenca.getStatus())) {
+                                } else if ("AUSENTE".equals(presenca.getStatus())) {
                                     materialCardView.setBackgroundColor(Color.parseColor("#b00e29"));
                                     textView.setText("Falta computada!");
                                 }

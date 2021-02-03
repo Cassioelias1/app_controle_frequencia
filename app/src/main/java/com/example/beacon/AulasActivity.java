@@ -8,12 +8,17 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.beacon.api.API;
 import com.example.beacon.api.wrappers.PresencasAulasWrapper;
 import com.example.beacon.utils.ListAdapterAulas;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AulasActivity extends AppCompatActivity {
     private ListAdapterAulas listAdapterAulas;
@@ -25,13 +30,39 @@ public class AulasActivity extends AppCompatActivity {
         final AulasActivity aulasActivity = this;
         initBottomNavigation();
 
+        API.getAllPresencas(new Callback<List<PresencasAulasWrapper>>() {
+            @Override
+            public void onResponse(Call<List<PresencasAulasWrapper>> call, Response<List<PresencasAulasWrapper>> response) {
+                List<PresencasAulasWrapper> presencasAulasWrapperList = response.body();
+                if (presencasAulasWrapperList != null){
+
+                    listAdapterAulas = new ListAdapterAulas(getApplicationContext(), aulasActivity, presencasAulasWrapperList);
+                    listAulas.setAdapter(listAdapterAulas);
+                } else {
+                    PresencasAulasWrapper presencasAulasWrapper = new PresencasAulasWrapper("Nenhum registro encontrado", "");
+                    presencasAulasWrapper.setWithError(true);
+
+                    listAdapterAulas = new ListAdapterAulas(getApplicationContext(), aulasActivity, Collections.singletonList(presencasAulasWrapper));
+                    listAulas.setAdapter(listAdapterAulas);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<PresencasAulasWrapper>> call, Throwable t) {
+                PresencasAulasWrapper presencasAulasWrapper = new PresencasAulasWrapper("Nenhum registro encontrado", "");
+                presencasAulasWrapper.setWithError(true);
+
+                listAdapterAulas = new ListAdapterAulas(getApplicationContext(), aulasActivity, Collections.singletonList(presencasAulasWrapper));
+                listAulas.setAdapter(listAdapterAulas);
+            }
+        }, "1");
 
         //Fazer um get no servidor para retornar todas as presencas agrupadas, o retorno na verdade vai ser um wrapper
         //pois alguns informações estão em duas tabelas diferentes;
-        List<PresencasAulasWrapper> presencas = Arrays.asList(new PresencasAulasWrapper("31/10/2021", "Geografia"));
+    }
 
-        listAdapterAulas = new ListAdapterAulas(getApplicationContext(), aulasActivity, presencas);
-        listAulas.setAdapter(listAdapterAulas);
+    private void addInListAdapter(){
+
     }
 
     private void initBottomNavigation(){

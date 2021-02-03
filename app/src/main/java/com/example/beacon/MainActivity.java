@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,13 +13,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import org.altbeacon.beacon.BeaconManager;
 
 public class MainActivity extends Activity {
     private static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
     private static final int PERMISSION_REQUEST_BACKGROUND_LOCATION = 2;
+    private Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,46 +45,39 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void showTextNotCredencials(){
-        Toast.makeText(this, "Não encontramos um usuário com essas credenciais.", Toast.LENGTH_LONG).show();
-    }
-
     private void onAuthAcademico() {
         EditText editEmail = findViewById(R.id.editEmail);
         EditText editSenha = findViewById(R.id.editPassword);
         String email = editEmail.getText().toString();
         String senha = editSenha.getText().toString();
-        redirectToCentralApp();
-        /*if (!Util.isNullOrEmpty(email) && !Util.isNullOrEmpty(senha)) {
-            API.validarLogin(new Callback<List<Academico>>() {
-                @Override
-                public void onResponse(Call<List<Academico>> call, Response<List<Academico>> response) {
-                    if (!response.body().isEmpty()){
-                        Academico academico = response.body().get(0);
-
-                        if (academico != null) {
-                            AppContext.setAcademicoId(academico.getId());
-                            redirectToCentralApp();
-                        }
-                    } else {
-                        showTextNotCredencials();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<List<Academico>> call, Throwable t) {
-                    //Não faz nada
-                }
-            }, email, senha);
-
-        } else {
-            Toast.makeText(this, "Não foi informado o E-mail ou a Senha!", Toast.LENGTH_LONG).show();
-        }*/
-    }
-
-    private void redirectToCentralApp() {
         Intent itImc = new Intent(MainActivity.this, RequestPermissionActivity.class);
         startActivity(itImc);
+//        if (!Util.isNullOrEmpty(email) && !Util.isNullOrEmpty(senha)) {
+//            API.validarLogin(new Callback<AcademicoTurmaWrapper>() {
+//                @Override
+//                public void onResponse(Call<AcademicoTurmaWrapper> call, Response<AcademicoTurmaWrapper> response) {
+//                    if (response.body() != null){
+//                        AcademicoTurmaWrapper academicoTurmaWrapper = response.body();
+//                        AppContext.setAcademicoId(academicoTurmaWrapper.getAcademicoId());
+//                        AppContext.setTurmaId(academicoTurmaWrapper.getTurmaId());
+//                        AppContext.setNomeTurma(academicoTurmaWrapper.getNomeTurma());
+//
+//                        Intent itImc = new Intent(MainActivity.this, RequestPermissionActivity.class);
+//                        startActivity(itImc);
+//                    } else {
+//                        Util.showToastMessage(context, "Não encontramos um usuário com essas credenciais.");
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Call<AcademicoTurmaWrapper> call, Throwable t) {
+//                    Util.showToastMessage(context, "Não foi possível realizar a autenticacao.");
+//                }
+//            }, email, senha);
+//
+//        } else {
+//            Util.showToastMessage(context, "Não foi informado o E-mail ou a Senha!");
+//        }
     }
 
     private void verificarDemaisPermission() {

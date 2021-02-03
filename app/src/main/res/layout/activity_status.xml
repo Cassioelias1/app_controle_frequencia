@@ -19,7 +19,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginTop="150px"
-                android:text="{{Nome da disciplina aqui}}"
                 android:textSize="60px"
                 android:textColor="@color/colorOrange"
                 android:gravity="center" />
@@ -28,7 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="{{Status da disciplina aqui}}"
+                android:text="Acompanhe aqui os status das suas frequências"
                 android:textSize="40px"
                 android:textColor="@color/colorBlack"
                 android:gravity="center" />
