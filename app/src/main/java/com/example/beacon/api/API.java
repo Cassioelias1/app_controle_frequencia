@@ -17,7 +17,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class API {
-    private static final String URL = "https://e037769bd548.ngrok.io";
+    private static final String URL = "http://192.168.0.102:7000";
 
     private static Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(URL)
@@ -80,4 +80,11 @@ public class API {
         call.enqueue(callback);
     }
 
+    public static void getAulaDiaAcademico(final Callback<List<Turma>> callback, String academicoId, String diaSemana) {
+        AcademicoEndPoint endPoint = retrofit.create(AcademicoEndPoint.class);
+        Call<List<Turma>> call;
+
+        call = endPoint.getAulaDiaAcademico(academicoId, diaSemana);
+        call.enqueue(callback);
+    }
 }

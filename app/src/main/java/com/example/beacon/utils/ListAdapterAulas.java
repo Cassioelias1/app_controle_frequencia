@@ -15,7 +15,11 @@ import com.example.beacon.AulasActivity;
 import com.example.beacon.DetalhamentoAulaActivity;
 import com.example.beacon.R;
 import com.example.beacon.api.wrappers.PresencasAulasWrapper;
+import com.example.beacon.context.AppContext;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class ListAdapterAulas extends ArrayAdapter<PresencasAulasWrapper> {
@@ -40,23 +44,29 @@ public class ListAdapterAulas extends ArrayAdapter<PresencasAulasWrapper> {
 
         TextView dataSaida = convertView.findViewById(R.id.nome_item);
 
-        //Format formatter = new SimpleDateFormat("dd/MM/yy");
-        //String dataFormatada = formatter.format(presenca.getDataValidacao());
+        //TODO: Se possível, tentar deixar este código mais elegante
+        try {
+            Date dt = new SimpleDateFormat("yyyy-MM-dd").parse(presenca.getDataValidacao());
 
-        String text = presenca.getDataValidacao();
-        if (!presenca.isWithError()){
-            convertView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View o) {
-                    aulasActivity.startActivity(new Intent(aulasActivity, DetalhamentoAulaActivity.class));
-                }
-            });
-            text += " - " + presenca.getNomeTurma();
-        } else {
-            dataSaida.setEnabled(false);
+            String text = new SimpleDateFormat("dd/MM/yyyy").format(dt);
+            if (!presenca.isWithError()){
+                convertView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View o) {
+                        AppContext.DATA_VALIDACAO_SELECTED = presenca.getDataValidacao();
+                        aulasActivity.startActivity(new Intent(aulasActivity, DetalhamentoAulaActivity.class));
+                    }
+                });
+                text += " - " + presenca.getNomeTurma();
+            } else {
+                dataSaida.setEnabled(false);
+            }
+
+            dataSaida.setText(text);
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 
-        dataSaida.setText(text);
 
         return convertView;
     }

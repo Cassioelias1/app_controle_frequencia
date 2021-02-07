@@ -1,6 +1,7 @@
 package com.example.beacon.api.endpoints;
 
 import com.example.beacon.api.models.Academico;
+import com.example.beacon.api.models.Turma;
 import com.example.beacon.api.wrappers.AcademicoTurmaWrapper;
 
 import java.util.List;
@@ -18,4 +19,7 @@ public interface AcademicoEndPoint {
 
 //    @GET("/api/escola/login")
 //    Call<Escola> GetEscolasByCodigoSenha(@Query("usuario_smart") final String usuario_smart, @Query("senha_smart") final String senha_smart);
+
+    @GET("/api/academicos/getauladiaacademico")
+    Call<List<Turma>> getAulaDiaAcademico(@Query("academico_id") final String academicoId, @Query("dia_semana") final String diaSemana);
 }

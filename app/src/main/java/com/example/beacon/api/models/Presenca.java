@@ -11,6 +11,9 @@ public class Presenca implements Serializable {
     @SerializedName("turma_id")
     private String idTurma;
 
+    @SerializedName("descricao")
+    private String descricao;//descricao da turma
+
     @SerializedName("data")
     private String data;
 
@@ -36,11 +39,11 @@ public class Presenca implements Serializable {
 
     public Presenca() {}
 
-    public Presenca(String idAcademico, String turmaId, String data, String materialCardId, String textViewId) {
+    public Presenca(String idAcademico, String turmaId, String data, String materialCardName, String textViewId) {
         this.idAcademico = idAcademico;
         this.idTurma = turmaId;
         this.data = data;
-        this.materialCardId = materialCardId;
+        this.materialCardId = materialCardName;
         this.textViewId = textViewId;
     }
 
@@ -126,5 +129,13 @@ public class Presenca implements Serializable {
 
     public void setIdSqlite(Integer idSqlite) {
         this.idSqlite = idSqlite;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 }

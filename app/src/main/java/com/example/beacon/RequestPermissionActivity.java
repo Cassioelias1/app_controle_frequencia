@@ -2,7 +2,6 @@ package com.example.beacon;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.NotificationManager;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -27,10 +26,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.beacon.api.API;
 import com.example.beacon.api.models.Presenca;
+import com.example.beacon.api.models.Turma;
 import com.example.beacon.context.AppContext;
 import com.example.beacon.sqlite.BancoController;
 import com.example.beacon.utils.BeaconUtils;
-import com.example.beacon.utils.Util;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
 
@@ -123,10 +122,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         MaterialCardView materialCardView2140 = findViewById(R.id.card_21_40);
         TextView textView2140 = findViewById(R.id.textView2140);
 //
-        onInitThread(materialCardView1915, textView1915, 19, 0, AppContext.getThread1915(), "1915");
-        onInitThread(materialCardView2015, textView2015, 19, 1, AppContext.getThread2015(), "2015");
-        onInitThread(materialCardView2100, textView2100, 19, 2, AppContext.getThread2100(), "2100");
-        onInitThread(materialCardView2140, textView2140, 19, 3, AppContext.getThread2140(), "2140");
+        onInitThread(materialCardView1915, textView1915, 21, 35, AppContext.getThread1915(), "card_19_15", "textView1915");
+        onInitThread(materialCardView2015, textView2015, 21, 36, AppContext.getThread2015(), "card_20_15", "textView2015");
+        onInitThread(materialCardView2100, textView2100, 21, 37, AppContext.getThread2100(), "card_21_00", "textView2100");
+        onInitThread(materialCardView2140, textView2140, 21, 38, AppContext.getThread2140(), "card_21_40", "textView2140");
 
         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
         textViewNomeDisciplica.setText(AppContext.getNomeTurma());
@@ -146,6 +145,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //        resetCardsPresencas(materialCardViews, textViews, 23, 7);
 
         initServiceFindBeacons();
+        getAulaDiaAcademico();
         getPresencasJaValidadas();
     }
 
@@ -172,12 +172,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         });
     }
 
-    private void onInitThread(final MaterialCardView materialCardView, final TextView textView, final Integer hour, final Integer minute, Thread thread, String enumThread) {
-        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+    private void onInitThread(final MaterialCardView materialCardView, final TextView textView, final Integer hour, final Integer minute, Thread thread, String nameMaterialCard, String nameTextView) {
         final boolean[] presencaValidada = {false};
 
         if (thread == null){
-            Util.sendNotification("TITULO", "THREADNULA", notificationManager, context);
             thread = new Thread() {
                 @Override
                 public void run() {
@@ -189,7 +187,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
                                 //Se não tiver pelo menos 3 idsBeacon significa que o aluno não esta dentro da sala de aula, implementar outras validações (trilateração)
                                 //salvar turmaId no Context.
-                                Presenca presenca = new Presenca(ID_SIMULATE_ACADEMICO, "1", LocalDateTime.now().toString(), materialCardView.getId()+"", textView.getId()+"");
+                                Presenca presenca = new Presenca(AppContext.getAcademicoId(), AppContext.getTurmaId(), LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
 
                                 presenca.setStatusTrilateracao(academicoEstaDentroSalaAula());
                                 validarPresencaApi(presenca, materialCardView, textView);
@@ -203,17 +201,17 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                 }
             };
 
-            switch (enumThread) {
-                case "1915":
+            switch (nameMaterialCard) {
+                case "card_19_15":
                     AppContext.setThread1915(thread);
                     break;
-                case "2015":
+                case "card_20_15":
                     AppContext.setThread2015(thread);
                     break;
-                case "2100":
+                case "card_21_00":
                     AppContext.setThread2100(thread);
                     break;
-                case "2140":
+                case "card_21_40":
                     AppContext.setThread2140(thread);
                     break;
             }
@@ -530,6 +528,32 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         } catch (RemoteException e) {   }
     }
 
+    private void getAulaDiaAcademico(){
+        if (AppContext.getTurmaId() == null && AppContext.getNomeTurma() == null){
+            API.getAulaDiaAcademico(new Callback<List<Turma>>() {
+                @Override
+                public void onResponse(Call<List<Turma>> call, Response<List<Turma>> response) {
+                    List<Turma> turmas = response.body();
+                    if (turmas != null && !turmas.isEmpty()) {
+                        Turma turma = turmas.get(0);//A query vai retorna um resultado, foi tratado como list por conta de um erro relacionado a como o mysql retorna os valores
+                        AppContext.setTurmaId(turma.getId().toString());
+                        AppContext.setNomeTurma(turma.getDescricao());
+
+                        TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
+                        textViewNomeDisciplica.setText(turma.getDescricao());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Turma>> call, Throwable t) {
+                }
+            }, ID_SIMULATE_ACADEMICO, LocalDate.now().getDayOfWeek().toString());
+        } else {
+            TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
+            textViewNomeDisciplica.setText(AppContext.getNomeTurma());
+        }
+    }
+
     private void getPresencasJaValidadas(){
         API.getPresencaDiaAcademico(new Callback<List<Presenca>>() {
             @Override
@@ -538,11 +562,14 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
                 if (presencas != null) {
                     for (Presenca presenca : presencas) {
-                        String idMaterialCard = presenca.getMaterialCardId();
-                        String idTextView = presenca.getTextViewId();
-                        if (idMaterialCard != null && idTextView != null) {
-                            MaterialCardView materialCardView = findViewById(Integer.parseInt(presenca.getMaterialCardId()));
-                            TextView textView = findViewById(Integer.parseInt(idTextView));
+                        String nameMaterialCard = presenca.getMaterialCardId();
+                        String nameTextView = presenca.getTextViewId();
+                        if (nameMaterialCard != null && nameTextView != null) {
+                            int idMaterialCard = getResources().getIdentifier(nameMaterialCard, "id", context.getPackageName());
+                            int idTextView = getResources().getIdentifier(nameTextView, "id", context.getPackageName());
+                            MaterialCardView materialCardView = findViewById(idMaterialCard);
+                            TextView textView = findViewById(idTextView);
+
                             if (materialCardView != null && textView != null) {
                                 if ("PRESENTE".equals(presenca.getStatus())) {
                                     materialCardView.setBackgroundColor(Color.parseColor("#11A33F"));
@@ -559,7 +586,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
             @Override
             public void onFailure(Call<List<Presenca>> call, Throwable t) {
-                showToastMessage("ERRO REQUISICAO-> "+t.getMessage());
             }
         }, ID_SIMULATE_ACADEMICO, LocalDate.now().toString());
     }

@@ -6,6 +6,7 @@ public class AppContext {
     private static String ACADEMICO_ID = null;
     private static String TURMA_ID = null;
     private static String NOME_TURMA = null;
+    public static String DATA_VALIDACAO_SELECTED = null;
     private static NotificationManager notificationManager = null;
 
     //thread
