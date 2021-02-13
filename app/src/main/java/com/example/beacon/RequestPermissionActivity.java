@@ -94,6 +94,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         setContentView(R.layout.activity_status);
         initBottomNavigation();
         handler = new Handler();
+//        Executors.newSingleThreadExecutor();
 
         mBeaconManager = BeaconManager.getInstanceForApplication(this);
 //        mBeaconManager = org.altbeacon.beacon.BeaconManager.getInstanceForApplication(this);
@@ -121,11 +122,25 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
         MaterialCardView materialCardView2140 = findViewById(R.id.card_21_40);
         TextView textView2140 = findViewById(R.id.textView2140);
-//
-        onInitThread(materialCardView1915, textView1915, 21, 35, AppContext.getThread1915(), "card_19_15", "textView1915");
-        onInitThread(materialCardView2015, textView2015, 21, 36, AppContext.getThread2015(), "card_20_15", "textView2015");
-        onInitThread(materialCardView2100, textView2100, 21, 37, AppContext.getThread2100(), "card_21_00", "textView2100");
-        onInitThread(materialCardView2140, textView2140, 21, 38, AppContext.getThread2140(), "card_21_40", "textView2140");
+
+//        SegundoPlano segundoPlano1915 = new SegundoPlano(materialCardView1915, textView1915, 23, 0, AppContext.getThread1915(), "card_19_15", "textView1915", handler, context);
+//        segundoPlano1915.execute();
+
+//        SegundoPlano segundoPlano2015 = new SegundoPlano(materialCardView2015, textView2015, 23, 27, AppContext.getThread2015(), "card_20_15", "textView2015", handler, context);
+//        segundoPlano2015.execute();
+
+//        SegundoPlano segundoPlano2100 = new SegundoPlano(materialCardView2100, textView2100, 23, 28, AppContext.getThread2100(), "card_21_00", "textView2100", handler, context);
+//        segundoPlano2100.execute();
+
+//        SegundoPlano segundoPlano2140 = new SegundoPlano(materialCardView2140, textView2140, 23, 29, AppContext.getThread2140(), "card_21_40", "textView2140", handler, context);
+//        segundoPlano2140.execute();
+
+        //TODO: NAO UTILIZAR O APPCONTEXT E SIM O SHAREDPREFERENCES, POIS APPCONTEXT FICA NULL DEPOIS SE FECHAR O APP
+        //TODO: COMO ELE FICA NULL PODE ACONTECER DAS THREADS SEREM INICIALIZADAS NOVAMENTE
+        onInitThread(materialCardView1915, textView1915, 0, 20, AppContext.getThread1915(), "card_19_15", "textView1915");
+        onInitThread(materialCardView2015, textView2015, 0, 21, AppContext.getThread2015(), "card_20_15", "textView2015");
+        onInitThread(materialCardView2100, textView2100, 0, 22, AppContext.getThread2100(), "card_21_00", "textView2100");
+        onInitThread(materialCardView2140, textView2140, 1, 22, AppContext.getThread2140(), "card_21_40", "textView2140");
 
         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
         textViewNomeDisciplica.setText(AppContext.getNomeTurma());
@@ -187,7 +202,8 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
                                 //Se não tiver pelo menos 3 idsBeacon significa que o aluno não esta dentro da sala de aula, implementar outras validações (trilateração)
                                 //salvar turmaId no Context.
-                                Presenca presenca = new Presenca(AppContext.getAcademicoId(), AppContext.getTurmaId(), LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
+//                                Presenca presenca = new Presenca(AppContext.getAcademicoId(), AppContext.getTurmaId(), LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
+                                Presenca presenca = new Presenca("1", "1", LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
 
                                 presenca.setStatusTrilateracao(academicoEstaDentroSalaAula());
                                 validarPresencaApi(presenca, materialCardView, textView);
