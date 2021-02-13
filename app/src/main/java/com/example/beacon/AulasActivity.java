@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.beacon.api.API;
 import com.example.beacon.api.wrappers.PresencasAulasWrapper;
+import com.example.beacon.context.AppContext;
 import com.example.beacon.utils.ListAdapterAulas;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -55,14 +56,7 @@ public class AulasActivity extends AppCompatActivity {
                 listAdapterAulas = new ListAdapterAulas(getApplicationContext(), aulasActivity, Collections.singletonList(presencasAulasWrapper));
                 listAulas.setAdapter(listAdapterAulas);
             }
-        }, "1");
-
-        //Fazer um get no servidor para retornar todas as presencas agrupadas, o retorno na verdade vai ser um wrapper
-        //pois alguns informações estão em duas tabelas diferentes;
-    }
-
-    private void addInListAdapter(){
-
+        }, AppContext.getAcademicoId());
     }
 
     private void initBottomNavigation(){

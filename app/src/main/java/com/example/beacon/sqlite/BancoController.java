@@ -19,10 +19,7 @@ public class BancoController {
         banco = new Banco(context);
     }
 
-    public boolean save(String data, String academicoId, String turmaId, String status, Integer materialCardId, Integer textViewId){
-        System.out.println("----------------------------------------------------------------------");
-        System.out.println("FAZENDO SAVE NO SQLITE");
-        System.out.println("----------------------------------------------------------------------");
+    public boolean save(String data, String academicoId, String turmaId, String status, String materialCardId, String textViewId){
         ContentValues valores;
         long result;
 

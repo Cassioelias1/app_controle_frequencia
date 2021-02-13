@@ -2,7 +2,6 @@ package com.example.beacon.api.endpoints;
 
 import com.example.beacon.api.models.Academico;
 import com.example.beacon.api.models.Turma;
-import com.example.beacon.api.wrappers.AcademicoTurmaWrapper;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ public interface AcademicoEndPoint {
     Call<List<Academico>> GetAcademicos();
 
     @GET("/api/academicos/login")
-    Call<AcademicoTurmaWrapper> GetAcademicoByEmailSenha(@Query("email") final String email, @Query("senha") final String senha);
+    Call<List<Academico>> GetAcademicoByEmailSenha(@Query("codigo") final String codigo, @Query("senha") final String senha);
 
 //    @GET("/api/escola/login")
 //    Call<Escola> GetEscolasByCodigoSenha(@Query("usuario_smart") final String usuario_smart, @Query("senha_smart") final String senha_smart);

@@ -4,7 +4,10 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class Academico extends RepeatConstraint implements Serializable {
+public class Academico implements Serializable {
+
+    @SerializedName("id")
+    private String id;
 
     @SerializedName("nome")
     private String nome;
@@ -64,9 +67,11 @@ public class Academico extends RepeatConstraint implements Serializable {
         this.email = email;
     }
 
-    //Verificar se isso funciona, duvido kkkk
-    @Override
-    public Integer getId() {
-        return super.getId();
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 }

@@ -6,7 +6,6 @@ import com.example.beacon.api.endpoints.TurmaEndPoint;
 import com.example.beacon.api.models.Academico;
 import com.example.beacon.api.models.Presenca;
 import com.example.beacon.api.models.Turma;
-import com.example.beacon.api.wrappers.AcademicoTurmaWrapper;
 import com.example.beacon.api.wrappers.PresencasAulasWrapper;
 
 import java.util.List;
@@ -48,11 +47,11 @@ public class API {
         call.enqueue(callback);
     }
 
-    public static void validarLogin(final Callback<AcademicoTurmaWrapper> callback, String email, String senha){
+    public static void validarLogin(final Callback<List<Academico>> callback, String codigo, String senha){
         AcademicoEndPoint endPoint = retrofit.create(AcademicoEndPoint.class);
-        Call<AcademicoTurmaWrapper> call;
+        Call<List<Academico>> call;
 
-        call = endPoint.GetAcademicoByEmailSenha(email, senha);
+        call = endPoint.GetAcademicoByEmailSenha(codigo, senha);
         call.enqueue(callback);
     }
 

@@ -58,7 +58,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RequestPermissionActivity extends AppCompatActivity implements BeaconConsumer, RangeNotifier {
+public class RequestPermissionActivity extends AppCompatActivity implements BeaconConsumer /*RangeNotifier*/ {
     //y = 3,70 | x= 4,55 | z = 2,60
     //0 é em metros o ponto x
     //0 é em metros o ponto y
@@ -137,10 +137,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
         //TODO: NAO UTILIZAR O APPCONTEXT E SIM O SHAREDPREFERENCES, POIS APPCONTEXT FICA NULL DEPOIS SE FECHAR O APP
         //TODO: COMO ELE FICA NULL PODE ACONTECER DAS THREADS SEREM INICIALIZADAS NOVAMENTE
-        onInitThread(materialCardView1915, textView1915, 0, 20, AppContext.getThread1915(), "card_19_15", "textView1915");
-        onInitThread(materialCardView2015, textView2015, 0, 21, AppContext.getThread2015(), "card_20_15", "textView2015");
-        onInitThread(materialCardView2100, textView2100, 0, 22, AppContext.getThread2100(), "card_21_00", "textView2100");
-        onInitThread(materialCardView2140, textView2140, 1, 22, AppContext.getThread2140(), "card_21_40", "textView2140");
+        onInitThread(materialCardView1915, textView1915, 14, 35, AppContext.getThread1915(), "card_19_15", "textView1915");
+        onInitThread(materialCardView2015, textView2015, 14, 36, AppContext.getThread2015(), "card_20_15", "textView2015");
+        onInitThread(materialCardView2100, textView2100, 14, 37, AppContext.getThread2100(), "card_21_00", "textView2100");
+        onInitThread(materialCardView2140, textView2140, 14, 38, AppContext.getThread2140(), "card_21_40", "textView2140");
 
         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
         textViewNomeDisciplica.setText(AppContext.getNomeTurma());
@@ -203,15 +203,14 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                                 //Se não tiver pelo menos 3 idsBeacon significa que o aluno não esta dentro da sala de aula, implementar outras validações (trilateração)
                                 //salvar turmaId no Context.
 //                                Presenca presenca = new Presenca(AppContext.getAcademicoId(), AppContext.getTurmaId(), LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
-                                Presenca presenca = new Presenca("1", "1", LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
+                                Presenca presenca = new Presenca(AppContext.getAcademicoId(), AppContext.getTurmaId(), LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
 
                                 presenca.setStatusTrilateracao(academicoEstaDentroSalaAula());
-                                validarPresencaApi(presenca, materialCardView, textView);
+                                validarPresencaApi(presenca, materialCardView, textView, nameMaterialCard, nameTextView);
 
                                 presencaValidada[0] = true;
                             }
                         } catch (Exception e) {
-                            e.printStackTrace();
                         }
                     }
                 }
@@ -283,7 +282,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         return teste;
     }
 
-    private void validarPresencaApi(Presenca presenca, MaterialCardView materialCardView, TextView textView){
+    private void validarPresencaApi(Presenca presenca, MaterialCardView materialCardView, TextView textView, String nameMaterialCard, String nameTextView){
         API.validarPresenca(presenca, new Callback<Presenca>() {
             @Override
             public void onResponse(Call<Presenca> call, Response<Presenca> response) {
@@ -302,23 +301,21 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                             }
                         });
                     }
-                } else {
-                    savePresencaNaoComputada(presenca, materialCardView.getId(), textView.getId());
                 }
             }
 
             @Override
             public void onFailure(Call<Presenca> call, Throwable t) {
-                savePresencaNaoComputada(presenca, materialCardView.getId(), textView.getId());
+                savePresencaNaoComputada(presenca, nameMaterialCard, nameTextView);
             }
         });
     }
 
-    private boolean savePresencaNaoComputada(Presenca presenca, Integer materialCardId, Integer textViewId){
+    private boolean savePresencaNaoComputada(Presenca presenca, String nameMaterialCard, String nameTextView){
         if (controller == null) {
             controller = new BancoController(context);
         }
-        return controller.save(presenca.getData(), presenca.getIdAcademico(), presenca.getIdTurma(), presenca.getStatus(), materialCardId, textViewId);
+        return controller.save(presenca.getData(), presenca.getIdAcademico(), presenca.getIdTurma(), presenca.getStatus(), nameMaterialCard, nameTextView);
     }
 
     private void resetCardsPresencas(final List<MaterialCardView> materialCardViews, final List<TextView> textViews, final Integer hour, final Integer minute){
@@ -355,7 +352,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         }.start();
     }
 
-    @Override
+    /*@Override
     public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
         if (beacons.size() == 0) {
             showToastMessage(getString(R.string.no_beacons_detected));
@@ -368,7 +365,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
             showToastMessage(getString(R.string.beacon_detected, beacon.getId3()));
         }
-    }
+    }*/
 
     private void initServiceFindBeacons(){
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -509,7 +506,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
     @Override
     public void onBeaconServiceConnect() {
-//        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
 
         RangeNotifier rangeNotifier = new RangeNotifier() {
             @Override
@@ -523,10 +520,12 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                     }
 
                     for (Beacon beacon : beacons) {
-//                        builder.append("ID1: "+beacon.getId1()).append("\n");
+                        builder.append("ID1: "+beacon.getId1()).append("\n");
 //                        builder.append("DISTANCIA em METROS: "+BigDecimal.valueOf(beacon.getDistance()).setScale(2, RoundingMode.HALF_UP)).append("\n");
-//                        builder.append("DISTANCIA NOVO: "+BeaconUtils.calcularDistanciaByRssi(beacon)).append("\n");
-//                        builder.append("====================").append("\n");
+                        builder.append("DISTANCIA NOVO: "+BeaconUtils.calcularDistanciaByRssi(beacon)).append("\n");
+                        builder.append("====================").append("\n");
+
+                        showToastMessage(builder.toString());
 
                         Double distance = BeaconUtils.calcularDistanciaByRssi(beacon);
                         beaconDistanceMap.put(beacon.getId1().toString(), distance);
@@ -544,8 +543,9 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         } catch (RemoteException e) {   }
     }
 
+    //TODO: não da pra retornar essas informações no login
     private void getAulaDiaAcademico(){
-        if (AppContext.getTurmaId() == null && AppContext.getNomeTurma() == null){
+        if (AppContext.getTurmaId() == null || AppContext.getNomeTurma() == null){
             API.getAulaDiaAcademico(new Callback<List<Turma>>() {
                 @Override
                 public void onResponse(Call<List<Turma>> call, Response<List<Turma>> response) {
@@ -557,13 +557,16 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
                         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
                         textViewNomeDisciplica.setText(turma.getDescricao());
+                    } else {
+                        TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
+                        textViewNomeDisciplica.setText("Você não possui aula hoje");
                     }
                 }
 
                 @Override
                 public void onFailure(Call<List<Turma>> call, Throwable t) {
                 }
-            }, ID_SIMULATE_ACADEMICO, LocalDate.now().getDayOfWeek().toString());
+            }, AppContext.getAcademicoId(), LocalDate.now().getDayOfWeek().toString());
         } else {
             TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
             textViewNomeDisciplica.setText(AppContext.getNomeTurma());

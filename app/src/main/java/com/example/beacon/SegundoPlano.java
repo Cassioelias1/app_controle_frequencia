@@ -132,6 +132,7 @@ public class SegundoPlano extends AsyncTask<Void, Void, String> {
         if (controller == null) {
             controller = new BancoController(context);
         }
-        return controller.save(presenca.getData(), presenca.getIdAcademico(), presenca.getIdTurma(), presenca.getStatus(), materialCardId, textViewId);
+//        return controller.save(presenca.getData(), presenca.getIdAcademico(), presenca.getIdTurma(), presenca.getStatus(), materialCardId, textViewId);
+        return false;
     }
 }

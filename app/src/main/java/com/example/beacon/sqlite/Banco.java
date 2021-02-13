@@ -26,8 +26,8 @@ public class Banco extends SQLiteOpenHelper {
 //        sql.append("id_beacon_1 text,");
 //        sql.append("id_beacon_2 text,");
 //        sql.append("id_beacon_3 text,");
-        sql.append("material_card_id integer,");
-        sql.append("text_view_id integer);");
+        sql.append("material_card_id text,");
+        sql.append("text_view_id text);");
 
         db.execSQL(sql.toString());
     }

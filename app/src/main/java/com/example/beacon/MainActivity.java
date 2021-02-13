@@ -14,7 +14,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.beacon.api.API;
+import com.example.beacon.api.models.Academico;
+import com.example.beacon.context.AppContext;
+import com.example.beacon.utils.Util;
+
 import org.altbeacon.beacon.BeaconManager;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends Activity {
     private static final int PERMISSION_REQUEST_FINE_LOCATION = 1;
@@ -32,6 +43,11 @@ public class MainActivity extends Activity {
         //Variavel responsável pelo serviço de notificações
         //AppContext.setNotificationManager((NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE));
 
+        EditText editText = findViewById(R.id.editEmail);
+        editText.setText("95082");
+        EditText editText2 = findViewById(R.id.editPassword);
+        editText2.setText("95082");
+
         initButtons();
     }
 
@@ -46,38 +62,43 @@ public class MainActivity extends Activity {
     }
 
     private void onAuthAcademico() {
-        EditText editEmail = findViewById(R.id.editEmail);
+        EditText editEmail = findViewById(R.id.editEmail);//mas é código
         EditText editSenha = findViewById(R.id.editPassword);
-        String email = editEmail.getText().toString();
+        String codigo = editEmail.getText().toString();
         String senha = editSenha.getText().toString();
-        Intent itImc = new Intent(MainActivity.this, RequestPermissionActivity.class);
-        startActivity(itImc);
-//        if (!Util.isNullOrEmpty(email) && !Util.isNullOrEmpty(senha)) {
-//            API.validarLogin(new Callback<AcademicoTurmaWrapper>() {
-//                @Override
-//                public void onResponse(Call<AcademicoTurmaWrapper> call, Response<AcademicoTurmaWrapper> response) {
-//                    if (response.body() != null){
-//                        AcademicoTurmaWrapper academicoTurmaWrapper = response.body();
-//                        AppContext.setAcademicoId(academicoTurmaWrapper.getAcademicoId());
-//                        AppContext.setTurmaId(academicoTurmaWrapper.getTurmaId());
-//                        AppContext.setNomeTurma(academicoTurmaWrapper.getNomeTurma());
-//
-//                        Intent itImc = new Intent(MainActivity.this, RequestPermissionActivity.class);
-//                        startActivity(itImc);
-//                    } else {
-//                        Util.showToastMessage(context, "Não encontramos um usuário com essas credenciais.");
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(Call<AcademicoTurmaWrapper> call, Throwable t) {
-//                    Util.showToastMessage(context, "Não foi possível realizar a autenticacao.");
-//                }
-//            }, email, senha);
-//
-//        } else {
-//            Util.showToastMessage(context, "Não foi informado o E-mail ou a Senha!");
-//        }
+//        Intent itImc = new Intent(MainActivity.this, RequestPermissionActivity.class);
+//        startActivity(itImc);
+//        AppContext.setAcademicoId("1");
+//        AppContext.setTurmaId("1");
+        if (!Util.isNullOrEmpty(codigo) && !Util.isNullOrEmpty(senha)) {
+            API.validarLogin(new Callback<List<Academico>>() {
+                @Override
+                public void onResponse(Call<List<Academico>> call, Response<List<Academico>> response) {
+                    List<Academico> academicoList = response.body();
+                    if (academicoList != null && !academicoList.isEmpty()){
+                        System.out.println(academicoList.size());
+                        Academico academico = academicoList.get(0);
+                        AppContext.setAcademicoId(academico.getId());
+
+                        Intent itImc = new Intent(MainActivity.this, RequestPermissionActivity.class);
+                        startActivity(itImc);
+                    } else {
+                        Util.showToastMessage(context, "Não encontramos um usuário com essas credenciais.");
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<Academico>> call, Throwable t) {
+                    System.out.println("---------------------------------------------------------");
+                    System.out.println(t.getMessage());
+                    System.out.println("---------------------------------------------------------");
+                    Util.showToastMessage(context, "Não foi possível realizar a autenticacao.");
+                }
+            }, codigo, senha);
+
+        } else {
+            Util.showToastMessage(context, "Não foi informado o E-mail ou a Senha!");
+        }
     }
 
     private void verificarDemaisPermission() {

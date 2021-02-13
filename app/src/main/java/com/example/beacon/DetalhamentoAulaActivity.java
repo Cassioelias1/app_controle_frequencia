@@ -35,11 +35,10 @@ public class DetalhamentoAulaActivity extends AppCompatActivity {
         //O find deve ser feito pelo id do academico e da turma onde ele está logado.
         //Futuramente após implementar o login salvar o id da turma e do acamido no AppContext ou naquele SharedPreferences.
 
-        String dataValidacaoSelected = AppContext.DATA_VALIDACAO_SELECTED;
 //        TextView textView = findViewById(R.id.horario_detalhamento_presenca);
 //        textView.setText(LocalDate.parse(dataValidacaoSelected).toString());
 
-        getPresencasJaValidadas(LocalDate.parse(dataValidacaoSelected).toString());
+        getPresencasJaValidadas(LocalDate.parse(AppContext.DATA_VALIDACAO_SELECTED).toString());
     }
 
     private void setNomeAulaPresencaComputada(Presenca presenca){
@@ -82,7 +81,7 @@ public class DetalhamentoAulaActivity extends AppCompatActivity {
             public void onFailure(Call<List<Presenca>> call, Throwable t) {
 
             }
-        }, "1", data);
+        }, AppContext.getAcademicoId(), data);
     }
 
     private void initBottomNavigation(){
