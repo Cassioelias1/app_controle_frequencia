@@ -25,11 +25,13 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.beacon.api.API;
+import com.example.beacon.api.models.PosicaoAcademico;
 import com.example.beacon.api.models.Presenca;
 import com.example.beacon.api.models.Turma;
 import com.example.beacon.context.AppContext;
 import com.example.beacon.sqlite.BancoController;
 import com.example.beacon.utils.BeaconUtils;
+import com.example.beacon.utils.Util;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
 
@@ -44,7 +46,6 @@ import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
 import org.altbeacon.beacon.startup.RegionBootstrap;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -64,9 +65,9 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     //0 é em metros o ponto y
     //2,6 é em metros o ponto z
     //370 / 2 = 185
-    private static final String ID_BEACON_POSICAO_0_0_0 = "0x0077656c6c636f726573736407";
-    private static final String ID_BEACON_POSICAO_0_370_0 = "2";
-    private static final String ID_BEACON_POSICAO_455_185_260 = "3";
+    private static final String ID_BEACON_POSICAO_2275_0_130 = "0x0077656c6c636f726573736407";
+    private static final String ID_BEACON_POSICAO_0_185_130 = "2";
+    private static final String ID_BEACON_POSICAO_2275_185_260 = "3";
     private static final String ID_SIMULATE_ACADEMICO = "1";
     private Handler handler;
 
@@ -135,12 +136,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //        SegundoPlano segundoPlano2140 = new SegundoPlano(materialCardView2140, textView2140, 23, 29, AppContext.getThread2140(), "card_21_40", "textView2140", handler, context);
 //        segundoPlano2140.execute();
 
-        //TODO: NAO UTILIZAR O APPCONTEXT E SIM O SHAREDPREFERENCES, POIS APPCONTEXT FICA NULL DEPOIS SE FECHAR O APP
-        //TODO: COMO ELE FICA NULL PODE ACONTECER DAS THREADS SEREM INICIALIZADAS NOVAMENTE
-        onInitThread(materialCardView1915, textView1915, 14, 35, AppContext.getThread1915(), "card_19_15", "textView1915");
-        onInitThread(materialCardView2015, textView2015, 14, 36, AppContext.getThread2015(), "card_20_15", "textView2015");
-        onInitThread(materialCardView2100, textView2100, 14, 37, AppContext.getThread2100(), "card_21_00", "textView2100");
-        onInitThread(materialCardView2140, textView2140, 14, 38, AppContext.getThread2140(), "card_21_40", "textView2140");
+        onInitThread(materialCardView1915, textView1915, 0, 15, AppContext.getThread1915(), "card_19_15", "textView1915");
+        onInitThread(materialCardView2015, textView2015, 0, 16, AppContext.getThread2015(), "card_20_15", "textView2015");
+        onInitThread(materialCardView2100, textView2100, 0, 17, AppContext.getThread2100(), "card_21_00", "textView2100");
+        onInitThread(materialCardView2140, textView2140, 0, 18, AppContext.getThread2140(), "card_21_40", "textView2140");
 
         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
         textViewNomeDisciplica.setText(AppContext.getNomeTurma());
@@ -200,12 +199,9 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                             LocalDateTime primeiroHorario = LocalDateTime.of(agora.getYear(), agora.getMonth(), agora.getDayOfMonth(), hour, minute);
                             if (agora.getHour() == primeiroHorario.getHour() && agora.getMinute() == primeiroHorario.getMinute()){
 
-                                //Se não tiver pelo menos 3 idsBeacon significa que o aluno não esta dentro da sala de aula, implementar outras validações (trilateração)
-                                //salvar turmaId no Context.
-//                                Presenca presenca = new Presenca(AppContext.getAcademicoId(), AppContext.getTurmaId(), LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
                                 Presenca presenca = new Presenca(AppContext.getAcademicoId(), AppContext.getTurmaId(), LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
 
-                                presenca.setStatusTrilateracao(academicoEstaDentroSalaAula());
+                                presenca.setPosicaoAcademicoHorarioAulaAndSetStatus(academicoEstaDentroSalaAula());
                                 validarPresencaApi(presenca, materialCardView, textView, nameMaterialCard, nameTextView);
 
                                 presencaValidada[0] = true;
@@ -238,48 +234,39 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     }
 
     //este método deve ser responsavel por aplicar a trilateração
-    private boolean academicoEstaDentroSalaAula(){
-
-        Map<String, Double> map = beaconDistanceMap;
-        if(map.size() < 3){
-            return false;//se não está captando pelo menos 3 beacons significa que o academico não está em sala de aula.
+    private PosicaoAcademico academicoEstaDentroSalaAula(){
+        if(beaconDistanceMap.size() < 3){
+            return null;//se não está captando pelo menos 3 beacons significa que o academico não está em sala de aula.
         }
 
-        BigDecimal distanciaBeacon1 = null;
-        BigDecimal distanciaBeacon2 = null;
-        BigDecimal distanciaBeacon3 = null;
+        //Dados total da sala
+        //Altura (Z) = 2.60
+        //Largura Lateral (X) = 4.55
+        //Largura Frontal (Y) = 3.70
+        //           (x, y, z)
+        //beacon 1 = (2.275, 0, 1.30) -> irá representar o plano xz
+        //beacon 2 = (0, 1.85, 1.30) -> irá representar o plano zy
+        //beacon 3 = (2.275, 1.85, 2.60) -> irá representar o plano xy
 
-        //beacon 1 = (0,0)
-        //beacon 2 = (0,3.7)
-        //beacon 3 = (4.55,1.85)
-        BigDecimal posicaoYBeacon2 = new BigDecimal("3.7");
-        BigDecimal posicaoXBeacon3 = new BigDecimal("4.55");
-        BigDecimal posicaoYBeacon3 = new BigDecimal("1.85");
+        BigDecimal distanciaBeacon1 = Util.getZeroIsNull(beaconDistanceMap.get(ID_BEACON_POSICAO_2275_0_130));
+        BigDecimal distanciaBeacon2 = Util.getZeroIsNull(beaconDistanceMap.get(ID_BEACON_POSICAO_0_185_130));
+        BigDecimal distanciaBeacon3 = Util.getZeroIsNull(beaconDistanceMap.get(ID_BEACON_POSICAO_2275_185_260));
 
-        for (Map.Entry<String, Double> m : map.entrySet()) {
-            if (m.getKey().equals(ID_BEACON_POSICAO_0_0_0)){
-                distanciaBeacon1 = new BigDecimal(m.getValue());
-            } else if(m.getKey().equals(ID_BEACON_POSICAO_0_370_0)){
-                distanciaBeacon2 = new BigDecimal(m.getValue());
-            } else if(m.getKey().equals(ID_BEACON_POSICAO_455_185_260)) {
-                distanciaBeacon3 = new BigDecimal(m.getValue());
-            }
+        //Se não existe uma das distâncias significa que o acadêmico não está em sala de aula.
+        if(distanciaBeacon1.compareTo(BigDecimal.ZERO) > 0 || distanciaBeacon2.compareTo(BigDecimal.ZERO) > 0 || distanciaBeacon3.compareTo(BigDecimal.ZERO) > 0){
+            return null;
         }
 
-        if(distanciaBeacon1 == null || distanciaBeacon2 == null || distanciaBeacon3 == null){
-            return false;
-        }
+        //tem que implementar algumas validações para verificar os pontos máximos, esses pontos máximos seram definidos e cada sala deve ter os seus
+        return new PosicaoAcademico(distanciaBeacon2, distanciaBeacon1, distanciaBeacon3);
 
-        final BigDecimal DOIS = new BigDecimal("2");
-
+        /*final BigDecimal DOIS = new BigDecimal("2");
         BigDecimal posX = distanciaBeacon1.pow(2).subtract(distanciaBeacon2.pow(2)).add(posicaoYBeacon2.pow(2))
                 .divide(DOIS.multiply(posicaoYBeacon2), RoundingMode.HALF_UP);
 
         BigDecimal posY = distanciaBeacon1.pow(2).subtract(distanciaBeacon3.pow(2)).add(posicaoXBeacon3.pow(2)).add(posicaoYBeacon3.pow(2))
                 .divide(DOIS.multiply(posicaoYBeacon3), RoundingMode.HALF_UP).subtract(posicaoXBeacon3.divide(posicaoYBeacon3, RoundingMode.HALF_UP)).multiply(posX);
-
-        teste = !teste;
-        return teste;
+        */
     }
 
     private void validarPresencaApi(Presenca presenca, MaterialCardView materialCardView, TextView textView, String nameMaterialCard, String nameTextView){
@@ -515,17 +502,18 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //                    builder.delete(0, builder.length());
 //                    builder.append("Quantidade de beacons localizado: ").append(beacons.size()).append("\n");
 
-                    if (!beaconDistanceMap.isEmpty()){
-                        beaconDistanceMap.clear();
-                    }
+//                    if (!beaconDistanceMap.isEmpty()){
+//                        beaconDistanceMap.clear();
+//                    }
+                    beaconDistanceMap = new HashMap<>();
 
                     for (Beacon beacon : beacons) {
-                        builder.append("ID1: "+beacon.getId1()).append("\n");
+//                        builder.append("ID1: "+beacon.getId1()).append("\n");
 //                        builder.append("DISTANCIA em METROS: "+BigDecimal.valueOf(beacon.getDistance()).setScale(2, RoundingMode.HALF_UP)).append("\n");
-                        builder.append("DISTANCIA NOVO: "+BeaconUtils.calcularDistanciaByRssi(beacon)).append("\n");
-                        builder.append("====================").append("\n");
+//                        builder.append("DISTANCIA NOVO: "+BeaconUtils.calcularDistanciaByRssi(beacon)).append("\n");
+//                        builder.append("====================").append("\n");
 
-                        showToastMessage(builder.toString());
+//                        showToastMessage(builder.toString());
 
                         Double distance = BeaconUtils.calcularDistanciaByRssi(beacon);
                         beaconDistanceMap.put(beacon.getId1().toString(), distance);
@@ -538,8 +526,8 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         try {
             mBeaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
             mBeaconManager.addRangeNotifier(rangeNotifier);
-            mBeaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
-            mBeaconManager.addRangeNotifier(rangeNotifier);
+//            mBeaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
+//            mBeaconManager.addRangeNotifier(rangeNotifier);
         } catch (RemoteException e) {   }
     }
 
@@ -560,6 +548,9 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                     } else {
                         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
                         textViewNomeDisciplica.setText("Você não possui aula hoje");
+
+                        //TODO: Apenas para testes, remover depois
+                        AppContext.setTurmaId("1");
                     }
                 }
 

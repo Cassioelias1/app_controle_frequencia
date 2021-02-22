@@ -14,6 +14,8 @@ import android.widget.Toast;
 import com.example.beacon.MainActivity;
 import com.example.beacon.R;
 
+import java.math.BigDecimal;
+
 public class Util {
 
     public static boolean isNullOrEmpty(String valor){
@@ -51,4 +53,7 @@ public class Util {
         toast.show();
     }
 
+    public static BigDecimal getZeroIsNull(Double valor){
+        return valor == null ? BigDecimal.ZERO : new BigDecimal(valor);
+    }
 }

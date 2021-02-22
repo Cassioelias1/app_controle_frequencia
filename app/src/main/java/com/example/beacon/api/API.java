@@ -16,7 +16,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class API {
-    private static final String URL = "http://192.168.0.102:7000";
+//    private static final String URL = "http://192.168.0.102:7000";
+    private static final String URL = "http://scf.cassioelias.net.br";
 
     private static Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(URL)

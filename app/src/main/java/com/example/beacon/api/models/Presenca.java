@@ -3,6 +3,7 @@ package com.example.beacon.api.models;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class Presenca implements Serializable {
     @SerializedName("academico_id")
@@ -23,17 +24,22 @@ public class Presenca implements Serializable {
     @SerializedName("status")
     private String status;//transformar em enum
 
-    @SerializedName("posicao_x")
-    private String posicaoX;
-
-    @SerializedName("posicao_y")
-    private String posicaoY;
-
     @SerializedName("material_card_id")
     private String materialCardId;
 
     @SerializedName("text_view_id")
     private String textViewId;
+
+    @SerializedName("posicao_x")
+    private BigDecimal posicaoX;//Referente ao plano zy / Beacon2
+
+    @SerializedName("posicao_y")
+    private BigDecimal posicaoY;//Referente ao plano xz / Beacon1
+
+    @SerializedName("posicao_z")
+    private BigDecimal posicaoZ;//Referente ao plano xy / Beacon3
+
+    //adicionar os fields de PosicaoAcademico ou fazer um include
 
     private Integer idSqlite;
 
@@ -87,22 +93,6 @@ public class Presenca implements Serializable {
         this.status = status;
     }
 
-    public String getPosicaoX() {
-        return posicaoX;
-    }
-
-    public void setPosicaoX(String posicaoX) {
-        this.posicaoX = posicaoX;
-    }
-
-    public String getPosicaoY() {
-        return posicaoY;
-    }
-
-    public void setPosicaoY(String posicaoY) {
-        this.posicaoY = posicaoY;
-    }
-
     public void setStatusTrilateracao(boolean estaDentroSalaAula){
         this.status = estaDentroSalaAula ? "PRESENTE" : "AUSENTE";
     }
@@ -137,5 +127,40 @@ public class Presenca implements Serializable {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public BigDecimal getPosicaoX() {
+        return posicaoX;
+    }
+
+    public void setPosicaoX(BigDecimal posicaoX) {
+        this.posicaoX = posicaoX;
+    }
+
+    public BigDecimal getPosicaoY() {
+        return posicaoY;
+    }
+
+    public void setPosicaoY(BigDecimal posicaoY) {
+        this.posicaoY = posicaoY;
+    }
+
+    public BigDecimal getPosicaoZ() {
+        return posicaoZ;
+    }
+
+    public void setPosicaoZ(BigDecimal posicaoZ) {
+        this.posicaoZ = posicaoZ;
+    }
+
+    public void setPosicaoAcademicoHorarioAulaAndSetStatus(PosicaoAcademico posicaoAcademico){
+        if (posicaoAcademico == null){
+            this.status = "AUSENTE";
+        } else {
+            this.status = "PRESENTE";
+            this.posicaoX = posicaoAcademico.getPosicaoX();
+            this.posicaoY = posicaoAcademico.getPosicaoY();
+            this.posicaoZ = posicaoAcademico.getPosicaoZ();
+        }
     }
 }
