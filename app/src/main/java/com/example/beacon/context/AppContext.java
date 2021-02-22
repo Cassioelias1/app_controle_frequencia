@@ -15,6 +15,11 @@ public class AppContext {
     private static Thread thread2100 = null;
     private static Thread thread2140 = null;
 
+    //representação da turma do dia
+    private static String ID_BEACON_1 = null;
+    private static String ID_BEACON_2 = null;
+    private static String ID_BEACON_3 = null;
+
     public static String getNomeTurma() {
         return NOME_TURMA;
     }
@@ -77,5 +82,29 @@ public class AppContext {
 
     public static void setThread2140(Thread thread2140) {
         AppContext.thread2140 = thread2140;
+    }
+
+    public static String getIdBeacon1() {
+        return ID_BEACON_1;
+    }
+
+    public static void setIdBeacon1(String idBeacon1) {
+        ID_BEACON_1 = idBeacon1;
+    }
+
+    public static String getIdBeacon2() {
+        return ID_BEACON_2;
+    }
+
+    public static void setIdBeacon2(String idBeacon2) {
+        ID_BEACON_2 = idBeacon2;
+    }
+
+    public static String getIdBeacon3() {
+        return ID_BEACON_3;
+    }
+
+    public static void setIdBeacon3(String idBeacon3) {
+        ID_BEACON_3 = idBeacon3;
     }
 }

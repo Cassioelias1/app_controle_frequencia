@@ -14,6 +14,15 @@ public class Turma implements Serializable {
     @SerializedName("periodo")
     private String periodo;
 
+    @SerializedName("id_beacon_1")
+    private String idBeacon1;
+
+    @SerializedName("id_beacon_2")
+    private String idBeacon2;
+
+    @SerializedName("id_beacon_3")
+    private String idBeacon3;
+
     public Turma() {
     }
 
@@ -49,5 +58,29 @@ public class Turma implements Serializable {
 
     public void setPeriodo(String periodo) {
         this.periodo = periodo;
+    }
+
+    public String getIdBeacon1() {
+        return idBeacon1;
+    }
+
+    public void setIdBeacon1(String idBeacon1) {
+        this.idBeacon1 = idBeacon1;
+    }
+
+    public String getIdBeacon2() {
+        return idBeacon2;
+    }
+
+    public void setIdBeacon2(String idBeacon2) {
+        this.idBeacon2 = idBeacon2;
+    }
+
+    public String getIdBeacon3() {
+        return idBeacon3;
+    }
+
+    public void setIdBeacon3(String idBeacon3) {
+        this.idBeacon3 = idBeacon3;
     }
 }

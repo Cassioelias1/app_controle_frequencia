@@ -68,7 +68,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     private static final String ID_BEACON_POSICAO_2275_0_130 = "0x0077656c6c636f726573736407";
     private static final String ID_BEACON_POSICAO_0_185_130 = "2";
     private static final String ID_BEACON_POSICAO_2275_185_260 = "3";
-    private static final String ID_SIMULATE_ACADEMICO = "1";
     private Handler handler;
 
     protected final String TAG = RequestPermissionActivity.this.getClass().getSimpleName();
@@ -136,10 +135,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //        SegundoPlano segundoPlano2140 = new SegundoPlano(materialCardView2140, textView2140, 23, 29, AppContext.getThread2140(), "card_21_40", "textView2140", handler, context);
 //        segundoPlano2140.execute();
 
-        onInitThread(materialCardView1915, textView1915, 0, 15, AppContext.getThread1915(), "card_19_15", "textView1915");
-        onInitThread(materialCardView2015, textView2015, 0, 16, AppContext.getThread2015(), "card_20_15", "textView2015");
-        onInitThread(materialCardView2100, textView2100, 0, 17, AppContext.getThread2100(), "card_21_00", "textView2100");
-        onInitThread(materialCardView2140, textView2140, 0, 18, AppContext.getThread2140(), "card_21_40", "textView2140");
+        onInitThread(materialCardView1915, textView1915, 3, 30, AppContext.getThread1915(), "card_19_15", "textView1915");
+        onInitThread(materialCardView2015, textView2015, 8, 0, AppContext.getThread2015(), "card_20_15", "textView2015");
+        onInitThread(materialCardView2100, textView2100, 12, 0, AppContext.getThread2100(), "card_21_00", "textView2100");
+        onInitThread(materialCardView2140, textView2140, 17, 30, AppContext.getThread2140(), "card_21_40", "textView2140");
 
         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
         textViewNomeDisciplica.setText(AppContext.getNomeTurma());
@@ -248,9 +247,9 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         //beacon 2 = (0, 1.85, 1.30) -> irá representar o plano zy
         //beacon 3 = (2.275, 1.85, 2.60) -> irá representar o plano xy
 
-        BigDecimal distanciaBeacon1 = Util.getZeroIsNull(beaconDistanceMap.get(ID_BEACON_POSICAO_2275_0_130));
-        BigDecimal distanciaBeacon2 = Util.getZeroIsNull(beaconDistanceMap.get(ID_BEACON_POSICAO_0_185_130));
-        BigDecimal distanciaBeacon3 = Util.getZeroIsNull(beaconDistanceMap.get(ID_BEACON_POSICAO_2275_185_260));
+        BigDecimal distanciaBeacon1 = Util.getZeroIsNull(beaconDistanceMap.get(AppContext.getIdBeacon1()));
+        BigDecimal distanciaBeacon2 = Util.getZeroIsNull(beaconDistanceMap.get(AppContext.getIdBeacon2()));
+        BigDecimal distanciaBeacon3 = Util.getZeroIsNull(beaconDistanceMap.get(AppContext.getIdBeacon3()));
 
         //Se não existe uma das distâncias significa que o acadêmico não está em sala de aula.
         if(distanciaBeacon1.compareTo(BigDecimal.ZERO) > 0 || distanciaBeacon2.compareTo(BigDecimal.ZERO) > 0 || distanciaBeacon3.compareTo(BigDecimal.ZERO) > 0){
@@ -493,8 +492,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
     @Override
     public void onBeaconServiceConnect() {
-        StringBuilder builder = new StringBuilder();
-
         RangeNotifier rangeNotifier = new RangeNotifier() {
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
@@ -519,6 +516,9 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                         beaconDistanceMap.put(beacon.getId1().toString(), distance);
                     }
                     //showToastMessage(builder.toString());
+                } else {
+                    String msg = AppContext.getIdBeacon1() + " - " + AppContext.getIdBeacon2() + " - " + AppContext.getIdBeacon3();
+                    showToastMessage(msg);
                 }
             }
 
@@ -542,6 +542,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                         Turma turma = turmas.get(0);//A query vai retorna um resultado, foi tratado como list por conta de um erro relacionado a como o mysql retorna os valores
                         AppContext.setTurmaId(turma.getId().toString());
                         AppContext.setNomeTurma(turma.getDescricao());
+
+                        AppContext.setIdBeacon1(turma.getIdBeacon1());
+                        AppContext.setIdBeacon2(turma.getIdBeacon2());
+                        AppContext.setIdBeacon3(turma.getIdBeacon3());
 
                         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
                         textViewNomeDisciplica.setText(turma.getDescricao());
@@ -597,6 +601,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
             @Override
             public void onFailure(Call<List<Presenca>> call, Throwable t) {
             }
-        }, ID_SIMULATE_ACADEMICO, LocalDate.now().toString());
+        }, AppContext.getAcademicoId(), LocalDate.now().toString());
     }
 }
