@@ -247,6 +247,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         //beacon 2 = (0, 1.85, 1.30) -> irá representar o plano zy
         //beacon 3 = (2.275, 1.85, 2.60) -> irá representar o plano xy
 
+        //a distancia até o beacon irá representa a posicação.
         BigDecimal distanciaBeacon1 = Util.getZeroIsNull(beaconDistanceMap.get(AppContext.getIdBeacon1()));
         BigDecimal distanciaBeacon2 = Util.getZeroIsNull(beaconDistanceMap.get(AppContext.getIdBeacon2()));
         BigDecimal distanciaBeacon3 = Util.getZeroIsNull(beaconDistanceMap.get(AppContext.getIdBeacon3()));
@@ -256,9 +257,18 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
             return null;
         }
 
-        //tem que implementar algumas validações para verificar os pontos máximos, esses pontos máximos seram definidos e cada sala deve ter os seus
-        return new PosicaoAcademico(distanciaBeacon2, distanciaBeacon1, distanciaBeacon3);
+        PosicaoAcademico posicaoAcademico = new PosicaoAcademico(distanciaBeacon2, distanciaBeacon1, distanciaBeacon3);
 
+        BigDecimal maxPosicaoX = new BigDecimal("4.55");
+        BigDecimal maxPosicaoY = new BigDecimal("3.70");
+        BigDecimal maxPosicaoZ = new BigDecimal("2.60");
+
+        //Só irá cair quando as posições calculadas foram maiores que a da sala, significando que está fora da sala.
+        if (isMaior(posicaoAcademico.getPosicaoX(), maxPosicaoX) || isMaior(posicaoAcademico.getPosicaoY(), maxPosicaoY) || isMaior(posicaoAcademico.getPosicaoZ(), maxPosicaoZ)){
+            return posicaoAcademico.falta();
+        }
+
+        return posicaoAcademico.presenca();
         /*final BigDecimal DOIS = new BigDecimal("2");
         BigDecimal posX = distanciaBeacon1.pow(2).subtract(distanciaBeacon2.pow(2)).add(posicaoYBeacon2.pow(2))
                 .divide(DOIS.multiply(posicaoYBeacon2), RoundingMode.HALF_UP);
@@ -266,6 +276,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         BigDecimal posY = distanciaBeacon1.pow(2).subtract(distanciaBeacon3.pow(2)).add(posicaoXBeacon3.pow(2)).add(posicaoYBeacon3.pow(2))
                 .divide(DOIS.multiply(posicaoYBeacon3), RoundingMode.HALF_UP).subtract(posicaoXBeacon3.divide(posicaoYBeacon3, RoundingMode.HALF_UP)).multiply(posX);
         */
+    }
+
+    private boolean isMaior(BigDecimal posicaoCalculada, BigDecimal posicaoMaxima){
+        return posicaoCalculada.compareTo(posicaoMaxima) > 0;
     }
 
     private void validarPresencaApi(Presenca presenca, MaterialCardView materialCardView, TextView textView, String nameMaterialCard, String nameTextView){

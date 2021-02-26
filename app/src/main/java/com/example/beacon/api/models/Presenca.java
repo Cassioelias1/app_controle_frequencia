@@ -154,13 +154,9 @@ public class Presenca implements Serializable {
     }
 
     public void setPosicaoAcademicoHorarioAulaAndSetStatus(PosicaoAcademico posicaoAcademico){
-        if (posicaoAcademico == null){
-            this.status = "AUSENTE";
-        } else {
-            this.status = "PRESENTE";
-            this.posicaoX = posicaoAcademico.getPosicaoX();
-            this.posicaoY = posicaoAcademico.getPosicaoY();
-            this.posicaoZ = posicaoAcademico.getPosicaoZ();
-        }
+        this.status = posicaoAcademico.getStatus();
+        this.posicaoX = posicaoAcademico.getPosicaoX();
+        this.posicaoY = posicaoAcademico.getPosicaoY();
+        this.posicaoZ = posicaoAcademico.getPosicaoZ();
     }
 }
