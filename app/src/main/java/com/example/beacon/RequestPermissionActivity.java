@@ -135,10 +135,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //        SegundoPlano segundoPlano2140 = new SegundoPlano(materialCardView2140, textView2140, 23, 29, AppContext.getThread2140(), "card_21_40", "textView2140", handler, context);
 //        segundoPlano2140.execute();
 
-        onInitThread(materialCardView1915, textView1915, 3, 30, AppContext.getThread1915(), "card_19_15", "textView1915");
-        onInitThread(materialCardView2015, textView2015, 8, 0, AppContext.getThread2015(), "card_20_15", "textView2015");
-        onInitThread(materialCardView2100, textView2100, 12, 0, AppContext.getThread2100(), "card_21_00", "textView2100");
-        onInitThread(materialCardView2140, textView2140, 17, 30, AppContext.getThread2140(), "card_21_40", "textView2140");
+        onInitThread(materialCardView1915, textView1915, 21, 22, AppContext.getThread1915(), "card_19_15", "textView1915");
+        onInitThread(materialCardView2015, textView2015, 21, 25, AppContext.getThread2015(), "card_20_15", "textView2015");
+        onInitThread(materialCardView2100, textView2100, 21, 26, AppContext.getThread2100(), "card_21_00", "textView2100");
+        onInitThread(materialCardView2140, textView2140, 21, 28, AppContext.getThread2140(), "card_21_40", "textView2140");
 
         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
         textViewNomeDisciplica.setText(AppContext.getNomeTurma());
@@ -186,7 +186,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     }
 
     private void onInitThread(final MaterialCardView materialCardView, final TextView textView, final Integer hour, final Integer minute, Thread thread, String nameMaterialCard, String nameTextView) {
-        final boolean[] presencaValidada = {false};
+        boolean[] presencaValidada = {false};
 
         if (thread == null){
             thread = new Thread() {
@@ -197,13 +197,13 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                             LocalDateTime agora = LocalDateTime.now();
                             LocalDateTime primeiroHorario = LocalDateTime.of(agora.getYear(), agora.getMonth(), agora.getDayOfMonth(), hour, minute);
                             if (agora.getHour() == primeiroHorario.getHour() && agora.getMinute() == primeiroHorario.getMinute()){
-
+                                presencaValidada[0] = true;
+                                System.out.println("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
+                                System.out.println("DEU HORARIO");
+                                System.out.println("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
                                 Presenca presenca = new Presenca(AppContext.getAcademicoId(), AppContext.getTurmaId(), LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
-
                                 presenca.setPosicaoAcademicoHorarioAulaAndSetStatus(academicoEstaDentroSalaAula());
                                 validarPresencaApi(presenca, materialCardView, textView, nameMaterialCard, nameTextView);
-
-                                presencaValidada[0] = true;
                             }
                         } catch (Exception e) {
                         }
@@ -234,7 +234,9 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
     //este método deve ser responsavel por aplicar a trilateração
     private PosicaoAcademico academicoEstaDentroSalaAula(){
+        System.out.println("000000000000000000000");
         if(beaconDistanceMap.size() < 3){
+            System.out.println("1111111111111111");
             return null;//se não está captando pelo menos 3 beacons significa que o academico não está em sala de aula.
         }
 
@@ -252,6 +254,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         BigDecimal distanciaBeacon2 = Util.getZeroIsNull(beaconDistanceMap.get(AppContext.getIdBeacon2()));
         BigDecimal distanciaBeacon3 = Util.getZeroIsNull(beaconDistanceMap.get(AppContext.getIdBeacon3()));
 
+        System.out.println("33333333333333333");
         //Se não existe uma das distâncias significa que o acadêmico não está em sala de aula.
         if(distanciaBeacon1.compareTo(BigDecimal.ZERO) > 0 || distanciaBeacon2.compareTo(BigDecimal.ZERO) > 0 || distanciaBeacon3.compareTo(BigDecimal.ZERO) > 0){
             return null;
@@ -283,14 +286,19 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     }
 
     private void validarPresencaApi(Presenca presenca, MaterialCardView materialCardView, TextView textView, String nameMaterialCard, String nameTextView){
+        System.out.println("VALIDANDO NA API - REQ");
         API.validarPresenca(presenca, new Callback<Presenca>() {
             @Override
             public void onResponse(Call<Presenca> call, Response<Presenca> response) {
+                System.out.println("ON RESPONSEEEEEEEEEEEEEEEEEEE");
                 if (response.body() != null){
+                    System.out.println("1");
                     if (response.body().getMensagemRetorno() != null){
+                        System.out.println("2");
                         handler.post(new Runnable(){
                             @Override
                             public void run() {
+                                System.out.println("3");
                                 if ("PRESENTE".equals(response.body().getStatus())){
                                     materialCardView.setBackgroundColor(Color.parseColor("#11A33F"));
                                     textView.setText("Presença válidada!");
@@ -306,6 +314,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
             @Override
             public void onFailure(Call<Presenca> call, Throwable t) {
+                System.out.println("ON FAILUREEEEEEEEEEE");
                 savePresencaNaoComputada(presenca, nameMaterialCard, nameTextView);
             }
         });
