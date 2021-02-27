@@ -1,7 +1,9 @@
 package com.example.beacon;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -50,7 +52,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -135,10 +139,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //        SegundoPlano segundoPlano2140 = new SegundoPlano(materialCardView2140, textView2140, 23, 29, AppContext.getThread2140(), "card_21_40", "textView2140", handler, context);
 //        segundoPlano2140.execute();
 
-        onInitThread(materialCardView1915, textView1915, 21, 22, AppContext.getThread1915(), "card_19_15", "textView1915");
-        onInitThread(materialCardView2015, textView2015, 21, 25, AppContext.getThread2015(), "card_20_15", "textView2015");
-        onInitThread(materialCardView2100, textView2100, 21, 26, AppContext.getThread2100(), "card_21_00", "textView2100");
-        onInitThread(materialCardView2140, textView2140, 21, 28, AppContext.getThread2140(), "card_21_40", "textView2140");
+//        onInitThread(materialCardView1915, textView1915, 0, 20, AppContext.getThread1915(), "card_19_15", "textView1915");
+        onInitThread(materialCardView2015, textView2015, 0, 30, AppContext.getThread2015(), "card_20_15", "textView2015");
+//        onInitThread(materialCardView2100, textView2100, 0, 22, AppContext.getThread2100(), "card_21_00", "textView2100");
+//        onInitThread(materialCardView2140, textView2140, 0, 23, AppContext.getThread2140(), "card_21_40", "textView2140");
 
         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
         textViewNomeDisciplica.setText(AppContext.getNomeTurma());
@@ -157,6 +161,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
 //        resetCardsPresencas(materialCardViews, textViews, 23, 7);
 
+//        createAlarmManagerToBackgroundProcess(0, 5);
         initServiceFindBeacons();
         getAulaDiaAcademico();
         getPresencasJaValidadas();
@@ -185,6 +190,22 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         });
     }
 
+    private void createAlarmManagerToBackgroundProcess(Integer hora, Integer minuto, String nameCard, String nameTextView){
+        Intent intent = new Intent(context, AlarmPresencas.class);
+        intent.putExtra("nameCard", nameCard);
+        intent.putExtra("nameTextView", nameTextView);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, hora);
+        calendar.set(Calendar.MINUTE, minuto);
+        calendar.set(Calendar.SECOND, 20);//20sec para dar tempo de validar a presença quando o app estiver aberto.
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+    }
+
     private void onInitThread(final MaterialCardView materialCardView, final TextView textView, final Integer hour, final Integer minute, Thread thread, String nameMaterialCard, String nameTextView) {
         boolean[] presencaValidada = {false};
 
@@ -192,6 +213,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
             thread = new Thread() {
                 @Override
                 public void run() {
+                    createAlarmManagerToBackgroundProcess(hour, minute, nameMaterialCard, nameTextView);
                     while (!presencaValidada[0]) {
                         try {
                             LocalDateTime agora = LocalDateTime.now();
@@ -378,9 +400,9 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         stopDetectingBeacons();
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        if (mBluetoothAdapter.isEnabled()) {
-            mBluetoothAdapter.disable();
-        }
+//        if (mBluetoothAdapter.isEnabled()) {
+//            mBluetoothAdapter.disable();
+//        }
     }
 
     private void showToastMessage (String message) {
@@ -394,6 +416,11 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         super.onDestroy();
         mBeaconManager.removeAllRangeNotifiers();
         mBeaconManager.unbind(this);
+
+        Intent intent = new Intent("RECEIVER_ALARM");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmManager.cancel(pendingIntent);
     }
 
     private void askForLocationPermissions() {

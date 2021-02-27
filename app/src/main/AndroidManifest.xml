@@ -2,10 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.beacon">
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -30,6 +33,14 @@
         <activity android:name=".StatusActivity"></activity>
         <activity android:name=".SincronizacaoActivity"></activity>
         <activity android:name=".RequestPermissionActivity"></activity>
+        <receiver android:name=".AlarmPresencas"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="RECEIVER_ALARM"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </receiver>
         <service android:name="org.altbeacon.beacon.service.BeaconService"
             tools:node="replace">
             <meta-data android:name="longScanForcingEnabled" android:value="true"/>
