@@ -139,10 +139,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //        SegundoPlano segundoPlano2140 = new SegundoPlano(materialCardView2140, textView2140, 23, 29, AppContext.getThread2140(), "card_21_40", "textView2140", handler, context);
 //        segundoPlano2140.execute();
 
-//        onInitThread(materialCardView1915, textView1915, 0, 20, AppContext.getThread1915(), "card_19_15", "textView1915");
-        onInitThread(materialCardView2015, textView2015, 0, 30, AppContext.getThread2015(), "card_20_15", "textView2015");
-//        onInitThread(materialCardView2100, textView2100, 0, 22, AppContext.getThread2100(), "card_21_00", "textView2100");
-//        onInitThread(materialCardView2140, textView2140, 0, 23, AppContext.getThread2140(), "card_21_40", "textView2140");
+        onInitThread(materialCardView1915, textView1915, 14, 20, AppContext.getThread1915(), "card_19_15", "textView1915");
+        onInitThread(materialCardView2015, textView2015, 14, 21, AppContext.getThread2015(), "card_20_15", "textView2015");
+        onInitThread(materialCardView2100, textView2100, 14, 22, AppContext.getThread2100(), "card_21_00", "textView2100");
+        onInitThread(materialCardView2140, textView2140, 14, 23, AppContext.getThread2140(), "card_21_40", "textView2140");
 
         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
         textViewNomeDisciplica.setText(AppContext.getNomeTurma());

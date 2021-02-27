@@ -1,24 +1,17 @@
 package com.example.beacon;
 
-import android.app.AlarmManager;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.widget.TextView;
 
 import com.example.beacon.api.API;
 import com.example.beacon.api.models.Presenca;
 import com.example.beacon.context.AppContext;
 import com.example.beacon.sqlite.BancoController;
 import com.example.beacon.utils.Util;
-import com.google.android.material.card.MaterialCardView;
 
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.logging.Handler;
 
 import retrofit2.Call;
 import retrofit2.Callback;
