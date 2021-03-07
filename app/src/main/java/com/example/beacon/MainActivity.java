@@ -48,6 +48,8 @@ public class MainActivity extends Activity {
         EditText editText2 = findViewById(R.id.editPassword);
         editText2.setText("95082");
 
+        //TODO: setar no AppContext null em turmaId e academicoId
+
         initButtons();
     }
 

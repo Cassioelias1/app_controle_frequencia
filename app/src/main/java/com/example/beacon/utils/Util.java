@@ -22,6 +22,10 @@ public class Util {
         return valor == null || valor.length() == 0;
     }
 
+    public static String getEmptyIfNull(String valor){
+        return valor != null ? valor : "";
+    }
+
     public static void sendNotification(String tituloNotificacao, String contentNotificacao, NotificationManager notificationManager, Context context) {
 //        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
         Notification.Builder builder;
@@ -53,7 +57,8 @@ public class Util {
         toast.show();
     }
 
-    public static BigDecimal getZeroIsNull(Double valor){
+    //getZeroIfNull
+    public static BigDecimal getZeroIfNull(Double valor){
         return valor == null ? BigDecimal.ZERO : new BigDecimal(valor);
     }
 }

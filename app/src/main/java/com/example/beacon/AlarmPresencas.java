@@ -25,7 +25,7 @@ public class AlarmPresencas extends BroadcastReceiver {
 
         Presenca presenca = new Presenca(AppContext.getAcademicoId(), AppContext.getTurmaId(), LocalDateTime.now().toString(), nameCard, nameTextView);
         //TODO: ainda falta chamar o método da trilateração pra setar o status
-        validarPresencaApi(presenca, nameCard, nameTextView, context);
+        //validarPresencaApi(presenca, nameCard, nameTextView, context);
     }
 
     private void validarPresencaApi(Presenca presenca, String nameMaterialCard, String nameTextView, Context context){
@@ -41,7 +41,7 @@ public class AlarmPresencas extends BroadcastReceiver {
             public void onFailure(Call<Presenca> call, Throwable t) {
                 NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                 Util.sendNotification("Erro ao validar presença", "Sua presença não foi validando, tente realizar a sincronização!", notificationManager, context);
-                savePresencaNaoComputada(presenca, nameMaterialCard, nameTextView, context);
+                //savePresencaNaoComputada(presenca, nameMaterialCard, nameTextView, context);
             }
         });
     }
