@@ -98,6 +98,9 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     private Map<String, Double> beaconDistanceMap = new HashMap<>();
     private BancoController controller;
 
+    boolean[] validarPresencaDia = {true, true, true, true};
+    boolean[] resetarCardsPresencas = {true};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,10 +148,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //        SegundoPlano segundoPlano2140 = new SegundoPlano(materialCardView2140, textView2140, 23, 29, AppContext.getThread2140(), "card_21_40", "textView2140", handler, context);
 //        segundoPlano2140.execute();
 
-        onInitThread(materialCardView1915, textView1915, 13, 0, AppContext.getThread1915(), "card_19_15", "textView1915");
-        onInitThread(materialCardView2015, textView2015, 13, 10, AppContext.getThread2015(), "card_20_15", "textView2015");
-        onInitThread(materialCardView2100, textView2100, 13, 20, AppContext.getThread2100(), "card_21_00", "textView2100");
-        onInitThread(materialCardView2140, textView2140, 13, 30, AppContext.getThread2140(), "card_21_40", "textView2140");
+        onInitThread(materialCardView1915, textView1915, 17, 5, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
+        onInitThread(materialCardView2015, textView2015, 17, 6, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
+        onInitThread(materialCardView2100, textView2100, 17, 7, AppContext.getThread2100(), "card_21_00", "textView2100", 2);
+        onInitThread(materialCardView2140, textView2140, 17, 8, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
 
         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
         textViewNomeDisciplica.setText(AppContext.getNomeTurma());
@@ -165,7 +168,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //        textViews.add(textView2100);
 //        textViews.add(textView2140);
 
-//        resetCardsPresencas(materialCardViews, textViews, 23, 7);
+//        resetCardsPresencas(materialCardViews, textViews);
 
 //        createAlarmManagerToBackgroundProcess(0, 5);
         initServiceFindBeacons();
@@ -212,19 +215,23 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
-    private void onInitThread(final MaterialCardView materialCardView, final TextView textView, final Integer hour, final Integer minute, Thread thread, String nameMaterialCard, String nameTextView) {
+    private void onInitThread(final MaterialCardView materialCardView, final TextView textView, final Integer hour, final Integer minute, Thread thread, String nameMaterialCard, String nameTextView, int posicaoThread) {
         if (thread == null){
             thread = new Thread() {
                 @Override
                 public void run() {
-                    boolean presencaValidada = true;
                     //createAlarmManagerToBackgroundProcess(hour, minute, nameMaterialCard, nameTextView);
-                    while (presencaValidada) {
+                    while (validarPresencaDia[posicaoThread]) {
                         try {
                             LocalDateTime agora = LocalDateTime.now();
                             LocalDateTime primeiroHorario = LocalDateTime.of(agora.getYear(), agora.getMonth(), agora.getDayOfMonth(), hour, minute);
                             if (agora.getHour() == primeiroHorario.getHour() && agora.getMinute() == primeiroHorario.getMinute()){
-                                presencaValidada = false;
+                                validarPresencaDia[posicaoThread] = false;
+
+                                if (posicaoThread == 3){//No momento em que for validada a ultima presença do academico, iniciar esta variavel para que o app realize o reset a meia noite.
+                                    resetarCardsPresencas[0] = true;
+                                }
+
                                 Presenca presenca = new Presenca(AppContext.getAcademicoId(), AppContext.getTurmaId(), LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
                                 presenca.setPosicaoAcademicoHorarioAulaAndSetStatus(academicoEstaDentroSalaAula());
                                 validarPresencaApi(presenca, materialCardView, textView, nameMaterialCard, nameTextView);
@@ -261,7 +268,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         if(beaconDistanceMap.size() < 3){
             return null;//se não está captando pelo menos 3 beacons significa que o academico não está em sala de aula.
         } else if (beaconDistanceMap.size() >= 3){//TODO: Apenas para testes.
-            return new PosicaoAcademico(BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE);
+            return new PosicaoAcademico(BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE).presenca();
         }
 
         //Dados total da sala
@@ -317,21 +324,24 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     }
 
     private void validarPresencaApi(Presenca presenca, MaterialCardView materialCardView, TextView textView, String nameMaterialCard, String nameTextView){
+        System.out.println("VALIDANDO PRESENCA *************************");
         API.validarPresenca(presenca, new Callback<Presenca>() {
             @Override
             public void onResponse(Call<Presenca> call, Response<Presenca> response) {
+                System.out.println("ONRESPONSEEEEEEEEEEEEEEEE");
                 if (response.body() != null){
+                    System.out.println("TEM BODY");
                     if (response.body().getMensagemRetorno() != null){
-                        handler.post(new Runnable(){
-                            @Override
-                            public void run() {
-                                if ("PRESENTE".equals(response.body().getStatus())){
-                                    materialCardView.setBackgroundColor(Color.parseColor("#11A33F"));
-                                    textView.setText("Presença válidada!");
-                                } else if("AUSENTE".equals(response.body().getStatus())) {
-                                    materialCardView.setBackgroundColor(Color.parseColor("#b00e29"));
-                                    textView.setText("Falta computada!");
-                                }
+                        System.out.println("TEM RETORNO");
+                        handler.post(() -> {
+                            if ("PRESENTE".equals(response.body().getStatus())){
+                                System.out.println("SeTEI PRESENTE");
+                                materialCardView.setBackgroundColor(Color.parseColor("#11A33F"));
+                                textView.setText("Presença válidada!");
+                            } else if("AUSENTE".equals(response.body().getStatus())) {
+                                System.out.println("SeTEI AUSENte");
+                                materialCardView.setBackgroundColor(Color.parseColor("#b00e29"));
+                                textView.setText("Falta computada!");
                             }
                         });
                     }
@@ -340,6 +350,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
             @Override
             public void onFailure(Call<Presenca> call, Throwable t) {
+                System.out.println("ONFAILUREEEEEEEEEEEEE");
                 savePresencaNaoComputada(presenca, nameMaterialCard, nameTextView);
             }
         });
@@ -352,18 +363,21 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         return controller.save(presenca.getData(), presenca.getIdAcademico(), presenca.getIdTurma(), presenca.getStatus(), nameMaterialCard, nameTextView);
     }
 
-    private void resetCardsPresencas(final List<MaterialCardView> materialCardViews, final List<TextView> textViews, final Integer hour, final Integer minute){
-        final boolean[] resetRealizado = {false};
-
+    //TODO: este método deve resetar a variavel validarPresencaDia e limpar os quadrados da tela principal.
+    private void resetCardsPresencas(final List<MaterialCardView> materialCardViews, final List<TextView> textViews){
         new Thread(){
             @Override
             public void run() {
                 try {
-                    while (!resetRealizado[0]) {
+                    while (resetarCardsPresencas[0]) {
                         LocalDateTime agora = LocalDateTime.now();
-                        LocalDateTime primeiroHorario = LocalDateTime.of(agora.getYear(), agora.getMonth(), agora.getDayOfMonth(), hour, minute);
-                        if (agora.getHour() == primeiroHorario.getHour() && agora.getMinute() == primeiroHorario.getMinute()) {
-                            resetRealizado[0] = true;
+                        //Irá resetar meia noite, por isso 00:00:00
+                        if (agora.getHour() == 0 && agora.getMinute() == 0 && agora.getSecond() == 0) {
+                            resetarCardsPresencas[0] = false;
+                            validarPresencaDia[0] = true;
+                            validarPresencaDia[1] = true;
+                            validarPresencaDia[2] = true;
+                            validarPresencaDia[3] = true;
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
