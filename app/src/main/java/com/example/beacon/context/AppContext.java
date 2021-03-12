@@ -19,6 +19,7 @@ public class AppContext {
     private static String ID_BEACON_1 = null;
     private static String ID_BEACON_2 = null;
     private static String ID_BEACON_3 = null;
+    private static String ID_BEACON_4 = null;
 
     public static String getNomeTurma() {
         return NOME_TURMA;
@@ -106,5 +107,13 @@ public class AppContext {
 
     public static void setIdBeacon3(String idBeacon3) {
         ID_BEACON_3 = idBeacon3;
+    }
+
+    public static String getIdBeacon4() {
+        return ID_BEACON_4;
+    }
+
+    public static void setIdBeacon4(String idBeacon4) {
+        ID_BEACON_4 = idBeacon4;
     }
 }

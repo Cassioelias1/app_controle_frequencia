@@ -1,15 +1,16 @@
 package com.example.beacon.api.models;
 
-import java.math.BigDecimal;
-
 public class PosicaoAcademico {
 
-    private BigDecimal posicaoX;//Referente ao plano zy / Beacon2
-    private BigDecimal posicaoY;//Referente ao plano xz / Beacon1
-    private BigDecimal posicaoZ;//Referente ao plano xy / Beacon3
+    private double posicaoX;//Referente ao plano zy / Beacon2
+    private double posicaoY;//Referente ao plano xz / Beacon1
+    private double posicaoZ;//Referente ao plano xy / Beacon3
     private String status;
 
-    public PosicaoAcademico(BigDecimal posicaoX, BigDecimal posicaoY, BigDecimal posicaoZ) {
+    public PosicaoAcademico() {
+    }
+
+    public PosicaoAcademico(double posicaoX, double posicaoY, double posicaoZ) {
         this.posicaoX = posicaoX;
         this.posicaoY = posicaoY;
         this.posicaoZ = posicaoZ;
@@ -25,27 +26,27 @@ public class PosicaoAcademico {
         return this;
     }
 
-    public BigDecimal getPosicaoX() {
+    public double getPosicaoX() {
         return posicaoX;
     }
 
-    public void setPosicaoX(BigDecimal posicaoX) {
+    public void setPosicaoX(double posicaoX) {
         this.posicaoX = posicaoX;
     }
 
-    public BigDecimal getPosicaoY() {
+    public double getPosicaoY() {
         return posicaoY;
     }
 
-    public void setPosicaoY(BigDecimal posicaoY) {
+    public void setPosicaoY(double posicaoY) {
         this.posicaoY = posicaoY;
     }
 
-    public BigDecimal getPosicaoZ() {
+    public double getPosicaoZ() {
         return posicaoZ;
     }
 
-    public void setPosicaoZ(BigDecimal posicaoZ) {
+    public void setPosicaoZ(double posicaoZ) {
         this.posicaoZ = posicaoZ;
     }
 

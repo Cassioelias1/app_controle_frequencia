@@ -23,6 +23,9 @@ public class Turma implements Serializable {
     @SerializedName("id_beacon_3")
     private String idBeacon3;
 
+    @SerializedName("id_beacon_4")
+    private String idBeacon4;
+
     public Turma() {
     }
 
@@ -82,5 +85,13 @@ public class Turma implements Serializable {
 
     public void setIdBeacon3(String idBeacon3) {
         this.idBeacon3 = idBeacon3;
+    }
+
+    public String getIdBeacon4() {
+        return idBeacon4;
+    }
+
+    public void setIdBeacon4(String idBeacon4) {
+        this.idBeacon4 = idBeacon4;
     }
 }

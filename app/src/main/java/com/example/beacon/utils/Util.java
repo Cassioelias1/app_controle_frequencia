@@ -58,7 +58,7 @@ public class Util {
     }
 
     //getZeroIfNull
-    public static BigDecimal getZeroIfNull(Double valor){
-        return valor == null ? BigDecimal.ZERO : new BigDecimal(valor);
+    public static double getZeroIfNull(Double valor){
+        return valor == null ? 0 : valor;
     }
 }
