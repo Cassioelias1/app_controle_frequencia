@@ -514,51 +514,37 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
     @Override
     public void onBeaconServiceConnect() {
-//        StringBuilder builder = new StringBuilder();
-        RangeNotifier rangeNotifier = new RangeNotifier() {
-            @Override
-            public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-                if (beacons.size() > 0) {
-//                    builder.delete(0, builder.length());
-//                    builder.append("Quantidade de beacons localizado: ").append(beacons.size()).append("\n");
-
+        RangeNotifier rangeNotifier = (beacons, region) -> {
+            if (beacons.size() > 0) {
 //                    if (!beaconDistanceMap.isEmpty()){
 //                        beaconDistanceMap.clear();
 //                    }
-                    beaconDistanceMap = new HashMap<>();
+                //verificar se isso vai zerar os registros antigos.
+                beaconDistanceMap = new HashMap<>();
 
-                    for (Beacon beacon : beacons) {
-                        String idFinal = "";
+                String idFinal;
+                String id1 = null;
+                String id2 = null;
+                String id3 = null;
 
-                        String id1 = beacon.getId1() != null ? beacon.getId1().toString() : "";
-                        String id2 = null;
-                        String id3 = null;
-                        if (!"0x0077656c6c636f726573736407".equals(id1)) {//Esse beacon não possui id2 e id3
-                            id2 = beacon.getId2() != null ? beacon.getId2().toString() : "";
-                            id3 = beacon.getId3() != null ? beacon.getId3().toString() : "";
-                        }
-
-                        //Utilizar os 3 ids, pois alguns beacons podem conter id1 iguais.
-                        idFinal = id1 + "-" + Util.getEmptyIfNull(id2) + "-" + Util.getEmptyIfNull(id3);
-
-//                        builder.append("ID1: "+beacon.getId1()).append("\n");
-//                        builder.append("ID2: "+beacon.getId2()).append("\n");
-//                        builder.append("ID3: "+beacon.getId3()).append("\n");
-//                        builder.append("DISTANCIA em METROS: "+BigDecimal.valueOf(beacon.getDistance()).setScale(2, RoundingMode.HALF_UP)).append("\n");
-//                        builder.append("DISTANCIA NOVO: "+BeaconUtils.calcularDistanciaByRssi(beacon)).append("\n");
-//                        builder.append("====================").append("\n");
-
-                        Double distance = BeaconUtils.calcularDistanciaByRssi(beacon);
-                        beaconDistanceMap.put(idFinal, distance);
+                for (Beacon beacon : beacons) {
+                    id1 = beacon.getId1() != null ? beacon.getId1().toString() : "";
+                    if (beacon.getIdentifiers().size() > 3) {//Alguns beacons não possuem id2 e id3
+                        id2 = beacon.getId2() != null ? beacon.getId2().toString() : "";
+                        id3 = beacon.getId3() != null ? beacon.getId3().toString() : "";
                     }
+                    //Utilizar os 3 ids, pois alguns beacons podem conter id1 iguais.
+                    idFinal = id1 + "-" + Util.getEmptyIfNull(id2) + "-" + Util.getEmptyIfNull(id3);
+
+                    Double distance = BeaconUtils.calcularDistanciaByRssi(beacon);
+                    beaconDistanceMap.put(idFinal, distance);
+                }
 //                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 //                    Util.sendNotification("result", result, notificationManager, context);
-                } else {
-                    String msg = AppContext.getIdBeacon1() + " - " + AppContext.getIdBeacon2() + " - " + AppContext.getIdBeacon3();
-                    showToastMessage(msg);
-                }
+            } else {
+                String msg = AppContext.getIdBeacon1() + " - " + AppContext.getIdBeacon2() + " - " + AppContext.getIdBeacon3();
+                showToastMessage(msg);
             }
-
         };
         try {
             mBeaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
