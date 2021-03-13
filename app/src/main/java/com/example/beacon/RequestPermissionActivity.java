@@ -152,7 +152,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         onInitThread(materialCardView1915, textView1915, 22, 0, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
         onInitThread(materialCardView2015, textView2015, 22, 1, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
         onInitThread(materialCardView2100, textView2100, 22, 2, AppContext.getThread2100(), "card_21_00", "textView2100", 2);
-        onInitThread(materialCardView2140, textView2140, 22, 3, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
+        onInitThread(materialCardView2140, textView2140, 22, 8, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
 
         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
         textViewNomeDisciplica.setText(AppContext.getNomeTurma());
@@ -266,9 +266,9 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
     //este método deve ser responsavel por aplicar a trilateração
     private PosicaoAcademico academicoEstaDentroSalaAula(){
-        if(beaconDistanceMap.size() < 3){
-            return null;//se não está captando pelo menos 3 beacons significa que o academico não está em sala de aula.
-        }
+//        if(beaconDistanceMap.size() < 3){
+            //return null;//se não está captando pelo menos 3 beacons significa que o academico não está em sala de aula.
+//        }
 
         //Dados total da sala
         //Altura (Z) = 2.60
@@ -276,20 +276,31 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         //Largura Frontal (Y) = 3.70
 
         //a distancia até o beacon irá representa a posicação.
-        double distanciaBeacon1 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon1()));
-        double distanciaBeacon2 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon2()));
-        double distanciaBeacon3 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon3()));
-        double distanciaBeacon4 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon4()));
+        Double distanciaBeacon1 = beaconDistanceMap.get(AppContext.getIdBeacon1());
+        Double distanciaBeacon2 = beaconDistanceMap.get(AppContext.getIdBeacon2());
+        Double distanciaBeacon3 = beaconDistanceMap.get(AppContext.getIdBeacon3());
+        Double distanciaBeacon4 = beaconDistanceMap.get(AppContext.getIdBeacon4());
+
+        if (distanciaBeacon1 == null || distanciaBeacon2 == null || distanciaBeacon3 == null || distanciaBeacon4 == null){
+            return null;
+        }
+
+//        distanciaBeacon2 = 5.5;
+//        distanciaBeacon3 = 6;
 
         //TODO: Posição x será calculada a partir dos beacons 2 e 3 juntamente ao tamanho do lado x
-        Heron heronX = new Heron(distanciaBeacon2, distanciaBeacon3, 4.55);
+        Heron heronX = new Heron(distanciaBeacon2, distanciaBeacon3, 4.55);//o lado 3 irá representar a medida do lado da sala.
         //TODO: Posição y será calculada a partir dos beacons 2 e 4 juntamente ao tamanho do lado y
-        Heron heronY = new Heron(distanciaBeacon2, distanciaBeacon4, 3.70);
+        Heron heronY = new Heron(distanciaBeacon2, distanciaBeacon4, 3.70);//o lado 3 irá representar a medida do lado da sala.
         //TODO: Posição z será calculada a partir dos beacons 1 e 2 juntamente ao tamanho do lado z
-        Heron heronZ = new Heron(distanciaBeacon1, distanciaBeacon2, 2.60);
+        Heron heronZ = new Heron(distanciaBeacon1, distanciaBeacon2, 2.60);//o lado 3 irá representar a medida do lado da sala.
 
 
         PosicaoAcademico posicaoAcademico = new PosicaoAcademico(heronX.calcularAlturaLado(4.55), heronY.calcularAlturaLado(3.70), heronZ.calcularAlturaLado(2.60));
+
+//        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+//        String result = "("+posicaoAcademico.getPosicaoX()+", "+posicaoAcademico.getPosicaoY()+", "+posicaoAcademico.getPosicaoZ()+")";
+//        Util.sendNotification("result", result, notificationManager, context);
 
         //TODO: fazer algumas validações em posicaoAcademico para verificar se as posições calculadas estão dentro da sala de aula de fato.
 
