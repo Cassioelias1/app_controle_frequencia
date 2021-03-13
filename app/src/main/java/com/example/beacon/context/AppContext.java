@@ -21,6 +21,11 @@ public class AppContext {
     private static String ID_BEACON_3 = null;
     private static String ID_BEACON_4 = null;
 
+    //representação das medidas da sala de aula.
+    private static Double medidaLadoX;
+    private static Double medidaLadoY;
+    private static Double medidaLadoZ;
+
     public static String getNomeTurma() {
         return NOME_TURMA;
     }
@@ -115,5 +120,29 @@ public class AppContext {
 
     public static void setIdBeacon4(String idBeacon4) {
         ID_BEACON_4 = idBeacon4;
+    }
+
+    public static Double getMedidaLadoX() {
+        return medidaLadoX;
+    }
+
+    public static void setMedidaLadoX(Double medidaLadoX) {
+        AppContext.medidaLadoX = medidaLadoX;
+    }
+
+    public static Double getMedidaLadoY() {
+        return medidaLadoY;
+    }
+
+    public static void setMedidaLadoY(Double medidaLadoY) {
+        AppContext.medidaLadoY = medidaLadoY;
+    }
+
+    public static Double getMedidaLadoZ() {
+        return medidaLadoZ;
+    }
+
+    public static void setMedidaLadoZ(Double medidaLadoZ) {
+        AppContext.medidaLadoZ = medidaLadoZ;
     }
 }

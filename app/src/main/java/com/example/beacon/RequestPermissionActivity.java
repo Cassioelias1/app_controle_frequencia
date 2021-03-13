@@ -276,27 +276,31 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         //Largura Frontal (Y) = 3.70
 
         //a distancia até o beacon irá representa a posicação.
-        Double distanciaBeacon1 = beaconDistanceMap.get(AppContext.getIdBeacon1());
-        Double distanciaBeacon2 = beaconDistanceMap.get(AppContext.getIdBeacon2());
-        Double distanciaBeacon3 = beaconDistanceMap.get(AppContext.getIdBeacon3());
-        Double distanciaBeacon4 = beaconDistanceMap.get(AppContext.getIdBeacon4());
-
-        if (distanciaBeacon1 == null || distanciaBeacon2 == null || distanciaBeacon3 == null || distanciaBeacon4 == null){
-            return null;
-        }
+        Double distanciaBeacon1 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon1()));
+        Double distanciaBeacon2 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon2()));
+        Double distanciaBeacon3 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon3()));
+        Double distanciaBeacon4 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon4()));
 
 //        distanciaBeacon2 = 5.5;
 //        distanciaBeacon3 = 6;
 
+        Double medidaLadoX = AppContext.getMedidaLadoX();
+        Double medidaLadoY = AppContext.getMedidaLadoY();
+        Double medidaLadoZ = AppContext.getMedidaLadoZ();
+
+        //podem ser nulos se houver erro na requisição para recuperar a aula do dia do academico ou se for sabádo ou domingo.
+        if (medidaLadoX == null || medidaLadoY == null || medidaLadoZ == null){
+            return null;
+        }
+
         //TODO: Posição x será calculada a partir dos beacons 2 e 3 juntamente ao tamanho do lado x
-        Heron heronX = new Heron(distanciaBeacon2, distanciaBeacon3, 4.55);//o lado 3 irá representar a medida do lado da sala.
+        Heron heronX = new Heron(distanciaBeacon2, distanciaBeacon3, medidaLadoX);//o lado 3 irá representar a medida do lado da sala.
         //TODO: Posição y será calculada a partir dos beacons 2 e 4 juntamente ao tamanho do lado y
-        Heron heronY = new Heron(distanciaBeacon2, distanciaBeacon4, 3.70);//o lado 3 irá representar a medida do lado da sala.
+        Heron heronY = new Heron(distanciaBeacon2, distanciaBeacon4, medidaLadoY);//o lado 3 irá representar a medida do lado da sala.
         //TODO: Posição z será calculada a partir dos beacons 1 e 2 juntamente ao tamanho do lado z
-        Heron heronZ = new Heron(distanciaBeacon1, distanciaBeacon2, 2.60);//o lado 3 irá representar a medida do lado da sala.
+        Heron heronZ = new Heron(distanciaBeacon1, distanciaBeacon2, medidaLadoZ);//o lado 3 irá representar a medida do lado da sala.
 
-
-        PosicaoAcademico posicaoAcademico = new PosicaoAcademico(heronX.calcularAlturaLado(4.55), heronY.calcularAlturaLado(3.70), heronZ.calcularAlturaLado(2.60));
+        PosicaoAcademico posicaoAcademico = new PosicaoAcademico(heronX.calcularAlturaLado(medidaLadoX), heronY.calcularAlturaLado(medidaLadoY), heronZ.calcularAlturaLado(medidaLadoZ));
 
 //        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 //        String result = "("+posicaoAcademico.getPosicaoX()+", "+posicaoAcademico.getPosicaoY()+", "+posicaoAcademico.getPosicaoZ()+")";
@@ -565,7 +569,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         } catch (RemoteException e) {   }
     }
 
-    //TODO: não da pra retornar essas informações no login
+    //TODO: Retornar as medidas da sala de aula aqui tbm.
     private void getAulaDiaAcademico(){
         if (AppContext.getTurmaId() == null || AppContext.getNomeTurma() == null){
             API.getAulaDiaAcademico(new Callback<List<Turma>>() {
@@ -573,8 +577,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                 public void onResponse(Call<List<Turma>> call, Response<List<Turma>> response) {
                     List<Turma> turmas = response.body();
                     if (turmas != null && !turmas.isEmpty()) {
-                        System.out.println("==================================");
-                        System.out.println("teve resultado");
                         Turma turma = turmas.get(0);//A query vai retorna um resultado, foi tratado como list por conta de um erro relacionado a como o mysql retorna os valores
                         AppContext.setTurmaId(turma.getId().toString());
                         AppContext.setNomeTurma(turma.getDescricao());
@@ -584,11 +586,13 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                         AppContext.setIdBeacon3(turma.getIdBeacon3());
                         AppContext.setIdBeacon4(turma.getIdBeacon4());
 
+                        AppContext.setMedidaLadoX(turma.getMedidaLadoX());
+                        AppContext.setMedidaLadoY(turma.getMedidaLadoY());
+                        AppContext.setMedidaLadoZ(turma.getMedidaLadoZ());
+
                         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
                         textViewNomeDisciplica.setText(turma.getDescricao());
                     } else {
-                        System.out.println("==================================");
-                        System.out.println("sem resultado");
                         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
                         textViewNomeDisciplica.setText("Você não possui aula hoje");
 
