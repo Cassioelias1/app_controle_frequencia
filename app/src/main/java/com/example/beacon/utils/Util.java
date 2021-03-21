@@ -17,6 +17,7 @@ import com.example.beacon.R;
 import java.math.BigDecimal;
 
 public class Util {
+    public static BigDecimal DOIS = new BigDecimal("2");
 
     public static boolean isNullOrEmpty(String valor){
         return valor == null || valor.length() == 0;
@@ -58,7 +59,7 @@ public class Util {
     }
 
     //getZeroIfNull
-    public static double getZeroIfNull(Double valor){
+    public static Double getZeroIfNull(Double valor){
         return valor == null ? 0 : valor;
     }
 }

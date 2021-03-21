@@ -2,6 +2,8 @@ package com.example.beacon.context;
 
 import android.app.NotificationManager;
 
+import java.math.BigDecimal;
+
 public class AppContext {
     private static String ACADEMICO_ID = null;
     private static String TURMA_ID = null;

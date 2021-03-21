@@ -33,6 +33,7 @@ import com.example.beacon.api.models.Presenca;
 import com.example.beacon.api.models.Turma;
 import com.example.beacon.context.AppContext;
 import com.example.beacon.heron.Heron;
+import com.example.beacon.services.BeaconService;
 import com.example.beacon.sqlite.BancoController;
 import com.example.beacon.utils.BeaconUtils;
 import com.example.beacon.utils.Util;
@@ -50,6 +51,7 @@ import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
 import org.altbeacon.beacon.startup.RegionBootstrap;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -226,16 +228,19 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                         try {
                             LocalDateTime agora = LocalDateTime.now();
                             LocalDateTime primeiroHorario = LocalDateTime.of(agora.getYear(), agora.getMonth(), agora.getDayOfMonth(), hour, minute);
-                            if (agora.getHour() == primeiroHorario.getHour() && agora.getMinute() == primeiroHorario.getMinute()){
-                                validarPresencaDia[posicaoThread] = false;
+                            if (agora.getDayOfWeek() != DayOfWeek.SATURDAY && agora.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                                if (agora.getHour() == primeiroHorario.getHour() && agora.getMinute() == primeiroHorario.getMinute()) {
+                                    validarPresencaDia[posicaoThread] = false;
 
-                                if (posicaoThread == 3){//No momento em que for validada a ultima presença do academico, iniciar esta variavel para que o app realize o reset a meia noite.
-                                    resetarCardsPresencas[0] = true;
+                                    if (posicaoThread == 3) {//No momento em que for validada a ultima presença do academico, iniciar esta variavel para que o app realize o reset a meia noite.
+                                        resetarCardsPresencas[0] = true;
+                                    }
+
+                                    BeaconService beaconService = BeaconService.instance();
+                                    Presenca presenca = new Presenca(AppContext.getAcademicoId(), AppContext.getTurmaId(), LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
+                                    presenca.setPosicaoAcademicoHorarioAulaAndSetStatus(beaconService.academicoEstaDentroSalaAula(beaconDistanceMap));
+                                    validarPresencaApi(presenca, materialCardView, textView, nameMaterialCard, nameTextView);
                                 }
-
-                                Presenca presenca = new Presenca(AppContext.getAcademicoId(), AppContext.getTurmaId(), LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
-                                presenca.setPosicaoAcademicoHorarioAulaAndSetStatus(academicoEstaDentroSalaAula());
-                                validarPresencaApi(presenca, materialCardView, textView, nameMaterialCard, nameTextView);
                             }
                         } catch (Exception e) {
                         }
@@ -262,54 +267,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                 thread.start();
             }
         }
-    }
-
-    //este método deve ser responsavel por aplicar a trilateração
-    private PosicaoAcademico academicoEstaDentroSalaAula(){
-//        if(beaconDistanceMap.size() < 3){
-            //return null;//se não está captando pelo menos 3 beacons significa que o academico não está em sala de aula.
-//        }
-
-        //Dados total da sala
-        //Altura (Z) = 2.60
-        //Largura Lateral (X) = 4.55
-        //Largura Frontal (Y) = 3.70
-
-        //a distancia até o beacon irá representa a posicação.
-        Double distanciaBeacon1 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon1()));
-        Double distanciaBeacon2 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon2()));
-        Double distanciaBeacon3 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon3()));
-        Double distanciaBeacon4 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon4()));
-
-//        distanciaBeacon2 = 5.5;
-//        distanciaBeacon3 = 6;
-
-        Double medidaLadoX = AppContext.getMedidaLadoX();
-        Double medidaLadoY = AppContext.getMedidaLadoY();
-        Double medidaLadoZ = AppContext.getMedidaLadoZ();
-
-        //podem ser nulos se houver erro na requisição para recuperar a aula do dia do academico ou se for sabádo ou domingo.
-        if (medidaLadoX == null || medidaLadoY == null || medidaLadoZ == null){
-            return null;
-        }
-
-        //TODO: Posição x será calculada a partir dos beacons 2 e 3 juntamente ao tamanho do lado x
-        Heron heronX = new Heron(distanciaBeacon2, distanciaBeacon3, medidaLadoX);//o lado 3 irá representar a medida do lado da sala.
-        //TODO: Posição y será calculada a partir dos beacons 2 e 4 juntamente ao tamanho do lado y
-        Heron heronY = new Heron(distanciaBeacon2, distanciaBeacon4, medidaLadoY);//o lado 3 irá representar a medida do lado da sala.
-        //TODO: Posição z será calculada a partir dos beacons 1 e 2 juntamente ao tamanho do lado z
-        Heron heronZ = new Heron(distanciaBeacon1, distanciaBeacon2, medidaLadoZ);//o lado 3 irá representar a medida do lado da sala.
-
-        PosicaoAcademico posicaoAcademico = new PosicaoAcademico(heronX.calcularAlturaLado(medidaLadoX), heronY.calcularAlturaLado(medidaLadoY), heronZ.calcularAlturaLado(medidaLadoZ));
-
-//        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-//        String result = "("+posicaoAcademico.getPosicaoX()+", "+posicaoAcademico.getPosicaoY()+", "+posicaoAcademico.getPosicaoZ()+")";
-//        Util.sendNotification("result", result, notificationManager, context);
-
-        //TODO: fazer algumas validações em posicaoAcademico para verificar se as posições calculadas estão dentro da sala de aula de fato.
-
-        return posicaoAcademico;
-        //String.format("%.2f", heron.calcularAlturaLado(5)); salvar assim no banco
     }
 
     private boolean isMaior(BigDecimal posicaoCalculada, BigDecimal posicaoMaxima){

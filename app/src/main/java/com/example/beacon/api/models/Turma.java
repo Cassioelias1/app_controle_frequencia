@@ -3,6 +3,7 @@ package com.example.beacon.api.models;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class Turma implements Serializable {
     @SerializedName("id")
