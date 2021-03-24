@@ -24,9 +24,9 @@ public class AppContext {
     private static String ID_BEACON_4 = null;
 
     //representação das medidas da sala de aula.
-    private static Double medidaLadoX;
-    private static Double medidaLadoY;
-    private static Double medidaLadoZ;
+    private static BigDecimal medidaLadoX;
+    private static BigDecimal medidaLadoY;
+    private static BigDecimal medidaLadoZ;
 
     public static String getNomeTurma() {
         return NOME_TURMA;
@@ -124,27 +124,27 @@ public class AppContext {
         ID_BEACON_4 = idBeacon4;
     }
 
-    public static Double getMedidaLadoX() {
+    public static BigDecimal getMedidaLadoX() {
         return medidaLadoX;
     }
 
-    public static void setMedidaLadoX(Double medidaLadoX) {
+    public static void setMedidaLadoX(BigDecimal medidaLadoX) {
         AppContext.medidaLadoX = medidaLadoX;
     }
 
-    public static Double getMedidaLadoY() {
+    public static BigDecimal getMedidaLadoY() {
         return medidaLadoY;
     }
 
-    public static void setMedidaLadoY(Double medidaLadoY) {
+    public static void setMedidaLadoY(BigDecimal medidaLadoY) {
         AppContext.medidaLadoY = medidaLadoY;
     }
 
-    public static Double getMedidaLadoZ() {
+    public static BigDecimal getMedidaLadoZ() {
         return medidaLadoZ;
     }
 
-    public static void setMedidaLadoZ(Double medidaLadoZ) {
+    public static void setMedidaLadoZ(BigDecimal medidaLadoZ) {
         AppContext.medidaLadoZ = medidaLadoZ;
     }
 }

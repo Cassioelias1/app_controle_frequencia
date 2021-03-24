@@ -6,14 +6,14 @@ public class Beacon {
 
     //Combinação dos ids(1,2,3) do Beacon.
     private String identificador;
-    private double posicaoX;
-    private double posicaoY;
-    private double posicaoZ;
+    private BigDecimal posicaoX;
+    private BigDecimal posicaoY;
+    private BigDecimal posicaoZ;
 
     public Beacon() {
     }
 
-    public Beacon(double posicaoX, double posicaoY, double posicaoZ) {
+    public Beacon(BigDecimal posicaoX, BigDecimal posicaoY, BigDecimal posicaoZ) {
         this.posicaoX = posicaoX;
         this.posicaoY = posicaoY;
         this.posicaoZ = posicaoZ;
@@ -27,27 +27,27 @@ public class Beacon {
         this.identificador = identificador;
     }
 
-    public double getPosicaoX() {
+    public BigDecimal getPosicaoX() {
         return posicaoX;
     }
 
-    public void setPosicaoX(double posicaoX) {
+    public void setPosicaoX(BigDecimal posicaoX) {
         this.posicaoX = posicaoX;
     }
 
-    public double getPosicaoY() {
+    public BigDecimal getPosicaoY() {
         return posicaoY;
     }
 
-    public void setPosicaoY(double posicaoY) {
+    public void setPosicaoY(BigDecimal posicaoY) {
         this.posicaoY = posicaoY;
     }
 
-    public double getPosicaoZ() {
+    public BigDecimal getPosicaoZ() {
         return posicaoZ;
     }
 
-    public void setPosicaoZ(double posicaoZ) {
+    public void setPosicaoZ(BigDecimal posicaoZ) {
         this.posicaoZ = posicaoZ;
     }
 }

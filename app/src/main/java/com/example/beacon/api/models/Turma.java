@@ -28,13 +28,13 @@ public class Turma implements Serializable {
     private String idBeacon4;
 
     @SerializedName("medida_lado_x")
-    private Double medidaLadoX;
+    private BigDecimal medidaLadoX;
 
     @SerializedName("medida_lado_y")
-    private Double medidaLadoY;
+    private BigDecimal medidaLadoY;
 
     @SerializedName("medida_lado_z")
-    private Double medidaLadoZ;
+    private BigDecimal medidaLadoZ;
 
     public Turma() {
     }
@@ -105,27 +105,27 @@ public class Turma implements Serializable {
         this.idBeacon4 = idBeacon4;
     }
 
-    public Double getMedidaLadoX() {
+    public BigDecimal getMedidaLadoX() {
         return medidaLadoX;
     }
 
-    public void setMedidaLadoX(Double medidaLadoX) {
+    public void setMedidaLadoX(BigDecimal medidaLadoX) {
         this.medidaLadoX = medidaLadoX;
     }
 
-    public Double getMedidaLadoY() {
+    public BigDecimal getMedidaLadoY() {
         return medidaLadoY;
     }
 
-    public void setMedidaLadoY(Double medidaLadoY) {
+    public void setMedidaLadoY(BigDecimal medidaLadoY) {
         this.medidaLadoY = medidaLadoY;
     }
 
-    public Double getMedidaLadoZ() {
+    public BigDecimal getMedidaLadoZ() {
         return medidaLadoZ;
     }
 
-    public void setMedidaLadoZ(Double medidaLadoZ) {
+    public void setMedidaLadoZ(BigDecimal medidaLadoZ) {
         this.medidaLadoZ = medidaLadoZ;
     }
 }

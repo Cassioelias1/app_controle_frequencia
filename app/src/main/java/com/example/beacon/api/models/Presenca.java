@@ -31,13 +31,13 @@ public class Presenca implements Serializable {
     private String textViewId;
 
     @SerializedName("posicao_x")
-    private double posicaoX;//Referente ao plano zy / Beacon2
+    private BigDecimal posicaoX;//Referente ao plano zy / Beacon2
 
     @SerializedName("posicao_y")
-    private double posicaoY;//Referente ao plano xz / Beacon1
+    private BigDecimal posicaoY;//Referente ao plano xz / Beacon1
 
     @SerializedName("posicao_z")
-    private double posicaoZ;//Referente ao plano xy / Beacon3
+    private BigDecimal posicaoZ;//Referente ao plano xy / Beacon3
 
     //adicionar os fields de PosicaoAcademico ou fazer um include
 
@@ -129,27 +129,27 @@ public class Presenca implements Serializable {
         this.descricao = descricao;
     }
 
-    public double getPosicaoX() {
+    public BigDecimal getPosicaoX() {
         return posicaoX;
     }
 
-    public void setPosicaoX(double posicaoX) {
+    public void setPosicaoX(BigDecimal posicaoX) {
         this.posicaoX = posicaoX;
     }
 
-    public double getPosicaoY() {
+    public BigDecimal getPosicaoY() {
         return posicaoY;
     }
 
-    public void setPosicaoY(double posicaoY) {
+    public void setPosicaoY(BigDecimal posicaoY) {
         this.posicaoY = posicaoY;
     }
 
-    public double getPosicaoZ() {
+    public BigDecimal getPosicaoZ() {
         return posicaoZ;
     }
 
-    public void setPosicaoZ(double posicaoZ) {
+    public void setPosicaoZ(BigDecimal posicaoZ) {
         this.posicaoZ = posicaoZ;
     }
 

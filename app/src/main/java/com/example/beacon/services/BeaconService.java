@@ -17,9 +17,9 @@ public class BeaconService {
     }
 
     //este método deve ser responsavel por aplicar a trilateração com 4 beacons -> https://eg.uc.pt/bitstream/10316/31758/1/Tese_AnaRitaPereira.pdf
-    public PosicaoAcademico academicoEstaDentroSalaAula(Map<String, Double> beaconDistanceMap){
+    public PosicaoAcademico academicoEstaDentroSalaAula(Map<String, BigDecimal> beaconDistanceMap){
 //        if(beaconDistanceMap.size() < 3){
-        //return null;//se não está captando pelo menos 3 beacons significa que o academico não está em sala de aula.
+//            return null;//se não está captando pelo menos 3 beacons significa que o academico não está em sala de aula.
 //        }
 
         //Dados total da sala
@@ -32,34 +32,42 @@ public class BeaconService {
         //b3 = (0, 3.70, 0) -> coordenadas do beacon 3
         //b4 = (2.275, 1.85, 2.60) -> coordenadas do beacon 4
 
-        //a distancia até o beacon irá representa a posicação.
-        Double distanciaBeacon1 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon1()));
-        Double distanciaBeacon2 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon2()));
-        Double distanciaBeacon3 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon3()));
-        Double distanciaBeacon4 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon4()));
+//        BigDecimal distanciaBeacon1 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon1()));
+        BigDecimal distanciaBeacon1 = new BigDecimal("3.5");
+//        BigDecimal distanciaBeacon2 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon2()));
+        BigDecimal distanciaBeacon2 = new BigDecimal("2.35");
+//        BigDecimal distanciaBeacon3 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon3()));
+        BigDecimal distanciaBeacon3 = new BigDecimal("3.85");
+//        BigDecimal distanciaBeacon4 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon4()));
+        BigDecimal distanciaBeacon4 = new BigDecimal("1.79");
 
-        Double medidaLadoX = AppContext.getMedidaLadoX();
-        Double medidaLadoY = AppContext.getMedidaLadoY();
-        Double medidaLadoZ = AppContext.getMedidaLadoZ();
+//        BigDecimal medidaLadoX = AppContext.getMedidaLadoX();
+        BigDecimal medidaLadoX = new BigDecimal("4.55");;
+//        BigDecimal medidaLadoY = AppContext.getMedidaLadoY();
+        BigDecimal medidaLadoY = new BigDecimal("3.70");;
+//        BigDecimal medidaLadoZ = AppContext.getMedidaLadoZ();
+        BigDecimal medidaLadoZ = new BigDecimal("2.60");;
 
         //podem ser nulos se houver erro na requisição para recuperar a aula do dia do academico ou se for sabádo ou domingo.
         if (medidaLadoX == null || medidaLadoY == null || medidaLadoZ == null){
             return null;
         }
 
-        Beacon beacon1 = new Beacon(0, 0, 0);
-        Beacon beacon2 = new Beacon(medidaLadoX, 0, 0);
-        Beacon beacon3 = new Beacon(medidaLadoX, medidaLadoY, 0);
-        Beacon beacon4 = new Beacon(medidaLadoX / 2, medidaLadoY / 2, medidaLadoZ);
+        BigDecimal ZERO = BigDecimal.ZERO;
+
+        Beacon beacon1 = new Beacon(ZERO, ZERO, ZERO);
+        Beacon beacon2 = new Beacon(medidaLadoX, ZERO, ZERO);
+        Beacon beacon3 = new Beacon(BigDecimal.ZERO, medidaLadoY, ZERO);
+        Beacon beacon4 = new Beacon(medidaLadoX.divide(Util.DOIS, RoundingMode.HALF_UP), medidaLadoY.divide(Util.DOIS, RoundingMode.HALF_UP), medidaLadoZ);
 
         BeaconDistancia beaconDistancia1 = new BeaconDistancia(distanciaBeacon1, beacon1);
         BeaconDistancia beaconDistancia2 = new BeaconDistancia(distanciaBeacon2, beacon2);
         BeaconDistancia beaconDistancia3 = new BeaconDistancia(distanciaBeacon3, beacon3);
         BeaconDistancia beaconDistancia4 = new BeaconDistancia(distanciaBeacon4, beacon4);
 
-        double posicaoXAcademico = getPosicaoX(beaconDistancia1, beaconDistancia2);
-        double posicaoYAcademico = getPosicaoY(beaconDistancia1, beaconDistancia3, posicaoXAcademico);
-        double posicaoZAcademico = getPosicaoZ(beaconDistancia1, beaconDistancia4, posicaoXAcademico, posicaoYAcademico);
+        BigDecimal posicaoXAcademico = getPosicaoX(beaconDistancia1, beaconDistancia2);
+        BigDecimal posicaoYAcademico = getPosicaoY(beaconDistancia1, beaconDistancia3, posicaoXAcademico);
+        BigDecimal posicaoZAcademico = getPosicaoZ(beaconDistancia1, beaconDistancia4, posicaoXAcademico, posicaoYAcademico);
 
         PosicaoAcademico posicaoAcademico = new PosicaoAcademico(posicaoXAcademico, posicaoYAcademico, posicaoZAcademico);
 
@@ -68,36 +76,50 @@ public class BeaconService {
         return posicaoAcademico;
     }
 
-    private Double getPosicaoX(BeaconDistancia beaconDistancia1, BeaconDistancia beaconDistancia2){
-        double distancia1AoQuadrado = Math.pow(beaconDistancia1.getDistancia(), 2);
-        double distancia2AoQuadrado = Math.pow(beaconDistancia2.getDistancia(), 2);
-        double posicaoXBeacon2 = beaconDistancia2.getBeacon().getPosicaoX();
-        double posicaoXBeacon2AoQuadrado = Math.pow(posicaoXBeacon2, 2);
+    private BigDecimal getPosicaoX(BeaconDistancia beaconDistancia1, BeaconDistancia beaconDistancia2){
+        BigDecimal distancia1AoQuadrado = beaconDistancia1.getDistancia().pow(2);
+        BigDecimal distancia2AoQuadrado = beaconDistancia2.getDistancia().pow(2);
+        BigDecimal posicaoXBeacon2 = beaconDistancia2.getBeacon().getPosicaoX();
+        BigDecimal posicaoXBeacon2AoQuadrado = posicaoXBeacon2.pow(2);
 
-        return (distancia1AoQuadrado - distancia2AoQuadrado + posicaoXBeacon2AoQuadrado) / (2 * posicaoXBeacon2);
+        return distancia1AoQuadrado
+                .subtract(distancia2AoQuadrado)
+                .add(posicaoXBeacon2AoQuadrado)
+                .divide(Util.DOIS.multiply(posicaoXBeacon2), RoundingMode.HALF_UP);
     }
 
-    private double getPosicaoY(BeaconDistancia beaconDistancia1, BeaconDistancia beaconDistancia3, double posicaoXAcademico){
-        double distancia1AoQuadrado = Math.pow(beaconDistancia1.getDistancia(), 2);
-        double distancia3AoQuadrado = Math.pow(beaconDistancia3.getDistancia(), 2);
-        double posicaoXBeacon3 = beaconDistancia3.getBeacon().getPosicaoX();
-        double posicaoXBeacon3AoQuadrado = Math.pow(posicaoXBeacon3, 2);
-        double posicaoYBeacon3 = beaconDistancia3.getBeacon().getPosicaoY();
-        double posicaoYBeacon3AoQuadrado = Math.pow(posicaoYBeacon3, 2);
+    private BigDecimal getPosicaoY(BeaconDistancia beaconDistancia1, BeaconDistancia beaconDistancia3, BigDecimal posicaoXAcademico){
+        BigDecimal distancia1AoQuadrado = beaconDistancia1.getDistancia().pow(2);
+        BigDecimal distancia3AoQuadrado = beaconDistancia3.getDistancia().pow(2);
+        BigDecimal posicaoXBeacon3 = beaconDistancia3.getBeacon().getPosicaoX();
+        BigDecimal posicaoXBeacon3AoQuadrado = posicaoXBeacon3.pow(2);
+        BigDecimal posicaoYBeacon3 = beaconDistancia3.getBeacon().getPosicaoY();
+        BigDecimal posicaoYBeacon3AoQuadrado = posicaoYBeacon3.pow(2);
 
-        return (distancia1AoQuadrado - distancia3AoQuadrado + posicaoXBeacon3AoQuadrado + posicaoYBeacon3AoQuadrado) - (2 * posicaoXBeacon3 * posicaoXAcademico) / (2 * posicaoYBeacon3);
+        return distancia1AoQuadrado
+                .subtract(distancia3AoQuadrado)
+                .add(posicaoXBeacon3AoQuadrado)
+                .add(posicaoYBeacon3AoQuadrado)
+                .subtract(Util.DOIS.multiply(posicaoXBeacon3).multiply(posicaoXAcademico))
+                .divide(Util.DOIS.multiply(posicaoYBeacon3), RoundingMode.HALF_UP);
     }
 
-    private double getPosicaoZ(BeaconDistancia beaconDistancia1, BeaconDistancia beaconDistancia4, double posicaoXAcademico, double posicaoYAcademico){
-        double distancia1AoQuadrado = Math.pow(beaconDistancia1.getDistancia(), 2);
-        double distancia4AoQuadrado = Math.pow(beaconDistancia4.getDistancia(), 2);
-        double posicaoXBeacon4 = beaconDistancia4.getBeacon().getPosicaoX();
-        double posicaoXBeacon4AoQuadrado = Math.pow(posicaoXBeacon4, 2);
-        double posicaoYBeacon4 = beaconDistancia4.getBeacon().getPosicaoY();
-        double posicaoYBeacon4AoQuadrado = Math.pow(posicaoYBeacon4, 2);
-        double posicaoZBeacon4 = beaconDistancia4.getBeacon().getPosicaoZ();
-        double posicaoZBeacon4AoQuadrado = Math.pow(posicaoZBeacon4, 2);
+    private BigDecimal getPosicaoZ(BeaconDistancia beaconDistancia1, BeaconDistancia beaconDistancia4, BigDecimal posicaoXAcademico, BigDecimal posicaoYAcademico){
+        BigDecimal distancia1AoQuadrado = beaconDistancia1.getDistancia().pow(2);
+        BigDecimal distancia4AoQuadrado = beaconDistancia4.getDistancia().pow(2);
+        BigDecimal posicaoXBeacon4 = beaconDistancia4.getBeacon().getPosicaoX();
+        BigDecimal posicaoXBeacon4AoQuadrado = posicaoXBeacon4.pow(2);
+        BigDecimal posicaoYBeacon4 = beaconDistancia4.getBeacon().getPosicaoY();
+        BigDecimal posicaoYBeacon4AoQuadrado = posicaoYBeacon4.pow(2);
+        BigDecimal posicaoZBeacon4 = beaconDistancia4.getBeacon().getPosicaoZ();
+        BigDecimal posicaoZBeacon4AoQuadrado = posicaoZBeacon4.pow(2);
 
-        return (distancia1AoQuadrado - distancia4AoQuadrado + posicaoXBeacon4AoQuadrado + posicaoYBeacon4AoQuadrado + posicaoZBeacon4AoQuadrado) - (2 * posicaoXAcademico * posicaoXAcademico) - (2 * posicaoYAcademico * posicaoYAcademico) / (2 * posicaoZBeacon4);
+        return distancia1AoQuadrado.subtract(distancia4AoQuadrado)
+                .add(posicaoXBeacon4AoQuadrado)
+                .add(posicaoYBeacon4AoQuadrado)
+                .add(posicaoZBeacon4AoQuadrado)
+                .subtract(Util.DOIS.multiply(posicaoXBeacon4).multiply(posicaoXAcademico))
+                .subtract(Util.DOIS.multiply(posicaoYBeacon4).multiply(posicaoYAcademico))
+                .divide(Util.DOIS.multiply(posicaoZBeacon4), RoundingMode.HALF_UP);
     }
 }

@@ -28,11 +28,10 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.beacon.api.API;
-import com.example.beacon.api.models.PosicaoAcademico;
 import com.example.beacon.api.models.Presenca;
 import com.example.beacon.api.models.Turma;
 import com.example.beacon.context.AppContext;
-import com.example.beacon.heron.Heron;
+import com.example.beacon.models.BeaconDistancia;
 import com.example.beacon.services.BeaconService;
 import com.example.beacon.sqlite.BancoController;
 import com.example.beacon.utils.BeaconUtils;
@@ -95,10 +94,9 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
     private BackgroundPowerSaver backgroundPowerSaver;
     private RegionBootstrap regionBootstrap;
-    private boolean teste = true;
     private Context context = this;
 
-    private Map<String, Double> beaconDistanceMap = new HashMap<>();
+    private Map<String, BigDecimal> beaconDistanceMap = new HashMap<>();
     private BancoController controller;
 
     boolean[] validarPresencaDia = {true, true, true, true};
@@ -508,8 +506,8 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                     //Utilizar os 3 ids, pois alguns beacons podem conter id1 iguais.
                     idFinal = id1 + "-" + Util.getEmptyIfNull(id2) + "-" + Util.getEmptyIfNull(id3);
 
-                    Double distance = BeaconUtils.calcularDistanciaByRssi(beacon);
-                    beaconDistanceMap.put(idFinal, distance);
+                    Double distance = BeaconUtils.calcularDistanciaByRssi(beacon);//TODO: Fazer retornar BigDecimal
+                    beaconDistanceMap.put(idFinal, new BigDecimal(distance));
                 }
 //                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 //                    Util.sendNotification("result", result, notificationManager, context);

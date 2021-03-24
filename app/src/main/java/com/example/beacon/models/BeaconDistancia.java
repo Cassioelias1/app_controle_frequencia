@@ -3,19 +3,19 @@ package com.example.beacon.models;
 import java.math.BigDecimal;
 
 public class BeaconDistancia {
-    private double distancia;
+    private BigDecimal distancia;
     private Beacon beacon;
 
-    public BeaconDistancia(double distancia, Beacon beacon) {
+    public BeaconDistancia(BigDecimal distancia, Beacon beacon) {
         this.distancia = distancia;
         this.beacon = beacon;
     }
 
-    public double getDistancia() {
+    public BigDecimal getDistancia() {
         return distancia;
     }
 
-    public void setDistancia(double distancia) {
+    public void setDistancia(BigDecimal distancia) {
         this.distancia = distancia;
     }
 

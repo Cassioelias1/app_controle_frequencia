@@ -59,7 +59,7 @@ public class Util {
     }
 
     //getZeroIfNull
-    public static Double getZeroIfNull(Double valor){
-        return valor == null ? 0 : valor;
+    public static BigDecimal getZeroIfNull(BigDecimal valor){
+        return valor == null ? BigDecimal.ZERO : valor;
     }
 }
