@@ -13,7 +13,7 @@ public class BeaconUtils {
         return sum / ultimosSeisRssis.size();
     }
 
-    public static double calcularDistanciaByRssi(List<Integer> ultimosSeisRssis, Context context) {
+    public static double calcularDistanciaByRssi(List<Integer> ultimosSeisRssis) {
         double txPower = -63;
         int rssi = calcularMediaRssi(ultimosSeisRssis);
 
@@ -24,20 +24,9 @@ public class BeaconUtils {
         double ratio = rssi * 1.0 / txPower;
 
         if(ratio < 1.0){
-            double a = Math.pow(ratio, 10);
-            teste(a, rssi, context);
-            return a;
+            return Math.pow(ratio, 10);
         } else {
-            double b = 1.203420305 * Math.pow(ratio, 6.170094565) + 0.059805905;
-            teste(b, rssi, context);
-            return b;
-        }
-    }
-
-    private static void teste(double distance, int mediaRssi, Context context){
-        if (distance > 0){
-            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            Util.sendNotification("result", distance+" | "+mediaRssi, notificationManager, context);
+            return 1.203420305 * Math.pow(ratio, 6.170094565) + 0.059805905;
         }
     }
 }

@@ -47,7 +47,6 @@ import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
-import org.altbeacon.beacon.startup.RegionBootstrap;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -56,8 +55,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,10 +74,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     //Estrela = fda50693-a4e2-4fb1-afcf-c6eb0764782556 // id2 = 5, id3 = 6 TODO: Beacon2
     //Quadrado = fda50693-a4e2-4fb1-afcf-c6eb0764782512 // id2 = 1, id3 = 2 TODO: Beacon3
     //Sabonete = 0x0077656c6c636f726573736407 TODO: Beacon4
-
-    private static final String ID_BEACON_POSICAO_2275_0_130 = "0x0077656c6c636f726573736407";
-    private static final String ID_BEACON_POSICAO_0_185_130 = "fda50693-a4e2-4fb1-afcf-c6eb07647825-5-6";
-    private static final String ID_BEACON_POSICAO_2275_185_260 = "fda50693-a4e2-4fb1-afcf-c6eb07647825-1-2";
     private Handler handler;
 
     protected final String TAG = RequestPermissionActivity.this.getClass().getSimpleName();
@@ -94,7 +87,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     private Region mRegion;
 
     private BackgroundPowerSaver backgroundPowerSaver;
-    private RegionBootstrap regionBootstrap;
     private Context context = this;
 
     private Map<String, BigDecimal> beaconDistanceMap = new HashMap<>();
@@ -111,10 +103,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         setContentView(R.layout.activity_status);
         initBottomNavigation();
         handler = new Handler();
-//        Executors.newSingleThreadExecutor();
-
         mBeaconManager = BeaconManager.getInstanceForApplication(this);
-//        mBeaconManager = org.altbeacon.beacon.BeaconManager.getInstanceForApplication(this);
 
         List<BeaconParser> beaconParsers = Arrays.asList(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_UID_LAYOUT),
                 new BeaconParser().setBeaconLayout(BeaconParser.URI_BEACON_LAYOUT), new BeaconParser().setBeaconLayout(BeaconParser.ALTBEACON_LAYOUT),
@@ -268,10 +257,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                 thread.start();
             }
         }
-    }
-
-    private boolean isMaior(BigDecimal posicaoCalculada, BigDecimal posicaoMaxima){
-        return posicaoCalculada.compareTo(posicaoMaxima) > 0;
     }
 
     private void validarPresencaApi(Presenca presenca, MaterialCardView materialCardView, TextView textView, String nameMaterialCard, String nameTextView){
@@ -499,7 +484,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                 String id1 = null;
                 String id2 = null;
                 String id3 = null;
-                double distance = 0;
 
                 for (Beacon beacon : beacons) {
                     id1 = beacon.getId1() != null ? beacon.getId1().toString() : "";
@@ -523,7 +507,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                         ultimosSeisRssis.add(beacon.getRssi());
                     }
 
-                    //distance = BeaconUtils.calcularDistanciaByRssi(ultimosSeisRssis, context);
+                    double distance = BeaconUtils.calcularDistanciaByRssi(ultimosSeisRssis);
                     beaconDistanceMap.put(idFinal, new BigDecimal(distance));
                 }
             } else {

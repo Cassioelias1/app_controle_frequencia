@@ -64,7 +64,10 @@ public class BeaconService {
 
         PosicaoAcademico posicaoAcademico = new PosicaoAcademico(posicaoXAcademico, posicaoYAcademico, posicaoZAcademico);
 
-        //TODO: realizar algumas validação para garantir que essas posições estão dentro da sala de aula.
+        //Caso algumas das posições calculadas seja maior que o total da sala. Não esquecer de tolerar alguns centimêtros.
+        if (posicaoAcademico.getPosicaoX().compareTo(medidaLadoX) > 0 || posicaoAcademico.getPosicaoY().compareTo(medidaLadoY) > 0 || posicaoAcademico.getPosicaoZ().compareTo(medidaLadoZ) > 0) {
+            posicaoAcademico.setStatus("AUSENTE");
+        }
 
         return posicaoAcademico;
     }
