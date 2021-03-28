@@ -18,9 +18,9 @@ public class BeaconService {
 
     //este método deve ser responsavel por aplicar a trilateração com 4 beacons -> https://eg.uc.pt/bitstream/10316/31758/1/Tese_AnaRitaPereira.pdf
     public PosicaoAcademico academicoEstaDentroSalaAula(Map<String, BigDecimal> beaconDistanceMap){
-//        if(beaconDistanceMap.size() < 3){
-//            return null;//se não está captando pelo menos 3 beacons significa que o academico não está em sala de aula.
-//        }
+        if(beaconDistanceMap.size() < 3){
+            return null;//se não está captando pelo menos 3 beacons significa que o academico não está em sala de aula.
+        }
 
         //Dados total da sala
         //Altura (Z) = 2.60
@@ -32,21 +32,14 @@ public class BeaconService {
         //b3 = (0, 3.70, 0) -> coordenadas do beacon 3
         //b4 = (2.275, 1.85, 2.60) -> coordenadas do beacon 4
 
-//        BigDecimal distanciaBeacon1 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon1()));
-        BigDecimal distanciaBeacon1 = new BigDecimal("3.5");
-//        BigDecimal distanciaBeacon2 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon2()));
-        BigDecimal distanciaBeacon2 = new BigDecimal("2.35");
-//        BigDecimal distanciaBeacon3 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon3()));
-        BigDecimal distanciaBeacon3 = new BigDecimal("3.85");
-//        BigDecimal distanciaBeacon4 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon4()));
-        BigDecimal distanciaBeacon4 = new BigDecimal("1.79");
+        BigDecimal distanciaBeacon1 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon1()));
+        BigDecimal distanciaBeacon2 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon2()));
+        BigDecimal distanciaBeacon3 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon3()));
+        BigDecimal distanciaBeacon4 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon4()));
 
-//        BigDecimal medidaLadoX = AppContext.getMedidaLadoX();
-        BigDecimal medidaLadoX = new BigDecimal("4.55");;
-//        BigDecimal medidaLadoY = AppContext.getMedidaLadoY();
-        BigDecimal medidaLadoY = new BigDecimal("3.70");;
-//        BigDecimal medidaLadoZ = AppContext.getMedidaLadoZ();
-        BigDecimal medidaLadoZ = new BigDecimal("2.60");;
+        BigDecimal medidaLadoX = AppContext.getMedidaLadoX();
+        BigDecimal medidaLadoY = AppContext.getMedidaLadoY();
+        BigDecimal medidaLadoZ = AppContext.getMedidaLadoZ();
 
         //podem ser nulos se houver erro na requisição para recuperar a aula do dia do academico ou se for sabádo ou domingo.
         if (medidaLadoX == null || medidaLadoY == null || medidaLadoZ == null){

@@ -73,9 +73,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     //2,6 é em metros o ponto z
     //370 / 2 = 185
 
-    //Sabonete = 0x0077656c6c636f726573736407
-    //Estrela = fda50693-a4e2-4fb1-afcf-c6eb07647825-5-6 // id2 = 5, id3 = 6
-    //Quadrado = fda50693-a4e2-4fb1-afcf-c6eb07647825-1-2 // id2 = 1, id3 = 2
+    //Celular com Beacon Simulator = a52d6b05-24ec-46b7-b3c1-cb853a6e20b2 TODO: Beacon1
+    //Estrela = fda50693-a4e2-4fb1-afcf-c6eb0764782556 // id2 = 5, id3 = 6 TODO: Beacon2
+    //Quadrado = fda50693-a4e2-4fb1-afcf-c6eb0764782512 // id2 = 1, id3 = 2 TODO: Beacon3
+    //Sabonete = 0x0077656c6c636f726573736407 TODO: Beacon4
 
     private static final String ID_BEACON_POSICAO_2275_0_130 = "0x0077656c6c636f726573736407";
     private static final String ID_BEACON_POSICAO_0_185_130 = "fda50693-a4e2-4fb1-afcf-c6eb07647825-5-6";
@@ -101,6 +102,8 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
     boolean[] validarPresencaDia = {true, true, true, true};
     boolean[] resetarCardsPresencas = {true};
+
+    private Map<String, List<Integer>> ultimosSeisRssisPorBeaconMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,27 +152,27 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //        SegundoPlano segundoPlano2140 = new SegundoPlano(materialCardView2140, textView2140, 23, 29, AppContext.getThread2140(), "card_21_40", "textView2140", handler, context);
 //        segundoPlano2140.execute();
 
-        onInitThread(materialCardView1915, textView1915, 22, 0, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
-        onInitThread(materialCardView2015, textView2015, 22, 1, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
-        onInitThread(materialCardView2100, textView2100, 22, 2, AppContext.getThread2100(), "card_21_00", "textView2100", 2);
-        onInitThread(materialCardView2140, textView2140, 22, 8, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
+        onInitThread(materialCardView1915, textView1915, 15, 33, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
+        onInitThread(materialCardView2015, textView2015, 16, 0, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
+        onInitThread(materialCardView2100, textView2100, 17, 0, AppContext.getThread2100(), "card_21_00", "textView2100", 2);
+        onInitThread(materialCardView2140, textView2140, 18, 0, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
 
         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
         textViewNomeDisciplica.setText(AppContext.getNomeTurma());
 //
-//        List<MaterialCardView> materialCardViews = new ArrayList<>();
-//        materialCardViews.add(materialCardView1915);
-//        materialCardViews.add(materialCardView2015);
-//        materialCardViews.add(materialCardView2100);
-//        materialCardViews.add(materialCardView2140);
+        List<MaterialCardView> materialCardViews = new ArrayList<>();
+        materialCardViews.add(materialCardView1915);
+        materialCardViews.add(materialCardView2015);
+        materialCardViews.add(materialCardView2100);
+        materialCardViews.add(materialCardView2140);
 //
-//        List<TextView> textViews = new ArrayList<>();
-//        textViews.add(textView1915);
-//        textViews.add(textView2015);
-//        textViews.add(textView2100);
-//        textViews.add(textView2140);
+        List<TextView> textViews = new ArrayList<>();
+        textViews.add(textView1915);
+        textViews.add(textView2015);
+        textViews.add(textView2100);
+        textViews.add(textView2140);
 
-//        resetCardsPresencas(materialCardViews, textViews);
+        resetCardsPresencas(materialCardViews, textViews);
 
 //        createAlarmManagerToBackgroundProcess(0, 5);
         initServiceFindBeacons();
@@ -486,9 +489,9 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     public void onBeaconServiceConnect() {
         RangeNotifier rangeNotifier = (beacons, region) -> {
             if (beacons.size() > 0) {
-//                    if (!beaconDistanceMap.isEmpty()){
-//                        beaconDistanceMap.clear();
-//                    }
+//                if (!beaconDistanceMap.isEmpty()){
+//                    beaconDistanceMap.clear();
+//                }
                 //verificar se isso vai zerar os registros antigos.
                 beaconDistanceMap = new HashMap<>();
 
@@ -496,6 +499,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                 String id1 = null;
                 String id2 = null;
                 String id3 = null;
+                double distance = 0;
 
                 for (Beacon beacon : beacons) {
                     id1 = beacon.getId1() != null ? beacon.getId1().toString() : "";
@@ -504,13 +508,24 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                         id3 = beacon.getId3() != null ? beacon.getId3().toString() : "";
                     }
                     //Utilizar os 3 ids, pois alguns beacons podem conter id1 iguais.
-                    idFinal = id1 + "-" + Util.getEmptyIfNull(id2) + "-" + Util.getEmptyIfNull(id3);
+                    idFinal = id1 + Util.getEmptyIfNull(id2) + Util.getEmptyIfNull(id3);
 
-                    Double distance = BeaconUtils.calcularDistanciaByRssi(beacon);//TODO: Fazer retornar BigDecimal
+                    List<Integer> ultimosSeisRssis = ultimosSeisRssisPorBeaconMap.get(idFinal);
+
+                    if (ultimosSeisRssis == null){
+                        ultimosSeisRssis = new ArrayList<>();
+                        ultimosSeisRssis.add(beacon.getRssi());
+                        ultimosSeisRssisPorBeaconMap.put(idFinal, ultimosSeisRssis);
+                    } else if (ultimosSeisRssis.size() == 6){
+                        ultimosSeisRssis.remove(0);//Remove o primeiro para substituir e sempre manter 6
+                        ultimosSeisRssis.add(beacon.getRssi());
+                    } else {
+                        ultimosSeisRssis.add(beacon.getRssi());
+                    }
+
+                    //distance = BeaconUtils.calcularDistanciaByRssi(ultimosSeisRssis, context);
                     beaconDistanceMap.put(idFinal, new BigDecimal(distance));
                 }
-//                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-//                    Util.sendNotification("result", result, notificationManager, context);
             } else {
                 String msg = AppContext.getIdBeacon1() + " - " + AppContext.getIdBeacon2() + " - " + AppContext.getIdBeacon3();
                 showToastMessage(msg);
@@ -541,9 +556,9 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                         AppContext.setIdBeacon3(turma.getIdBeacon3());
                         AppContext.setIdBeacon4(turma.getIdBeacon4());
 
-                        AppContext.setMedidaLadoX(turma.getMedidaLadoX());
-                        AppContext.setMedidaLadoY(turma.getMedidaLadoY());
-                        AppContext.setMedidaLadoZ(turma.getMedidaLadoZ());
+                        AppContext.setMedidaLadoX(new BigDecimal(turma.getMedidaLadoX()));
+                        AppContext.setMedidaLadoY(new BigDecimal(turma.getMedidaLadoY()));
+                        AppContext.setMedidaLadoZ(new BigDecimal(turma.getMedidaLadoZ()));
 
                         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
                         textViewNomeDisciplica.setText(turma.getDescricao());
