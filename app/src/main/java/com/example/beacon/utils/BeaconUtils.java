@@ -1,7 +1,5 @@
 package com.example.beacon.utils;
 
-import android.app.NotificationManager;
-import android.content.Context;
 import java.util.List;
 
 public class BeaconUtils {

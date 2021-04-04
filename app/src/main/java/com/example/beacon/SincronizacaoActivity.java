@@ -57,7 +57,12 @@ public class SincronizacaoActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendPresencasNaoComputadas(getPresencasNaoComputadasSqlite());
+                List<Presenca> presencas = getPresencasNaoComputadasSqlite();
+                if (presencas.size() == 0){
+                    Util.showToastMessage(context, "Você não possui presenças para sincronizar.");
+                    return;
+                }
+                sendPresencasNaoComputadas(presencas);
             }
         });
     }
@@ -74,8 +79,6 @@ public class SincronizacaoActivity extends AppCompatActivity {
         API.validarPresencasNaoComputadas(presencas, new Callback<List<Presenca>>() {
             @Override
             public void onResponse(Call<List<Presenca>> call, Response<List<Presenca>> response) {
-                System.out.println("RESPONSE");
-                System.out.println(response.body());
                 Util.showToastMessage(context, "Presenças sincronizadas com o servidor com sucesso.");
                 deletePresencasSqliteSincronizadas(presencas);
             }

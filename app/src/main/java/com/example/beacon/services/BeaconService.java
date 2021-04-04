@@ -18,8 +18,8 @@ public class BeaconService {
 
     //este método deve ser responsavel por aplicar a trilateração com 4 beacons -> https://eg.uc.pt/bitstream/10316/31758/1/Tese_AnaRitaPereira.pdf
     public PosicaoAcademico academicoEstaDentroSalaAula(Map<String, BigDecimal> beaconDistanceMap){
-        if(beaconDistanceMap.size() < 3){
-            return null;//se não está captando pelo menos 3 beacons significa que o academico não está em sala de aula.
+        if(beaconDistanceMap.size() < 4){
+            return null;//se não está captando pelo menos 4 beacons significa que o academico não está em sala de aula.
         }
 
         //Dados total da sala
@@ -46,6 +46,11 @@ public class BeaconService {
             return null;
         }
 
+        //Podem ser nulos se o acadêmico não estiver perto da sala de aula, onde o app não consiga fazer a leitura dos beacons.
+        if (distanciaBeacon1 == null || distanciaBeacon2 == null || distanciaBeacon3 == null || distanciaBeacon4 == null) {
+            return null;
+        }
+
         BigDecimal ZERO = BigDecimal.ZERO;
 
         Beacon beacon1 = new Beacon(ZERO, ZERO, ZERO);
@@ -64,7 +69,13 @@ public class BeaconService {
 
         PosicaoAcademico posicaoAcademico = new PosicaoAcademico(posicaoXAcademico, posicaoYAcademico, posicaoZAcademico);
 
-        //Caso algumas das posições calculadas seja maior que o total da sala. Não esquecer de tolerar alguns centimêtros.
+        //Adicionando 30cm de tolerãncia devido a distância retornada pelo beacon
+        BigDecimal cm30 = new BigDecimal("0.30");
+        medidaLadoX = medidaLadoX.add(cm30);
+        medidaLadoY = medidaLadoY.add(cm30);
+        medidaLadoZ = medidaLadoZ.add(cm30);
+
+        //Caso algumas das posições calculadas seja maior que o total da sala.
         if (posicaoAcademico.getPosicaoX().compareTo(medidaLadoX) > 0 || posicaoAcademico.getPosicaoY().compareTo(medidaLadoY) > 0 || posicaoAcademico.getPosicaoZ().compareTo(medidaLadoZ) > 0) {
             posicaoAcademico.setStatus("AUSENTE");
         }
