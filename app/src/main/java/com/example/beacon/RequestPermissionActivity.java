@@ -3,6 +3,7 @@ package com.example.beacon;
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
@@ -79,7 +80,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     protected final String TAG = RequestPermissionActivity.this.getClass().getSimpleName();
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private static final int REQUEST_ENABLE_BLUETOOTH = 1;
-    private static final long DEFAULT_SCAN_PERIOD_MS = 20000;
+    private static final long DEFAULT_SCAN_PERIOD_MS = 5000;
     private static final String ALL_BEACONS_REGION = "AllBeaconsRegion";
     private static final String I_BEACON = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24";
 
@@ -141,10 +142,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //        SegundoPlano segundoPlano2140 = new SegundoPlano(materialCardView2140, textView2140, 23, 29, AppContext.getThread2140(), "card_21_40", "textView2140", handler, context);
 //        segundoPlano2140.execute();
 
-        onInitThread(materialCardView1915, textView1915, 13, 51, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
-        onInitThread(materialCardView2015, textView2015, 13, 28, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
-        onInitThread(materialCardView2100, textView2100, 13, 29, AppContext.getThread2100(), "card_21_00", "textView2100", 2);
-        onInitThread(materialCardView2140, textView2140, 13, 30, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
+        onInitThread(materialCardView1915, textView1915, 20, 50, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
+        onInitThread(materialCardView2015, textView2015, 21, 7, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
+        onInitThread(materialCardView2100, textView2100, 20, 54, AppContext.getThread2100(), "card_21_00", "textView2100", 2);
+        onInitThread(materialCardView2140, textView2140, 20, 55, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
 
         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
         textViewNomeDisciplica.setText(AppContext.getNomeTurma());
@@ -226,8 +227,15 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                                         resetarCardsPresencas[0] = true;
                                     }
 
+                                    String academicoId = AppContext.getAcademicoId();
+                                    String turmaId = AppContext.getTurmaId();
+
+                                    if (academicoId == null || turmaId == null){
+                                        return;
+                                    }
+
                                     BeaconService beaconService = BeaconService.instance();
-                                    Presenca presenca = new Presenca(AppContext.getAcademicoId(), AppContext.getTurmaId(), LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
+                                    Presenca presenca = new Presenca(academicoId, turmaId, LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
                                     presenca.setPosicaoAcademicoHorarioAulaAndSetStatus(beaconService.academicoEstaDentroSalaAula(beaconDistanceMap));
                                     validarPresencaApi(presenca, materialCardView, textView, nameMaterialCard, nameTextView);
                                 }
@@ -474,17 +482,17 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     public void onBeaconServiceConnect() {
         RangeNotifier rangeNotifier = (beacons, region) -> {
             if (beacons.size() > 0) {
-//                if (!beaconDistanceMap.isEmpty()){
-//                    beaconDistanceMap.clear();
-//                }
+                if (!beaconDistanceMap.isEmpty()){
+                    beaconDistanceMap.clear();
+                }
                 //verificar se isso vai zerar os registros antigos.
-                beaconDistanceMap = new HashMap<>();
+//                beaconDistanceMap = new HashMap<>();
 
                 String idFinal;
                 String id1 = null;
                 String id2 = null;
                 String id3 = null;
-                String distance2 = "";
+                double distance = 0;
 
                 for (Beacon beacon : beacons) {
                     id1 = beacon.getId1() != null ? beacon.getId1().toString() : "";
@@ -508,12 +516,11 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                         ultimosSeisRssis.add(beacon.getRssi());
                     }
 
-                    double distance = BeaconUtils.calcularDistanciaByRssi(ultimosSeisRssis);
-                    distance2 += distance + " - ";
+                    distance = BeaconUtils.calcularDistanciaByRssi(ultimosSeisRssis, beacon.getTxPower());
                     beaconDistanceMap.put(idFinal, new BigDecimal(distance));
                 }
-
-                showToastMessage(distance2);
+                NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                Util.sendNotification("DISTANCE", distance+"", notificationManager, context);
             }
         };
         try {

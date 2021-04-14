@@ -20,6 +20,7 @@ public class BeaconService {
     public PosicaoAcademico academicoEstaDentroSalaAula(Map<String, BigDecimal> beaconDistanceMap){
         if(beaconDistanceMap.size() < 4){
             return null;//se não está captando pelo menos 4 beacons significa que o academico não está em sala de aula.
+//            return new PosicaoAcademico().presenca();
         }
 
         //Dados total da sala
@@ -77,10 +78,11 @@ public class BeaconService {
 
         //Caso algumas das posições calculadas seja maior que o total da sala.
         if (posicaoAcademico.getPosicaoX().compareTo(medidaLadoX) > 0 || posicaoAcademico.getPosicaoY().compareTo(medidaLadoY) > 0 || posicaoAcademico.getPosicaoZ().compareTo(medidaLadoZ) > 0) {
-            posicaoAcademico.setStatus("AUSENTE");
+            posicaoAcademico.falta();
+            return posicaoAcademico;
         }
 
-        return posicaoAcademico;
+        return posicaoAcademico.presenca();
     }
 
     private BigDecimal getPosicaoX(BeaconDistancia beaconDistancia1, BeaconDistancia beaconDistancia2){

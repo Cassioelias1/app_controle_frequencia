@@ -11,20 +11,26 @@ public class BeaconUtils {
         return sum / ultimosSeisRssis.size();
     }
 
-    public static double calcularDistanciaByRssi(List<Integer> ultimosSeisRssis) {
-        double txPower = -63;
+    public static double calcularDistanciaByRssi(List<Integer> ultimosSeisRssis, int txPowerBeacon) {
+        double txPower = -65;
         int rssi = calcularMediaRssi(ultimosSeisRssis);
 
         if(rssi == 0){
             return -1;
         }
 
-        double ratio = rssi * 1.0 / txPower;
+        double ratio;
+        boolean isEddystone = false;
+        if (isEddystone){
+            ratio = rssi * 1.0 / (txPower - 36);
+        } else {
+            ratio = rssi * 1.0 / txPower;
+        }
 
         if(ratio < 1.0){
             return Math.pow(ratio, 10);
         } else {
-            return 1.203420305 * Math.pow(ratio, 6.170094565) + 0.059805905;
+            return 0.89976 * Math.pow(ratio, 7.7095) + 0.111;
         }
     }
 }
