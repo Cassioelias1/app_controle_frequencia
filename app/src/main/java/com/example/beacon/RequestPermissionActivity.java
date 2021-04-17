@@ -492,7 +492,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                 String id1 = null;
                 String id2 = null;
                 String id3 = null;
-                double distance = 0;
+                BigDecimal distance = BigDecimal.ZERO;
 
                 for (Beacon beacon : beacons) {
                     id1 = beacon.getId1() != null ? beacon.getId1().toString() : "";
@@ -517,7 +517,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                     }
 
                     distance = BeaconUtils.calcularDistanciaByRssi(ultimosSeisRssis, beacon.getTxPower());
-                    beaconDistanceMap.put(idFinal, new BigDecimal(distance));
+                    beaconDistanceMap.put(idFinal, distance);
                 }
                 NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                 Util.sendNotification("DISTANCE", distance+"", notificationManager, context);
