@@ -492,7 +492,8 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                 String id1 = null;
                 String id2 = null;
                 String id3 = null;
-                BigDecimal distance = BigDecimal.ZERO;
+                int mediaRssi = 0;
+                BeaconUtils beaconUtils = BeaconUtils.Instance();
 
                 for (Beacon beacon : beacons) {
                     id1 = beacon.getId1() != null ? beacon.getId1().toString() : "";
@@ -510,17 +511,21 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                         ultimosSeisRssis.add(beacon.getRssi());
                         ultimosSeisRssisPorBeaconMap.put(idFinal, ultimosSeisRssis);
                     } else if (ultimosSeisRssis.size() == 6){
-                        ultimosSeisRssis.remove(0);//Remove o primeiro para substituir e sempre manter 6
-                        ultimosSeisRssis.add(beacon.getRssi());
+                        if (!beaconUtils.rssiIsOutlier(mediaRssi, beacon.getRssi())){
+                            ultimosSeisRssis.remove(0);//Remove o primeiro para substituir e sempre manter 6
+                            ultimosSeisRssis.add(beacon.getRssi());
+                        }
                     } else {
                         ultimosSeisRssis.add(beacon.getRssi());
                     }
 
-                    distance = BeaconUtils.calcularDistanciaByRssi(ultimosSeisRssis, beacon.getTxPower());
-                    beaconDistanceMap.put(idFinal, distance);
+                    mediaRssi = beaconUtils.calcularMediaRssi(ultimosSeisRssis);
+
+                    double distance = beaconUtils.calcularDistanciaByRssi(mediaRssi);
+                    beaconDistanceMap.put(idFinal, new BigDecimal(distance));
                 }
-                NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                Util.sendNotification("DISTANCE", distance+"", notificationManager, context);
+//                NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+//                Util.sendNotification("DISTANCE", distance+"", notificationManager, context);
             }
         };
         try {

@@ -1,82 +1,127 @@
 package com.example.beacon.utils;
 
+import com.example.beacon.models.ContantesDistancia;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BeaconUtils {
-    private Map<Integer, BigDecimal> createMap(){
-        Map<Integer, BigDecimal> contantesMap = new HashMap<>();
-        contantesMap.put(-30, new BigDecimal("3.89976"));
-        contantesMap.put(-40, new BigDecimal("2.14554"));
-        contantesMap.put(-50, new BigDecimal("1.9894"));
-        contantesMap.put(-60, new BigDecimal("0.89976"));
-        contantesMap.put(-70, new BigDecimal("0.80000"));
-        contantesMap.put(-80, new BigDecimal("0.64461"));
-        contantesMap.put(-90, new BigDecimal("0.44387"));
+    public static BeaconUtils Instance(){
+        return new BeaconUtils();
+    }
+    public BeaconUtils() {
+    }
+
+    private Map<Integer, ContantesDistancia> createMap(){
+        Map<Integer, ContantesDistancia> contantesMap = new HashMap<>();
+        contantesMap.put(-30, new ContantesDistancia(-30, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-32, new ContantesDistancia(-32, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-38, new ContantesDistancia(-38, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-40, new ContantesDistancia(-40, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-42, new ContantesDistancia(-42, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-48, new ContantesDistancia(-48, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-50, new ContantesDistancia(-50, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-52, new ContantesDistancia(-52, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-58, new ContantesDistancia(-58, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-60, new ContantesDistancia(-60, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-62, new ContantesDistancia(-62, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-68, new ContantesDistancia(-68, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-70, new ContantesDistancia(-70, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-72, new ContantesDistancia(-72, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-78, new ContantesDistancia(-78, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-80, new ContantesDistancia(-80, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-82, new ContantesDistancia(-82, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-88, new ContantesDistancia(-88, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-90, new ContantesDistancia(-90, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-92, new ContantesDistancia(-92, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-98, new ContantesDistancia(-98, 0.89976, 7.7095, 0.111));
         return contantesMap;
     }
-    private BigDecimal getConstanteAByRssi(int medianaRssi){
-        BigDecimal constanteRetorno = null;
-        Map<Integer, BigDecimal> contantesMap = createMap();
 
-        for (Map.Entry<Integer, BigDecimal> set : contantesMap.entrySet()) {
-            Integer rssi = set.getKey();
-            BigDecimal constante = set.getValue();
-            if (false){//Verificar qual rssi é o mais proximo da medianaRssi
-                constanteRetorno = constante;
-                break;
+    private int getValorAbsoluto(Integer valor){
+        return Math.abs(valor);
+    }
+
+    private int getDiferenciaValores(int valor1, int valor2){
+        return valor1 - valor2;
+    }
+
+    private ContantesDistancia getConstantesByRssi(int medianaRssi){
+        ContantesDistancia constantesRetorno = null;
+        Map<Integer, ContantesDistancia> contantesMap = createMap();
+        List<Integer> keysRssis = contantesMap.keySet().stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+        int size = keysRssis.size();
+
+        for (int i = 0; i < size; i++) {
+            int proxIndice = i+1;
+            if (proxIndice < size){
+                int medianaAbsoluta = getValorAbsoluto(medianaRssi);
+                int posicaoAtualAbsoluta = getValorAbsoluto(keysRssis.get(i));
+                int proximaPosicaoAbsoluta = getValorAbsoluto(keysRssis.get(proxIndice));
+                if (medianaAbsoluta >= posicaoAtualAbsoluta && medianaAbsoluta <= proximaPosicaoAbsoluta){
+                    int diferencaIndice = getDiferenciaValores(posicaoAtualAbsoluta, medianaAbsoluta);
+                    int diferenciaProxIndice = getDiferenciaValores(proximaPosicaoAbsoluta, medianaAbsoluta);
+
+                    if (diferencaIndice < diferenciaProxIndice){
+                        constantesRetorno = contantesMap.get(keysRssis.get(i));
+                    } else {
+                        constantesRetorno = contantesMap.get(keysRssis.get(proxIndice));
+                    }
+                    break;
+                }
             }
         }
 
-        return constanteRetorno;
+        return constantesRetorno;
     }
 
-    private BigDecimal getConstanteBByRssi(){
-        return BigDecimal.ZERO;
-    }
+    public double calcularDistanciaByRssi(int mediaRssi) {
+        double txPower = -65;
 
-    private BigDecimal getConstanteCByRssi(){
-        return BigDecimal.ZERO;
-    }
-
-    public static BigDecimal calcularDistanciaByRssi(List<Integer> ultimosSeisRssis, int txPowerBeacon) {
-        BigDecimal txPower = new BigDecimal("-65");
-        int rssi = calcularMediaRssi(ultimosSeisRssis);
-
-        if(rssi == 0){
-            return new BigDecimal("-1");
+        if(mediaRssi == 0){
+            return -1;
         }
 
-        BigDecimal A = new BigDecimal("0.89976");
-        BigDecimal B = new BigDecimal("7.7095");
-        BigDecimal C = new BigDecimal("0.111");
-
-        BigDecimal ratio;
+        double ratio;
         boolean isEddystone = false;
         if (isEddystone){
-//            ratio = rssi * 1.0 / (txPower - 36);
-            ratio = new BigDecimal(rssi).multiply(BigDecimal.ONE).divide(txPower.subtract(new BigDecimal("36")), RoundingMode.HALF_UP);
+            ratio = mediaRssi * 1.0 / (txPower - 36);
         } else {
-//            ratio = rssi * 1.0 / txPower;
-            ratio = new BigDecimal(rssi).multiply(BigDecimal.ONE).divide(txPower, BigDecimal.ROUND_HALF_UP);
+            ratio = mediaRssi * 1.0 / txPower;
         }
 
-        if(ratio.compareTo(BigDecimal.ONE) < 0){//ratio < 1.0
-//            return Math.pow(ratio, 10);
-            return ratio.pow(10);
+        if(ratio < 1.0){
+            return Math.pow(ratio, 10);
         } else {
-//            return A * Math.pow(ratio, B) + C;
-            return A.multiply(ratio.pow(B.intValue())).add(C);
+            ContantesDistancia constantesDistancia = getConstantesByRssi(-94);
+
+            double A = constantesDistancia.getConstanteA();
+            double B = constantesDistancia.getConstanteB();
+            double C = constantesDistancia.getConstanteC();
+
+            return A * Math.pow(ratio, B) + C;
         }
     }
 
-    private static int calcularMediaRssi(List<Integer> ultimosSeisRssis){
+    public int calcularMediaRssi(List<Integer> ultimosSeisRssis){
         int sum = ultimosSeisRssis.stream().reduce(0, Integer::sum);
 
         //ultimosSeisRssis sempre deverá ter pelo menos um item.
         return sum / ultimosSeisRssis.size();
+    }
+
+    public boolean rssiIsOutlier(int mediaRssi, int rssiLeituraAtual){
+        rssiLeituraAtual = getValorAbsoluto(rssiLeituraAtual);
+        mediaRssi = getValorAbsoluto(mediaRssi);
+
+        int percentualAumento = ((rssiLeituraAtual - mediaRssi) / mediaRssi) * 100;
+
+        return percentualAumento > 10;
     }
 }
