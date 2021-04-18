@@ -62,6 +62,11 @@ public class SincronizacaoActivity extends AppCompatActivity {
                     Util.showToastMessage(context, "Você não possui presenças para sincronizar.");
                     return;
                 }
+//                for (Presenca presenca : presencas) {
+//                    if (presenca.getIdTurma() == null){
+//                        presenca.setIdTurma("1");
+//                    }
+//                }
                 sendPresencasNaoComputadas(presencas);
             }
         });

@@ -4,11 +4,16 @@ import com.example.beacon.api.models.PosicaoAcademico;
 import com.example.beacon.context.AppContext;
 import com.example.beacon.models.Beacon;
 import com.example.beacon.models.BeaconDistancia;
+import com.example.beacon.models.ContantesDistancia;
 import com.example.beacon.utils.Util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BeaconService {
 
@@ -17,10 +22,9 @@ public class BeaconService {
     }
 
     //este método deve ser responsavel por aplicar a trilateração com 4 beacons -> https://eg.uc.pt/bitstream/10316/31758/1/Tese_AnaRitaPereira.pdf
-    public PosicaoAcademico academicoEstaDentroSalaAula(Map<String, BigDecimal> beaconDistanceMap){
+    public PosicaoAcademico academicoEstaDentroSalaAula(Map<String, Integer> beaconDistanceMap){
         if(beaconDistanceMap.size() < 4){
             return null;//se não está captando pelo menos 4 beacons significa que o academico não está em sala de aula.
-//            return new PosicaoAcademico().presenca();
         }
 
         //Dados total da sala
@@ -33,10 +37,10 @@ public class BeaconService {
         //b3 = (0, 3.70, 0) -> coordenadas do beacon 3
         //b4 = (2.275, 1.85, 2.60) -> coordenadas do beacon 4
 
-        BigDecimal distanciaBeacon1 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon1()));
-        BigDecimal distanciaBeacon2 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon2()));
-        BigDecimal distanciaBeacon3 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon3()));
-        BigDecimal distanciaBeacon4 = Util.getZeroIfNull(beaconDistanceMap.get(AppContext.getIdBeacon4()));
+        BigDecimal distanciaBeacon1 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconDistanceMap.get(AppContext.getIdBeacon1())));
+        BigDecimal distanciaBeacon2 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconDistanceMap.get(AppContext.getIdBeacon2())));
+        BigDecimal distanciaBeacon3 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconDistanceMap.get(AppContext.getIdBeacon3())));
+        BigDecimal distanciaBeacon4 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconDistanceMap.get(AppContext.getIdBeacon4())));
 
         BigDecimal medidaLadoX = AppContext.getMedidaLadoX();
         BigDecimal medidaLadoY = AppContext.getMedidaLadoY();
@@ -56,7 +60,7 @@ public class BeaconService {
 
         Beacon beacon1 = new Beacon(ZERO, ZERO, ZERO);
         Beacon beacon2 = new Beacon(medidaLadoX, ZERO, ZERO);
-        Beacon beacon3 = new Beacon(BigDecimal.ZERO, medidaLadoY, ZERO);
+        Beacon beacon3 = new Beacon(ZERO, medidaLadoY, ZERO);
         Beacon beacon4 = new Beacon(medidaLadoX.divide(Util.DOIS, RoundingMode.HALF_UP), medidaLadoY.divide(Util.DOIS, RoundingMode.HALF_UP), medidaLadoZ);
 
         BeaconDistancia beaconDistancia1 = new BeaconDistancia(distanciaBeacon1, beacon1);
@@ -69,12 +73,6 @@ public class BeaconService {
         BigDecimal posicaoZAcademico = getPosicaoZ(beaconDistancia1, beaconDistancia4, posicaoXAcademico, posicaoYAcademico);
 
         PosicaoAcademico posicaoAcademico = new PosicaoAcademico(posicaoXAcademico, posicaoYAcademico, posicaoZAcademico);
-
-        //Adicionando 30cm de tolerãncia devido a distância retornada pelo beacon
-        BigDecimal cm30 = new BigDecimal("0.30");
-        medidaLadoX = medidaLadoX.add(cm30);
-        medidaLadoY = medidaLadoY.add(cm30);
-        medidaLadoZ = medidaLadoZ.add(cm30);
 
         //Caso algumas das posições calculadas seja maior que o total da sala.
         if (posicaoAcademico.getPosicaoX().compareTo(medidaLadoX) > 0 || posicaoAcademico.getPosicaoY().compareTo(medidaLadoY) > 0 || posicaoAcademico.getPosicaoZ().compareTo(medidaLadoZ) > 0) {
@@ -130,5 +128,119 @@ public class BeaconService {
                 .subtract(Util.DOIS.multiply(posicaoXBeacon4).multiply(posicaoXAcademico))
                 .subtract(Util.DOIS.multiply(posicaoYBeacon4).multiply(posicaoYAcademico))
                 .divide(Util.DOIS.multiply(posicaoZBeacon4), RoundingMode.HALF_UP);
+    }
+
+    private Map<Integer, ContantesDistancia> createMap(){
+        Map<Integer, ContantesDistancia> contantesMap = new HashMap<>();
+        contantesMap.put(-30, new ContantesDistancia(-30, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-32, new ContantesDistancia(-32, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-38, new ContantesDistancia(-38, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-40, new ContantesDistancia(-40, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-42, new ContantesDistancia(-42, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-48, new ContantesDistancia(-48, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-50, new ContantesDistancia(-50, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-52, new ContantesDistancia(-52, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-58, new ContantesDistancia(-58, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-60, new ContantesDistancia(-60, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-62, new ContantesDistancia(-62, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-68, new ContantesDistancia(-68, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-70, new ContantesDistancia(-70, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-72, new ContantesDistancia(-72, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-78, new ContantesDistancia(-78, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-80, new ContantesDistancia(-80, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-82, new ContantesDistancia(-82, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-88, new ContantesDistancia(-88, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-90, new ContantesDistancia(-90, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-92, new ContantesDistancia(-92, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-98, new ContantesDistancia(-98, 0.89976, 7.7095, 0.111));
+        return contantesMap;
+    }
+
+    private int getValorAbsoluto(Integer valor){
+        return Math.abs(valor);
+    }
+
+    private int getDiferenciaValores(int valor1, int valor2){
+        return valor1 - valor2;
+    }
+
+    private ContantesDistancia getConstantesByRssi(int medianaRssi){
+        Map<Integer, ContantesDistancia> contantesMap = createMap();
+        List<Integer> keysRssis = contantesMap.keySet().stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+        int size = keysRssis.size();
+
+        for (int i = 0; i < size; i++) {
+            int proxIndice = i+1;
+            if (proxIndice < size){
+                int medianaAbsoluta = getValorAbsoluto(medianaRssi);
+                int posicaoAtualAbsoluta = getValorAbsoluto(keysRssis.get(i));
+                int proximaPosicaoAbsoluta = getValorAbsoluto(keysRssis.get(proxIndice));
+                if (medianaAbsoluta >= posicaoAtualAbsoluta && medianaAbsoluta <= proximaPosicaoAbsoluta){
+                    //posicaoAtual = -62
+                    //proximaPosicao = -68
+                    //mediana = -63
+                    int diferencaIndice = getValorAbsoluto(getDiferenciaValores(posicaoAtualAbsoluta, medianaAbsoluta));
+                    int diferenciaProxIndice = getValorAbsoluto(getDiferenciaValores(proximaPosicaoAbsoluta, medianaAbsoluta));
+
+                    if (diferencaIndice <= diferenciaProxIndice){
+                        return contantesMap.get(keysRssis.get(i));
+                    } else {
+                        return contantesMap.get(keysRssis.get(proxIndice));
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public double calcularDistanciaByRssi(int mediaRssi) {
+        double txPower = -65;
+
+        if(mediaRssi == 0){
+            return -1;
+        }
+
+        double ratio;
+        boolean isEddystone = false;
+        if (isEddystone){
+            ratio = mediaRssi * 1.0 / (txPower - 36);
+        } else {
+            ratio = mediaRssi * 1.0 / txPower;
+        }
+
+        if(ratio < 1.0){
+            return Math.pow(ratio, 10);
+        } else {
+            ContantesDistancia constantesDistancia = getConstantesByRssi(mediaRssi);
+            if (constantesDistancia == null){
+                return -1;
+            }
+
+            double A = constantesDistancia.getConstanteA();
+            double B = constantesDistancia.getConstanteB();
+            double C = constantesDistancia.getConstanteC();
+
+            return A * Math.pow(ratio, B) + C;
+        }
+    }
+
+    public int calcularMediaRssi(List<Integer> ultimosSeisRssis){
+        int sum = ultimosSeisRssis.stream().reduce(0, Integer::sum);
+
+        //ultimosSeisRssis sempre deverá ter pelo menos um item.
+        return sum / ultimosSeisRssis.size();
+    }
+
+    public boolean rssiIsOutlier(int mediaRssi, int rssiLeituraAtual){
+        if (mediaRssi == 0){
+            return false;
+        }
+        rssiLeituraAtual = getValorAbsoluto(rssiLeituraAtual);
+        mediaRssi = getValorAbsoluto(mediaRssi);
+
+        int percentualAumento = ((rssiLeituraAtual - mediaRssi) / mediaRssi) * 100;
+
+        return percentualAumento > 10;
     }
 }
