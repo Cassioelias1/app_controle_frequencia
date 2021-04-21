@@ -52,9 +52,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -141,7 +145,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //        SegundoPlano segundoPlano2140 = new SegundoPlano(materialCardView2140, textView2140, 23, 29, AppContext.getThread2140(), "card_21_40", "textView2140", handler, context);
 //        segundoPlano2140.execute();
 
-        onInitThread(materialCardView1915, textView1915, 13, 25, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
+        onInitThread(materialCardView1915, textView1915, 19, 25, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
         onInitThread(materialCardView2015, textView2015, 13, 26, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
         onInitThread(materialCardView2100, textView2100, 13, 54, AppContext.getThread2100(), "card_21_00", "textView2100", 2);
         onInitThread(materialCardView2140, textView2140, 13, 55, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
@@ -167,10 +171,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         initServiceFindBeacons();
         getAulaDiaAcademico();
         getPresencasJaValidadas();
-
-        double teste = 0.89976;
-        BigDecimal teste2 = BigDecimal.valueOf(teste);
-        System.out.println(teste);
     }
 
     private void initBottomNavigation(){
@@ -483,55 +483,15 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     @Override
     public void onBeaconServiceConnect() {
         RangeNotifier rangeNotifier = (beacons, region) -> {
-            if (beacons.size() > 0) {
-                if (!beaconMediaRssiMap.isEmpty()){
-                    beaconMediaRssiMap.clear();
-                }
-
-                String idFinal;
-                String id1 = null;
-                String id2 = null;
-                String id3 = null;
-                BeaconService beaconService = BeaconService.instance();
-
+            if (beacons.size() > 0){
+                metodoComOutlier(beacons);
+//                metodoSemOutlier(beacons);
+                //TODO: Criar um método que só irá fazer a leitura dos beacons e salvar no map os rssi
+                //TODO: Criar um método que só irá fazer a leitura dos beacons e salvar no map os rssi e aplicar o outlier.
                 for (Beacon beacon : beacons) {
-                    id1 = beacon.getId1() != null ? beacon.getId1().toString() : "";
-                    if (beacon.getIdentifiers().size() > 3) {//Alguns beacons não possuem id2 e id3
-                        id2 = beacon.getId2() != null ? beacon.getId2().toString() : "";
-                        id3 = beacon.getId3() != null ? beacon.getId3().toString() : "";
-                    }
-                    //Utilizar os 3 ids, pois alguns beacons podem conter id1 iguais.
-                    idFinal = id1 + Util.getEmptyIfNull(id2) + Util.getEmptyIfNull(id3);
-
-                    List<Integer> ultimosSeisRssis = ultimosSeisRssisPorBeaconMap.get(idFinal);
-
-                    if (ultimosSeisRssis == null){
-                        ultimosSeisRssis = new ArrayList<>();
-                        ultimosSeisRssis.add(beacon.getRssi());
-                        ultimosSeisRssisPorBeaconMap.put(idFinal, ultimosSeisRssis);
-                    } else if (ultimosSeisRssis.size() == 6){
-                        if (!beaconService.rssiIsOutlier(mediaRssi, beacon.getRssi())){
-                            ultimosSeisRssis.remove(0);//Remove o primeiro para substituir e sempre manter 6
-                            ultimosSeisRssis.add(beacon.getRssi());
-                            rssisOutliers.clear();
-                        } else {
-                            rssisOutliers.add(beacon.getRssi());
-                        }
-                    } else {
-                        ultimosSeisRssis.add(beacon.getRssi());
-                    }
-
-                    if (rssisOutliers.size() == 6){
-                        ultimosSeisRssis.clear();
-                        ultimosSeisRssis.addAll(rssisOutliers);
-                    }
-
-                    mediaRssi = beaconService.calcularMediaRssi(ultimosSeisRssis);
-                    beaconMediaRssiMap.put(idFinal, mediaRssi);
+                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                    Util.sendNotification("RSSI", beacon.getRssi()+"", notificationManager, context);
                 }
-
-//                NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-//                Util.sendNotification("DISTANCE", distance+"", notificationManager, context);
             }
         };
         try {
@@ -540,6 +500,79 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //            mBeaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
 //            mBeaconManager.addRangeNotifier(rangeNotifier);
         } catch (RemoteException e) {   }
+    }
+
+    private void metodoSemOutlier(Collection<Beacon> beacons){
+        if (!beaconMediaRssiMap.isEmpty()){
+            beaconMediaRssiMap.clear();
+        }
+
+        String idFinal;
+        String id1 = null;
+        String id2 = null;
+        String id3 = null;
+        BeaconService beaconService = BeaconService.instance();
+
+        for (Beacon beacon : beacons) {
+            id1 = beacon.getId1() != null ? beacon.getId1().toString() : "";
+            if (beacon.getIdentifiers().size() > 3) {//Alguns beacons não possuem id2 e id3
+                id2 = beacon.getId2() != null ? beacon.getId2().toString() : "";
+                id3 = beacon.getId3() != null ? beacon.getId3().toString() : "";
+            }
+            //Utilizar os 3 ids, pois alguns beacons podem conter id1 iguais.
+            idFinal = id1 + Util.getEmptyIfNull(id2) + Util.getEmptyIfNull(id3);
+
+            mediaRssi = beaconService.calcularMediaRssi(Collections.singletonList(beacon.getRssi()));
+            beaconMediaRssiMap.put(idFinal, mediaRssi);
+        }
+    }
+
+    private void metodoComOutlier(Collection<Beacon> beacons){
+        if (!beaconMediaRssiMap.isEmpty()){
+            beaconMediaRssiMap.clear();
+        }
+
+        String idFinal;
+        String id1 = null;
+        String id2 = null;
+        String id3 = null;
+        BeaconService beaconService = BeaconService.instance();
+
+        for (Beacon beacon : beacons) {
+            id1 = beacon.getId1() != null ? beacon.getId1().toString() : "";
+            if (beacon.getIdentifiers().size() > 3) {//Alguns beacons não possuem id2 e id3
+                id2 = beacon.getId2() != null ? beacon.getId2().toString() : "";
+                id3 = beacon.getId3() != null ? beacon.getId3().toString() : "";
+            }
+            //Utilizar os 3 ids, pois alguns beacons podem conter id1 iguais.
+            idFinal = id1 + Util.getEmptyIfNull(id2) + Util.getEmptyIfNull(id3);
+
+            List<Integer> ultimosSeisRssis = ultimosSeisRssisPorBeaconMap.get(idFinal);
+
+            if (ultimosSeisRssis == null){
+                ultimosSeisRssis = new ArrayList<>();
+                ultimosSeisRssis.add(beacon.getRssi());
+                ultimosSeisRssisPorBeaconMap.put(idFinal, ultimosSeisRssis);
+            } else if (ultimosSeisRssis.size() == 6){
+                if (!beaconService.rssiIsOutlier(mediaRssi, beacon.getRssi())){
+                    ultimosSeisRssis.remove(0);//Remove o primeiro para substituir e sempre manter 6
+                    ultimosSeisRssis.add(beacon.getRssi());
+                    rssisOutliers.clear();
+                } else {
+                    rssisOutliers.add(beacon.getRssi());
+                }
+            } else {
+                ultimosSeisRssis.add(beacon.getRssi());
+            }
+
+            if (rssisOutliers.size() == 6){
+                ultimosSeisRssis.clear();
+                ultimosSeisRssis.addAll(rssisOutliers);
+            }
+
+            mediaRssi = beaconService.calcularMediaRssi(ultimosSeisRssis);
+            beaconMediaRssiMap.put(idFinal, mediaRssi);
+        }
     }
 
     //TODO: Retornar as medidas da sala de aula aqui tbm.

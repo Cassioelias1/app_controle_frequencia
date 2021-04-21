@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class BeaconService {
+    private static boolean COMAJUSTECONSTANTES = true;
 
     public static BeaconService instance(){
         return new BeaconService();
@@ -212,14 +213,21 @@ public class BeaconService {
         if(ratio < 1.0){
             return Math.pow(ratio, 10);
         } else {
-            ContantesDistancia constantesDistancia = getConstantesByRssi(mediaRssi);
-            if (constantesDistancia == null){
-                return -1;
-            }
+            double A, B, C;
+            if (COMAJUSTECONSTANTES) {
+                ContantesDistancia constantesDistancia = getConstantesByRssi(mediaRssi);
+                if (constantesDistancia == null) {
+                    return -1;
+                }
 
-            double A = constantesDistancia.getConstanteA();
-            double B = constantesDistancia.getConstanteB();
-            double C = constantesDistancia.getConstanteC();
+                A = constantesDistancia.getConstanteA();
+                B = constantesDistancia.getConstanteB();
+                C = constantesDistancia.getConstanteC();
+            } else {
+                A = 0.89976;
+                B = 7.7095;
+                C = 0.111;
+            }
 
             return A * Math.pow(ratio, B) + C;
         }
