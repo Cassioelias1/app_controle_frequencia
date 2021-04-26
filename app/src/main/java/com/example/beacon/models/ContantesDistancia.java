@@ -3,27 +3,19 @@ package com.example.beacon.models;
 import java.math.BigDecimal;
 
 public class ContantesDistancia {
-    private int rssi;
     private Double constanteA;
     private Double constanteB;
     private Double constanteC;
+    private int rssiUmMetro;
 
     public ContantesDistancia() {
     }
 
-    public ContantesDistancia(int rssi, Double constanteA, Double constanteB, Double constanteC) {
-        this.rssi = rssi;
+    public ContantesDistancia(int rssiUmMetro, Double constanteA, Double constanteB, Double constanteC) {
+        this.rssiUmMetro = rssiUmMetro;
         this.constanteA = constanteA;
         this.constanteB = constanteB;
         this.constanteC = constanteC;
-    }
-
-    public int getRssi() {
-        return rssi;
-    }
-
-    public void setRssi(int rssi) {
-        this.rssi = rssi;
     }
 
     public Double getConstanteA() {
@@ -48,5 +40,13 @@ public class ContantesDistancia {
 
     public void setConstanteC(Double constanteC) {
         this.constanteC = constanteC;
+    }
+
+    public int getRssiUmMetro() {
+        return rssiUmMetro;
+    }
+
+    public void setRssiUmMetro(int rssiUmMetro) {
+        this.rssiUmMetro = rssiUmMetro;
     }
 }

@@ -68,11 +68,11 @@ public class MainActivity extends Activity {
         EditText editSenha = findViewById(R.id.editPassword);
         String codigo = editEmail.getText().toString();
         String senha = editSenha.getText().toString();
-//        Intent itImc = new Intent(MainActivity.this, RequestPermissionActivity.class);
-//        startActivity(itImc);
+        Intent itImc = new Intent(MainActivity.this, RequestPermissionActivity.class);
+        startActivity(itImc);
 //        AppContext.setAcademicoId("1");
 //        AppContext.setTurmaId("1");
-        if (!Util.isNullOrEmpty(codigo) && !Util.isNullOrEmpty(senha)) {
+        /*if (!Util.isNullOrEmpty(codigo) && !Util.isNullOrEmpty(senha)) {
             API.validarLogin(new Callback<List<Academico>>() {
                 @Override
                 public void onResponse(Call<List<Academico>> call, Response<List<Academico>> response) {
@@ -100,7 +100,7 @@ public class MainActivity extends Activity {
 
         } else {
             Util.showToastMessage(context, "Não foi informado o E-mail ou a Senha!");
-        }
+        }*/
     }
 
     private void verificarDemaisPermission() {

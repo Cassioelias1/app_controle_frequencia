@@ -488,10 +488,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //                metodoSemOutlier(beacons);
                 //TODO: Criar um método que só irá fazer a leitura dos beacons e salvar no map os rssi
                 //TODO: Criar um método que só irá fazer a leitura dos beacons e salvar no map os rssi e aplicar o outlier.
-                for (Beacon beacon : beacons) {
-                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                    Util.sendNotification("RSSI", beacon.getRssi()+"", notificationManager, context);
-                }
+//                for (Beacon beacon : beacons) {
+//                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+//                    Util.sendNotification("RSSI", beacon.getRssi()+"", notificationManager, context);
+//                }
             }
         };
         try {
@@ -537,6 +537,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         String id2 = null;
         String id3 = null;
         BeaconService beaconService = BeaconService.instance();
+//        double distance = 0;
 
         for (Beacon beacon : beacons) {
             id1 = beacon.getId1() != null ? beacon.getId1().toString() : "";
@@ -572,6 +573,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
             mediaRssi = beaconService.calcularMediaRssi(ultimosSeisRssis);
             beaconMediaRssiMap.put(idFinal, mediaRssi);
+//            distance = beaconService.calcularDistanciaByRssi(beaconMediaRssiMap.get(idFinal));
         }
     }
 

@@ -16,15 +16,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class BeaconService {
-    private static boolean COMAJUSTECONSTANTES = true;
+    private static boolean COMAJUSTECONSTANTES = false;
 
     public static BeaconService instance(){
         return new BeaconService();
     }
 
     //este método deve ser responsavel por aplicar a trilateração com 4 beacons -> https://eg.uc.pt/bitstream/10316/31758/1/Tese_AnaRitaPereira.pdf
-    public PosicaoAcademico academicoEstaDentroSalaAula(Map<String, Integer> beaconDistanceMap){
-        if(beaconDistanceMap.size() < 4){
+    public PosicaoAcademico academicoEstaDentroSalaAula(Map<String, Integer> beaconMediaRssiMap){
+        if(beaconMediaRssiMap.size() < 4){
             return null;//se não está captando pelo menos 4 beacons significa que o academico não está em sala de aula.
         }
 
@@ -38,15 +38,16 @@ public class BeaconService {
         //b3 = (0, 3.70, 0) -> coordenadas do beacon 3
         //b4 = (2.275, 1.85, 2.60) -> coordenadas do beacon 4
 
-        BigDecimal distanciaBeacon1 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconDistanceMap.get(AppContext.getIdBeacon1())));
-        BigDecimal distanciaBeacon2 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconDistanceMap.get(AppContext.getIdBeacon2())));
-        BigDecimal distanciaBeacon3 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconDistanceMap.get(AppContext.getIdBeacon3())));
-        BigDecimal distanciaBeacon4 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconDistanceMap.get(AppContext.getIdBeacon4())));
+        BigDecimal distanciaBeacon1 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconMediaRssiMap.get(AppContext.getIdBeacon1())));
+        BigDecimal distanciaBeacon2 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconMediaRssiMap.get(AppContext.getIdBeacon2())));
+        BigDecimal distanciaBeacon3 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconMediaRssiMap.get(AppContext.getIdBeacon3())));
+        BigDecimal distanciaBeacon4 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconMediaRssiMap.get(AppContext.getIdBeacon4())));
 
         BigDecimal medidaLadoX = AppContext.getMedidaLadoX();
         BigDecimal medidaLadoY = AppContext.getMedidaLadoY();
         BigDecimal medidaLadoZ = AppContext.getMedidaLadoZ();
 
+        //TODO: Verificar uma estratégia para caso o academico não tenha internet.
         //podem ser nulos se houver erro na requisição para recuperar a aula do dia do academico ou se for sabádo ou domingo.
         if (medidaLadoX == null || medidaLadoY == null || medidaLadoZ == null){
             return null;
@@ -133,27 +134,9 @@ public class BeaconService {
 
     private Map<Integer, ContantesDistancia> createMap(){
         Map<Integer, ContantesDistancia> contantesMap = new HashMap<>();
-        contantesMap.put(-30, new ContantesDistancia(-30, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-32, new ContantesDistancia(-32, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-38, new ContantesDistancia(-38, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-40, new ContantesDistancia(-40, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-42, new ContantesDistancia(-42, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-48, new ContantesDistancia(-48, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-50, new ContantesDistancia(-50, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-52, new ContantesDistancia(-52, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-58, new ContantesDistancia(-58, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-60, new ContantesDistancia(-60, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-62, new ContantesDistancia(-62, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-68, new ContantesDistancia(-68, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-70, new ContantesDistancia(-70, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-72, new ContantesDistancia(-72, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-78, new ContantesDistancia(-78, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-80, new ContantesDistancia(-80, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-82, new ContantesDistancia(-82, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-88, new ContantesDistancia(-88, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-90, new ContantesDistancia(-90, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-92, new ContantesDistancia(-92, 0.89976, 7.7095, 0.111));
-        contantesMap.put(-98, new ContantesDistancia(-98, 0.89976, 7.7095, 0.111));
+        contantesMap.put(-59, new ContantesDistancia(-59,1.20090834192006, 3.85094187965639, -0.2009083419));//1m
+        contantesMap.put(-79, new ContantesDistancia(-79,1.20090834192006, 3.85094187965639, -0.2009083419));//4m
+        contantesMap.put(-88, new ContantesDistancia(-88,1.20090834192006, 3.85094187965639, -0.2009083419));
         return contantesMap;
     }
 
@@ -196,41 +179,31 @@ public class BeaconService {
     }
 
     public double calcularDistanciaByRssi(int mediaRssi) {
-        double txPower = -65;
+        double rssiBaseUmMetro = -59;//TODO: Esse txPower é na verdade o RSSI médido a tal distância no "Iphone"
 
         if(mediaRssi == 0){
             return -1;
         }
 
-        double ratio;
-        boolean isEddystone = false;
-        if (isEddystone){
-            ratio = mediaRssi * 1.0 / (txPower - 36);
-        } else {
-            ratio = mediaRssi * 1.0 / txPower;
-        }
-
-        if(ratio < 1.0){
-            return Math.pow(ratio, 10);
-        } else {
-            double A, B, C;
-            if (COMAJUSTECONSTANTES) {
-                ContantesDistancia constantesDistancia = getConstantesByRssi(mediaRssi);
-                if (constantesDistancia == null) {
-                    return -1;
-                }
-
-                A = constantesDistancia.getConstanteA();
-                B = constantesDistancia.getConstanteB();
-                C = constantesDistancia.getConstanteC();
-            } else {
-                A = 0.89976;
-                B = 7.7095;
-                C = 0.111;
+        double A, B, C;
+        if (COMAJUSTECONSTANTES) {
+            ContantesDistancia constantesDistancia = getConstantesByRssi(mediaRssi);
+            if (constantesDistancia == null) {
+                return -1;
             }
 
-            return A * Math.pow(ratio, B) + C;
+            A = constantesDistancia.getConstanteA();
+            B = constantesDistancia.getConstanteB();
+            C = constantesDistancia.getConstanteC();
+            rssiBaseUmMetro = constantesDistancia.getRssiUmMetro();
+        } else {
+            A = 1.20090834192006;
+            B = 3.85094187965639;
+            C = -0.2009083419;
         }
+
+        double razao = mediaRssi * 1.0 / rssiBaseUmMetro;
+        return A * Math.pow(razao, B) + C;
     }
 
     public int calcularMediaRssi(List<Integer> ultimosSeisRssis){
