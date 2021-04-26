@@ -9,6 +9,7 @@ import com.example.beacon.api.API;
 import com.example.beacon.api.models.Presenca;
 import com.example.beacon.context.AppContext;
 import com.example.beacon.sqlite.BancoController;
+import com.example.beacon.utils.Shared;
 import com.example.beacon.utils.Util;
 
 import java.time.LocalDateTime;
@@ -23,7 +24,7 @@ public class AlarmPresencas extends BroadcastReceiver {
         String nameCard = intent.getStringExtra("nameCard");
         String nameTextView = intent.getStringExtra("nameTextView");
 
-        Presenca presenca = new Presenca(AppContext.getAcademicoId(), AppContext.getTurmaId(), LocalDateTime.now().toString(), nameCard, nameTextView);
+        Presenca presenca = new Presenca(Shared.getString(context, "academico_id"), Shared.getString(context, "turma_id"), LocalDateTime.now().toString(), nameCard, nameTextView);
         //TODO: ainda falta chamar o método da trilateração pra setar o status
         //validarPresencaApi(presenca, nameCard, nameTextView, context);
     }

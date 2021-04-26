@@ -33,6 +33,7 @@ import com.example.beacon.api.models.Turma;
 import com.example.beacon.context.AppContext;
 import com.example.beacon.services.BeaconService;
 import com.example.beacon.sqlite.BancoController;
+import com.example.beacon.utils.Shared;
 import com.example.beacon.utils.Util;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
@@ -145,13 +146,13 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //        SegundoPlano segundoPlano2140 = new SegundoPlano(materialCardView2140, textView2140, 23, 29, AppContext.getThread2140(), "card_21_40", "textView2140", handler, context);
 //        segundoPlano2140.execute();
 
-        onInitThread(materialCardView1915, textView1915, 19, 25, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
-        onInitThread(materialCardView2015, textView2015, 13, 26, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
-        onInitThread(materialCardView2100, textView2100, 13, 54, AppContext.getThread2100(), "card_21_00", "textView2100", 2);
-        onInitThread(materialCardView2140, textView2140, 13, 55, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
+        onInitThread(materialCardView1915, textView1915, 20, 10, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
+        onInitThread(materialCardView2015, textView2015, 20, 11, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
+        onInitThread(materialCardView2100, textView2100, 20, 12, AppContext.getThread2100(), "card_21_00", "textView2100", 2);
+        onInitThread(materialCardView2140, textView2140, 20, 13, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
 
         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
-        textViewNomeDisciplica.setText(AppContext.getNomeTurma());
+        textViewNomeDisciplica.setText(Shared.getString(context, "nome_turma"));
 //
         List<MaterialCardView> materialCardViews = new ArrayList<>();
         materialCardViews.add(materialCardView1915);
@@ -230,15 +231,15 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                                         resetarCardsPresencas[0] = true;
                                     }
 
-                                    String academicoId = AppContext.getAcademicoId();
-                                    String turmaId = AppContext.getTurmaId();
+                                    String academicoId = Shared.getString(context, "academico_id");
+                                    String turmaId = Shared.getString(context, "turma_id");
 
                                     if (academicoId == null || turmaId == null){
                                         return;
                                     }
 
                                     Presenca presenca = new Presenca(academicoId, turmaId, LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
-                                    presenca.setPosicaoAcademicoHorarioAulaAndSetStatus(BeaconService.instance().academicoEstaDentroSalaAula(beaconMediaRssiMap));
+                                    presenca.setPosicaoAcademicoHorarioAulaAndSetStatus(BeaconService.instance().academicoEstaDentroSalaAula(beaconMediaRssiMap, context));
                                     validarPresencaApi(presenca, materialCardView, textView, nameMaterialCard, nameTextView);
                                 }
                             //}
@@ -579,51 +580,47 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
     //TODO: Retornar as medidas da sala de aula aqui tbm.
     private void getAulaDiaAcademico(){
-        if (AppContext.getTurmaId() == null || AppContext.getNomeTurma() == null){
-            API.getAulaDiaAcademico(new Callback<List<Turma>>() {
-                @Override
-                public void onResponse(Call<List<Turma>> call, Response<List<Turma>> response) {
-                    List<Turma> turmas = response.body();
-                    if (turmas != null && !turmas.isEmpty()) {
-                        Turma turma = turmas.get(0);//A query vai retorna um resultado, foi tratado como list por conta de um erro relacionado a como o mysql retorna os valores
-                        AppContext.setTurmaId(turma.getId().toString());
-                        AppContext.setNomeTurma(turma.getDescricao());
+        API.getAulaDiaAcademico(new Callback<List<Turma>>() {
+            @Override
+            public void onResponse(Call<List<Turma>> call, Response<List<Turma>> response) {
+                List<Turma> turmas = response.body();
+                if (turmas != null && !turmas.isEmpty()) {
+                    Turma turma = turmas.get(0);//A query vai retorna um resultado, foi tratado como list por conta de um erro relacionado a como o mysql retorna os valores
+//                        AppContext.setTurmaId(turma.getId().toString());
+//                        AppContext.setNomeTurma(turma.getDescricao());
+                    Shared.putString(context,"turma_id", turma.getId().toString());
+                    Shared.putString(context,"nome_turma", turma.getDescricao());
 
-                        AppContext.setIdBeacon1(turma.getIdBeacon1());
-                        AppContext.setIdBeacon2(turma.getIdBeacon2());
-                        AppContext.setIdBeacon3(turma.getIdBeacon3());
-                        AppContext.setIdBeacon4(turma.getIdBeacon4());
+//                        AppContext.setIdBeacon1(turma.getIdBeacon1());
+//                        AppContext.setIdBeacon2(turma.getIdBeacon2());
+//                        AppContext.setIdBeacon3(turma.getIdBeacon3());
+//                        AppContext.setIdBeacon4(turma.getIdBeacon4());
+                    Shared.putString(context,"id_beacon_1", turma.getIdBeacon1());
+                    Shared.putString(context,"id_beacon_2", turma.getIdBeacon2());
+                    Shared.putString(context,"id_beacon_3", turma.getIdBeacon3());
+                    Shared.putString(context,"id_beacon_4", turma.getIdBeacon4());
 
-                        AppContext.setMedidaLadoX(new BigDecimal(turma.getMedidaLadoX()));
-                        AppContext.setMedidaLadoY(new BigDecimal(turma.getMedidaLadoY()));
-                        AppContext.setMedidaLadoZ(new BigDecimal(turma.getMedidaLadoZ()));
+//                        AppContext.setMedidaLadoX(new BigDecimal(turma.getMedidaLadoX()));
+//                        AppContext.setMedidaLadoY(new BigDecimal(turma.getMedidaLadoY()));
+//                        AppContext.setMedidaLadoZ(new BigDecimal(turma.getMedidaLadoZ()));
+                    Shared.putString(context,"medida_lado_x", turma.getMedidaLadoX());
+                    Shared.putString(context,"medida_lado_y", turma.getMedidaLadoY());
+                    Shared.putString(context,"medida_lado_z", turma.getMedidaLadoZ());
 
-                        TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
-                        textViewNomeDisciplica.setText(turma.getDescricao());
-                    } else {
-                        TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
-                        textViewNomeDisciplica.setText("Você não possui aula hoje");
-
-                        //TODO: Apenas para testes, remover depois
-                        AppContext.setTurmaId("1");
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<List<Turma>> call, Throwable t) {
+                    TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
+                    textViewNomeDisciplica.setText(turma.getDescricao());
+                } else {
                     TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
                     textViewNomeDisciplica.setText("Você não possui aula hoje");
-
-                    //TODO: Verificar uma estratégia para guardar o id da turma, pois se o acadêmico não tem internet deveriamos guardar
-                    //TODO: o id da turma para sincronização posterior.
-                    //TODO: Salvar no shared o id do acadêmico juntamente o id de todas turmas com o dia da semana?
-                    AppContext.setTurmaId("1");
                 }
-            }, AppContext.getAcademicoId(), LocalDate.now().getDayOfWeek().toString());
-        } else {
-            TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
-            textViewNomeDisciplica.setText(AppContext.getNomeTurma());
-        }
+            }
+
+            @Override
+            public void onFailure(Call<List<Turma>> call, Throwable t) {
+                TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
+                textViewNomeDisciplica.setText("Você não possui aula hoje");
+            }
+        }, Shared.getString(context, "academico_id"), LocalDate.now().getDayOfWeek().toString());
     }
 
     private void getPresencasJaValidadas(){
@@ -659,6 +656,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
             @Override
             public void onFailure(Call<List<Presenca>> call, Throwable t) {
             }
-        }, AppContext.getAcademicoId(), LocalDate.now().toString());
+        }, Shared.getString(context, "academico_id"), LocalDate.now().toString());
     }
 }

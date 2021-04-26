@@ -12,6 +12,7 @@ import com.example.beacon.api.API;
 import com.example.beacon.api.wrappers.PresencasAulasWrapper;
 import com.example.beacon.context.AppContext;
 import com.example.beacon.utils.ListAdapterAulas;
+import com.example.beacon.utils.Shared;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.Collections;
@@ -56,7 +57,7 @@ public class AulasActivity extends AppCompatActivity {
                 listAdapterAulas = new ListAdapterAulas(getApplicationContext(), aulasActivity, Collections.singletonList(presencasAulasWrapper));
                 listAulas.setAdapter(listAdapterAulas);
             }
-        }, AppContext.getAcademicoId());
+        }, Shared.getString(this, "academico_id"));
     }
 
     private void initBottomNavigation(){

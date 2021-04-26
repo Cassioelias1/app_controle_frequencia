@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.beacon.api.API;
 import com.example.beacon.api.models.Presenca;
 import com.example.beacon.context.AppContext;
+import com.example.beacon.utils.Shared;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
 
@@ -81,7 +82,7 @@ public class DetalhamentoAulaActivity extends AppCompatActivity {
             public void onFailure(Call<List<Presenca>> call, Throwable t) {
 
             }
-        }, AppContext.getAcademicoId(), data);
+        }, Shared.getString(context, "academico_id"), data);
     }
 
     private void initBottomNavigation(){

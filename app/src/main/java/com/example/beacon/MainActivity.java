@@ -17,6 +17,7 @@ import android.widget.EditText;
 import com.example.beacon.api.API;
 import com.example.beacon.api.models.Academico;
 import com.example.beacon.context.AppContext;
+import com.example.beacon.utils.Shared;
 import com.example.beacon.utils.Util;
 
 import org.altbeacon.beacon.BeaconManager;
@@ -68,19 +69,14 @@ public class MainActivity extends Activity {
         EditText editSenha = findViewById(R.id.editPassword);
         String codigo = editEmail.getText().toString();
         String senha = editSenha.getText().toString();
-        Intent itImc = new Intent(MainActivity.this, RequestPermissionActivity.class);
-        startActivity(itImc);
-//        AppContext.setAcademicoId("1");
-//        AppContext.setTurmaId("1");
-        /*if (!Util.isNullOrEmpty(codigo) && !Util.isNullOrEmpty(senha)) {
+        if (!Util.isNullOrEmpty(codigo) && !Util.isNullOrEmpty(senha)) {
             API.validarLogin(new Callback<List<Academico>>() {
                 @Override
                 public void onResponse(Call<List<Academico>> call, Response<List<Academico>> response) {
                     List<Academico> academicoList = response.body();
                     if (academicoList != null && !academicoList.isEmpty()){
-                        System.out.println(academicoList.size());
                         Academico academico = academicoList.get(0);
-                        AppContext.setAcademicoId(academico.getId());
+                        Shared.putString(context, "academico_id", academico.getId());
 
                         Intent itImc = new Intent(MainActivity.this, RequestPermissionActivity.class);
                         startActivity(itImc);
@@ -91,16 +87,13 @@ public class MainActivity extends Activity {
 
                 @Override
                 public void onFailure(Call<List<Academico>> call, Throwable t) {
-                    System.out.println("---------------------------------------------------------");
-                    System.out.println(t.getMessage());
-                    System.out.println("---------------------------------------------------------");
                     Util.showToastMessage(context, "Não foi possível realizar a autenticacao.");
                 }
             }, codigo, senha);
 
         } else {
             Util.showToastMessage(context, "Não foi informado o E-mail ou a Senha!");
-        }*/
+        }
     }
 
     private void verificarDemaisPermission() {
@@ -110,8 +103,8 @@ public class MainActivity extends Activity {
                     if (this.checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         if (!this.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
                             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                            builder.setTitle("This app needs background location access");
-                            builder.setMessage("Please grant location access so this app can detect beacons in the background.");
+                            builder.setTitle("Este aplicativo precisa de acesso à localização em segundo plano!");
+                            builder.setMessage("Por gentileza, conceda acesso à localização para que este aplicativo possa detectar beacons em segundo plano.");
                             builder.setPositiveButton(android.R.string.ok, null);
                             builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
 
@@ -126,8 +119,8 @@ public class MainActivity extends Activity {
                             builder.show();
                         } else {
                             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                            builder.setTitle("Functionality limited");
-                            builder.setMessage("Since background location access has not been granted, this app will not be able to discover beacons in the background.  Please go to Settings -> Applications -> Permissions and grant background location access to this app.");
+                            builder.setTitle("Funcionalidade limitada");
+                            builder.setMessage("Como o acesso à localização em segundo plano não foi concedido, este aplicativo não será capaz de descobrir beacons em segundo plano. Vá para Configurações -> Aplicativos -> Permissões e conceda acesso à localização em segundo plano para este aplicativo.");
                             builder.setPositiveButton(android.R.string.ok, null);
                             builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
                                 @Override
@@ -142,8 +135,8 @@ public class MainActivity extends Activity {
                     requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION}, PERMISSION_REQUEST_FINE_LOCATION);
                 } else {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Functionality limited");
-                    builder.setMessage("Since location access has not been granted, this app will not be able to discover beacons.  Please go to Settings -> Applications -> Permissions and grant location access to this app.");
+                    builder.setTitle("Funcionalidade limitada");
+                    builder.setMessage("Como o acesso à localização em segundo plano não foi concedido, este aplicativo não será capaz de descobrir beacons em segundo plano. Vá para Configurações -> Aplicativos -> Permissões e conceda acesso à localização em segundo plano para este aplicativo.");
                     builder.setPositiveButton(android.R.string.ok, null);
                     builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
@@ -166,7 +159,7 @@ public class MainActivity extends Activity {
                 } else {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("Funcionalidade limitada");
-                    builder.setMessage("Como o acesso à localização não foi concedido, este aplicativo não será capaz de descobrir beacons.");
+                    builder.setMessage("Como o acesso à localização em segundo plano não foi concedido, este aplicativo não será capaz de descobrir beacons em segundo plano. Vá para Configurações -> Aplicativos -> Permissões e conceda acesso à localização em segundo plano para este aplicativo.");
                     builder.setPositiveButton(android.R.string.ok, null);
                     builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
 
@@ -184,8 +177,8 @@ public class MainActivity extends Activity {
 //                    Log.d(TAG, "background location permission granted");
                 } else {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Functionality limited");
-                    builder.setMessage("Since background location access has not been granted, this app will not be able to discover beacons when in the background.");
+                    builder.setTitle("Funcionalidade Limitada");
+                    builder.setMessage("Como o acesso à localização em segundo plano não foi concedido, este aplicativo não será capaz de descobrir beacons em segundo plano. Vá para Configurações -> Aplicativos -> Permissões e conceda acesso à localização em segundo plano para este aplicativo.");
                     builder.setPositiveButton(android.R.string.ok, null);
                     builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
 
@@ -206,8 +199,8 @@ public class MainActivity extends Activity {
         try {
             if (!BeaconManager.getInstanceForApplication(this).checkAvailability()) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Bluetooth not enabled");
-                builder.setMessage("Please enable bluetooth in settings and restart this application.");
+                builder.setTitle("Bluetooth não habilitado");
+                builder.setMessage("Ative o bluetooth nas configurações e reinicie este aplicativo.");
                 builder.setPositiveButton(android.R.string.ok, null);
                 builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
@@ -221,8 +214,8 @@ public class MainActivity extends Activity {
         }
         catch (RuntimeException e) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Bluetooth LE not available");
-            builder.setMessage("Sorry, this device does not support Bluetooth LE.");
+            builder.setTitle("Bluetooth LE não disponível");
+            builder.setMessage("Desculpe, este dispositivo não é compatível com Bluetooth LE.");
             builder.setPositiveButton(android.R.string.ok, null);
             builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
 
