@@ -146,10 +146,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //        SegundoPlano segundoPlano2140 = new SegundoPlano(materialCardView2140, textView2140, 23, 29, AppContext.getThread2140(), "card_21_40", "textView2140", handler, context);
 //        segundoPlano2140.execute();
 
-        onInitThread(materialCardView1915, textView1915, 20, 10, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
-        onInitThread(materialCardView2015, textView2015, 20, 11, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
-        onInitThread(materialCardView2100, textView2100, 20, 12, AppContext.getThread2100(), "card_21_00", "textView2100", 2);
-        onInitThread(materialCardView2140, textView2140, 20, 13, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
+        onInitThread(materialCardView1915, textView1915, 21, 2, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
+//        onInitThread(materialCardView2015, textView2015, 19, 35, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
+//        onInitThread(materialCardView2100, textView2100, 19, 40, AppContext.getThread2100(), "card_21_00", "textView2100", 2);
+//        onInitThread(materialCardView2140, textView2140, 19, 45, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
 
         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
         textViewNomeDisciplica.setText(Shared.getString(context, "nome_turma"));
@@ -239,6 +239,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                                     }
 
                                     Presenca presenca = new Presenca(academicoId, turmaId, LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
+//                                    beaconMediaRssiMap.put("a52d6b05-24ec-46b7-b3c1-cb853a6e20b2", -79);
+//                                    beaconMediaRssiMap.put("fda50693-a4e2-4fb1-afcf-c6eb0764782556", -65);
+//                                    beaconMediaRssiMap.put("fda50693-a4e2-4fb1-afcf-c6eb0764782512", -70);
+//                                    beaconMediaRssiMap.put("0x0077656c6c636f726573736407", -74);
                                     presenca.setPosicaoAcademicoHorarioAulaAndSetStatus(BeaconService.instance().academicoEstaDentroSalaAula(beaconMediaRssiMap, context));
                                     validarPresencaApi(presenca, materialCardView, textView, nameMaterialCard, nameTextView);
                                 }
@@ -318,6 +322,16 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                             validarPresencaDia[1] = true;
                             validarPresencaDia[2] = true;
                             validarPresencaDia[3] = true;
+
+                            //Apenas para evitar possíveis erros nas validações de dias diferentes.
+                            Shared.putString(context, "id_beacon_1", null);
+                            Shared.putString(context, "id_beacon_2", null);
+                            Shared.putString(context, "id_beacon_3", null);
+                            Shared.putString(context, "id_beacon_4", null);
+                            Shared.putString(context, "medida_lado_x", null);
+                            Shared.putString(context, "medida_lado_Y", null);
+                            Shared.putString(context, "medida_lado_Z", null);
+
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -484,11 +498,11 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     @Override
     public void onBeaconServiceConnect() {
         RangeNotifier rangeNotifier = (beacons, region) -> {
+//            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+//            Util.sendNotification("Lendo Beacons", ""+beacons.size(), notificationManager, context);
             if (beacons.size() > 0){
-                metodoComOutlier(beacons);
-//                metodoSemOutlier(beacons);
-                //TODO: Criar um método que só irá fazer a leitura dos beacons e salvar no map os rssi
-                //TODO: Criar um método que só irá fazer a leitura dos beacons e salvar no map os rssi e aplicar o outlier.
+                metodoComTecnicaMelhoraAcuracia(beacons);
+//                metodoSemTecnicaMelhorarAcuracia(beacons);
 //                for (Beacon beacon : beacons) {
 //                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 //                    Util.sendNotification("RSSI", beacon.getRssi()+"", notificationManager, context);
@@ -503,7 +517,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         } catch (RemoteException e) {   }
     }
 
-    private void metodoSemOutlier(Collection<Beacon> beacons){
+    private void metodoSemTecnicaMelhorarAcuracia(Collection<Beacon> beacons){
         if (!beaconMediaRssiMap.isEmpty()){
             beaconMediaRssiMap.clear();
         }
@@ -523,31 +537,29 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
             //Utilizar os 3 ids, pois alguns beacons podem conter id1 iguais.
             idFinal = id1 + Util.getEmptyIfNull(id2) + Util.getEmptyIfNull(id3);
 
-            mediaRssi = beaconService.calcularMediaRssi(Collections.singletonList(beacon.getRssi()));
-            beaconMediaRssiMap.put(idFinal, mediaRssi);
+            beaconMediaRssiMap.put(idFinal, beacon.getRssi());
         }
     }
 
-    private void metodoComOutlier(Collection<Beacon> beacons){
-        if (!beaconMediaRssiMap.isEmpty()){
-            beaconMediaRssiMap.clear();
-        }
+    private void metodoComTecnicaMelhoraAcuracia(Collection<Beacon> beacons){
+//        if (!beaconMediaRssiMap.isEmpty()){
+//            beaconMediaRssiMap.clear();
+//        }
 
         String idFinal;
-        String id1 = null;
-        String id2 = null;
-        String id3 = null;
+        String id1;
+        String id2 = "";
+        String id3 = "";
         BeaconService beaconService = BeaconService.instance();
-//        double distance = 0;
 
         for (Beacon beacon : beacons) {
             id1 = beacon.getId1() != null ? beacon.getId1().toString() : "";
-            if (beacon.getIdentifiers().size() > 3) {//Alguns beacons não possuem id2 e id3
+            if (beacon.getIdentifiers().size() == 3) {//Alguns beacons não possuem id2 e id3
                 id2 = beacon.getId2() != null ? beacon.getId2().toString() : "";
                 id3 = beacon.getId3() != null ? beacon.getId3().toString() : "";
             }
             //Utilizar os 3 ids, pois alguns beacons podem conter id1 iguais.
-            idFinal = id1 + Util.getEmptyIfNull(id2) + Util.getEmptyIfNull(id3);
+            idFinal = id1 + id2 + id3;
 
             List<Integer> ultimosSeisRssis = ultimosSeisRssisPorBeaconMap.get(idFinal);
 
@@ -574,7 +586,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
             mediaRssi = beaconService.calcularMediaRssi(ultimosSeisRssis);
             beaconMediaRssiMap.put(idFinal, mediaRssi);
-//            distance = beaconService.calcularDistanciaByRssi(beaconMediaRssiMap.get(idFinal));
         }
     }
 

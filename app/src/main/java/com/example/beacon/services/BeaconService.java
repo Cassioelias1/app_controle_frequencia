@@ -1,9 +1,9 @@
 package com.example.beacon.services;
 
+import android.app.NotificationManager;
 import android.content.Context;
 
 import com.example.beacon.api.models.PosicaoAcademico;
-import com.example.beacon.context.AppContext;
 import com.example.beacon.models.Beacon;
 import com.example.beacon.models.BeaconDistancia;
 import com.example.beacon.models.ContantesDistancia;
@@ -28,6 +28,9 @@ public class BeaconService {
     //este método deve ser responsavel por aplicar a trilateração com 4 beacons -> https://eg.uc.pt/bitstream/10316/31758/1/Tese_AnaRitaPereira.pdf
     public PosicaoAcademico academicoEstaDentroSalaAula(Map<String, Integer> beaconMediaRssiMap, Context context){
         if(beaconMediaRssiMap.size() < 4){
+            int size = beaconMediaRssiMap.size();
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            Util.sendNotification("RSSI", "Não tem 4 beacons e sim: "+size, notificationManager, context);
             return null;//se não está captando pelo menos 4 beacons significa que o academico não está em sala de aula.
         }
 
@@ -36,30 +39,33 @@ public class BeaconService {
         //Largura Lateral (X) = 4.55
         //Largura Frontal (Y) = 3.70
 
-        //b1 = (0, 0, 0) -> coordenadas do beacon 1
-        //b2 = (4.55, 0, 0) -> coordenadas do beacon 2
-        //b3 = (0, 3.70, 0) -> coordenadas do beacon 3
-        //b4 = (2.275, 1.85, 2.60) -> coordenadas do beacon 4
-
-        BigDecimal distanciaBeacon1 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconMediaRssiMap.get(Shared.getString(context,"id_beacon_1"))));
-        BigDecimal distanciaBeacon2 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconMediaRssiMap.get(Shared.getString(context,"id_beacon_2"))));
-        BigDecimal distanciaBeacon3 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconMediaRssiMap.get(Shared.getString(context,"id_beacon_3"))));
-        BigDecimal distanciaBeacon4 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconMediaRssiMap.get(Shared.getString(context,"id_beacon_4"))));
-
-        BigDecimal medidaLadoX = new BigDecimal(Shared.getString(context, "medida_lado_x"));
-        BigDecimal medidaLadoY = new BigDecimal(Shared.getString(context, "medida_lado_y"));
-        BigDecimal medidaLadoZ = new BigDecimal(Shared.getString(context, "medida_lado_z"));
-
-        //TODO: Verificar uma estratégia para caso o academico não tenha internet.
-        //podem ser nulos se houver erro na requisição para recuperar a aula do dia do academico ou se for sabádo ou domingo.
-        if (medidaLadoX == null || medidaLadoY == null || medidaLadoZ == null){
-            return null;
-        }
+        String idBeacon1 = Shared.getString(context, "id_beacon_1");
+        String idBeacon2 = Shared.getString(context, "id_beacon_2");
+        String idBeacon3 = Shared.getString(context, "id_beacon_3");
+        String idBeacon4 = Shared.getString(context, "id_beacon_4");
 
         //Podem ser nulos se o acadêmico não estiver perto da sala de aula, onde o app não consiga fazer a leitura dos beacons.
-        if (distanciaBeacon1 == null || distanciaBeacon2 == null || distanciaBeacon3 == null || distanciaBeacon4 == null) {
+        if (idBeacon1 == null || idBeacon2 == null || idBeacon3 == null || idBeacon4 == null) {
             return null;
         }
+
+        String medidaLadoXString = Shared.getString(context, "medida_lado_x");
+        String medidaLadoYString = Shared.getString(context, "medida_lado_y");
+        String medidaLadoZString = Shared.getString(context, "medida_lado_z");
+
+        //podem ser nulos se houver erro na requisição para recuperar a aula do dia do academico ou se for sabádo ou domingo.
+        if (medidaLadoXString == null || medidaLadoYString == null || medidaLadoZString == null){
+            return null;
+        }
+
+        BigDecimal distanciaBeacon1 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconMediaRssiMap.get(idBeacon1)));
+        BigDecimal distanciaBeacon2 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconMediaRssiMap.get(idBeacon2)));
+        BigDecimal distanciaBeacon3 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconMediaRssiMap.get(idBeacon3)));
+        BigDecimal distanciaBeacon4 = BigDecimal.valueOf(calcularDistanciaByRssi(beaconMediaRssiMap.get(idBeacon4)));
+
+        BigDecimal medidaLadoX = new BigDecimal(medidaLadoXString);
+        BigDecimal medidaLadoY = new BigDecimal(medidaLadoYString);
+        BigDecimal medidaLadoZ = new BigDecimal(medidaLadoZString);
 
         BigDecimal ZERO = BigDecimal.ZERO;
 
