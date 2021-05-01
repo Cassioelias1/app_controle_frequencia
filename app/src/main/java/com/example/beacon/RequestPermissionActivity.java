@@ -72,7 +72,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     //2,6 é em metros o ponto z
     //370 / 2 = 185
 
-    //Celular com Beacon Simulator = a52d6b05-24ec-46b7-b3c1-cb853a6e20b2 TODO: Beacon1
+    //Celular com Beacon Simulator = a52d6b05-24ec-46b7-b3c1-cb853a6e20b25596 TODO: Beacon1
     //Estrela = fda50693-a4e2-4fb1-afcf-c6eb0764782556 // id2 = 5, id3 = 6 TODO: Beacon2
     //Quadrado = fda50693-a4e2-4fb1-afcf-c6eb0764782512 // id2 = 1, id3 = 2 TODO: Beacon3
     //Sabonete = 0x0077656c6c636f726573736407 TODO: Beacon4
@@ -81,7 +81,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     protected final String TAG = RequestPermissionActivity.this.getClass().getSimpleName();
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private static final int REQUEST_ENABLE_BLUETOOTH = 1;
-    private static final long DEFAULT_SCAN_PERIOD_MS = 5000;
+    private static final long DEFAULT_SCAN_PERIOD_MS = 20000;
     private static final String ALL_BEACONS_REGION = "AllBeaconsRegion";
     private static final String I_BEACON = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24";
 
@@ -146,14 +146,14 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //        SegundoPlano segundoPlano2140 = new SegundoPlano(materialCardView2140, textView2140, 23, 29, AppContext.getThread2140(), "card_21_40", "textView2140", handler, context);
 //        segundoPlano2140.execute();
 
-        onInitThread(materialCardView1915, textView1915, 21, 2, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
-//        onInitThread(materialCardView2015, textView2015, 19, 35, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
+        onInitThread(materialCardView1915, textView1915, 21, 30, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
+//        onInitThread(materialCardView2015, textView2015, 21, 5, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
 //        onInitThread(materialCardView2100, textView2100, 19, 40, AppContext.getThread2100(), "card_21_00", "textView2100", 2);
 //        onInitThread(materialCardView2140, textView2140, 19, 45, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
 
         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
         textViewNomeDisciplica.setText(Shared.getString(context, "nome_turma"));
-//
+
         List<MaterialCardView> materialCardViews = new ArrayList<>();
         materialCardViews.add(materialCardView1915);
         materialCardViews.add(materialCardView2015);

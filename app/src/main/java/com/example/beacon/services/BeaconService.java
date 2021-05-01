@@ -69,24 +69,35 @@ public class BeaconService {
 
         BigDecimal ZERO = BigDecimal.ZERO;
 
+        //Beacon1 (0, 0, 0)
+        //Beacon2 (0, 0, 2.6)
+        //Beacon3 (0, 3.7, 0)
+        //Beacon4 (4.55, 1.85, 1.3)
+
         Beacon beacon1 = new Beacon(ZERO, ZERO, ZERO);
-        Beacon beacon2 = new Beacon(medidaLadoX, ZERO, ZERO);
+//        Beacon beacon2 = new Beacon(medidaLadoX, ZERO, ZERO);
+        Beacon beacon2 = new Beacon(ZERO, ZERO, medidaLadoZ);
         Beacon beacon3 = new Beacon(ZERO, medidaLadoY, ZERO);
-        Beacon beacon4 = new Beacon(medidaLadoX.divide(Util.DOIS, RoundingMode.HALF_UP), medidaLadoY.divide(Util.DOIS, RoundingMode.HALF_UP), medidaLadoZ);
+//        Beacon beacon4 = new Beacon(medidaLadoX.divide(Util.DOIS, RoundingMode.HALF_UP), medidaLadoY.divide(Util.DOIS, RoundingMode.HALF_UP), medidaLadoZ);
+        Beacon beacon4 = new Beacon(medidaLadoX, medidaLadoY.divide(Util.DOIS, RoundingMode.HALF_UP), medidaLadoZ.divide(Util.DOIS, RoundingMode.HALF_UP));
 
         BeaconDistancia beaconDistancia1 = new BeaconDistancia(distanciaBeacon1, beacon1);
         BeaconDistancia beaconDistancia2 = new BeaconDistancia(distanciaBeacon2, beacon2);
         BeaconDistancia beaconDistancia3 = new BeaconDistancia(distanciaBeacon3, beacon3);
         BeaconDistancia beaconDistancia4 = new BeaconDistancia(distanciaBeacon4, beacon4);
 
-        BigDecimal posicaoXAcademico = getPosicaoX(beaconDistancia1, beaconDistancia2);
+        BigDecimal posicaoXAcademico = getPosicaoX(beaconDistancia1, beaconDistancia2);//TODO: Na verdade isso está entregando o Z pois mudei as posições do beacon
         BigDecimal posicaoYAcademico = getPosicaoY(beaconDistancia1, beaconDistancia3, posicaoXAcademico);
-        BigDecimal posicaoZAcademico = getPosicaoZ(beaconDistancia1, beaconDistancia4, posicaoXAcademico, posicaoYAcademico);
+        BigDecimal posicaoZAcademico = getPosicaoZ(beaconDistancia1, beaconDistancia4, posicaoXAcademico, posicaoYAcademico);//TODO: Na verdade isso está entregando o X pois mudei as posições do beacon
 
         PosicaoAcademico posicaoAcademico = new PosicaoAcademico(posicaoXAcademico, posicaoYAcademico, posicaoZAcademico);
 
+        //Z = 1.0469562272836872,
+        //Y = 2.1619344166634678,
+        //X = 2.891023460806052
+
         //Caso algumas das posições calculadas seja maior que o total da sala.
-        if (posicaoAcademico.getPosicaoX().compareTo(medidaLadoX) > 0 || posicaoAcademico.getPosicaoY().compareTo(medidaLadoY) > 0 || posicaoAcademico.getPosicaoZ().compareTo(medidaLadoZ) > 0) {
+        if (posicaoAcademico.getPosicaoX().compareTo(medidaLadoZ) > 0 || posicaoAcademico.getPosicaoY().compareTo(medidaLadoY) > 0 || posicaoAcademico.getPosicaoZ().compareTo(medidaLadoX) > 0) {
             posicaoAcademico.falta();
             return posicaoAcademico;
         }
@@ -97,7 +108,7 @@ public class BeaconService {
     private BigDecimal getPosicaoX(BeaconDistancia beaconDistancia1, BeaconDistancia beaconDistancia2){
         BigDecimal distancia1AoQuadrado = beaconDistancia1.getDistancia().pow(2);
         BigDecimal distancia2AoQuadrado = beaconDistancia2.getDistancia().pow(2);
-        BigDecimal posicaoXBeacon2 = beaconDistancia2.getBeacon().getPosicaoX();
+        BigDecimal posicaoXBeacon2 = beaconDistancia2.getBeacon().getPosicaoZ();
         BigDecimal posicaoXBeacon2AoQuadrado = posicaoXBeacon2.pow(2);
 
         return distancia1AoQuadrado
@@ -125,11 +136,11 @@ public class BeaconService {
     private BigDecimal getPosicaoZ(BeaconDistancia beaconDistancia1, BeaconDistancia beaconDistancia4, BigDecimal posicaoXAcademico, BigDecimal posicaoYAcademico){
         BigDecimal distancia1AoQuadrado = beaconDistancia1.getDistancia().pow(2);
         BigDecimal distancia4AoQuadrado = beaconDistancia4.getDistancia().pow(2);
-        BigDecimal posicaoXBeacon4 = beaconDistancia4.getBeacon().getPosicaoX();
+        BigDecimal posicaoXBeacon4 = beaconDistancia4.getBeacon().getPosicaoZ();
         BigDecimal posicaoXBeacon4AoQuadrado = posicaoXBeacon4.pow(2);
         BigDecimal posicaoYBeacon4 = beaconDistancia4.getBeacon().getPosicaoY();
         BigDecimal posicaoYBeacon4AoQuadrado = posicaoYBeacon4.pow(2);
-        BigDecimal posicaoZBeacon4 = beaconDistancia4.getBeacon().getPosicaoZ();
+        BigDecimal posicaoZBeacon4 = beaconDistancia4.getBeacon().getPosicaoX();
         BigDecimal posicaoZBeacon4AoQuadrado = posicaoZBeacon4.pow(2);
 
         return distancia1AoQuadrado.subtract(distancia4AoQuadrado)
@@ -187,10 +198,10 @@ public class BeaconService {
         return null;
     }
 
-    public double calcularDistanciaByRssi(int mediaRssi) {
+    public double calcularDistanciaByRssi(Integer mediaRssi) {
         double rssiBaseUmMetro = -59;//TODO: Esse txPower é na verdade o RSSI médido a tal distância no "Iphone"
 
-        if(mediaRssi == 0){
+        if(mediaRssi == null || mediaRssi == 0){
             return -1;
         }
 
