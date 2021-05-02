@@ -90,14 +90,10 @@ public class BeaconService {
         BigDecimal posicaoYAcademico = getPosicaoY(beaconDistancia1, beaconDistancia3, posicaoXAcademico);
         BigDecimal posicaoZAcademico = getPosicaoZ(beaconDistancia1, beaconDistancia4, posicaoXAcademico, posicaoYAcademico);//TODO: Na verdade isso está entregando o X pois mudei as posições do beacon
 
-        PosicaoAcademico posicaoAcademico = new PosicaoAcademico(posicaoXAcademico, posicaoYAcademico, posicaoZAcademico);
-
-        //Z = 1.0469562272836872,
-        //Y = 2.1619344166634678,
-        //X = 2.891023460806052
+        PosicaoAcademico posicaoAcademico = new PosicaoAcademico(posicaoZAcademico, posicaoYAcademico, posicaoXAcademico);
 
         //Caso algumas das posições calculadas seja maior que o total da sala.
-        if (posicaoAcademico.getPosicaoX().compareTo(medidaLadoZ) > 0 || posicaoAcademico.getPosicaoY().compareTo(medidaLadoY) > 0 || posicaoAcademico.getPosicaoZ().compareTo(medidaLadoX) > 0) {
+        if (posicaoAcademico.getPosicaoX().compareTo(medidaLadoX) > 0 || posicaoAcademico.getPosicaoY().compareTo(medidaLadoY) > 0 || posicaoAcademico.getPosicaoZ().compareTo(medidaLadoZ) > 0) {
             posicaoAcademico.falta();
             return posicaoAcademico;
         }

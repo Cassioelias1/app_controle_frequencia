@@ -46,29 +46,26 @@ public class ListAdapterAulas extends ArrayAdapter<PresencasAulasWrapper> {
 
         //TODO: Se possível, tentar deixar este código mais elegante
         try {
-            if (!"Nenhum registro encontrado".equals(presenca.getDataValidacao())) {
+            if (!presenca.isWithError()) {
                 Date dt = new SimpleDateFormat("yyyy-MM-dd").parse(presenca.getDataValidacao());
 
                 String text = new SimpleDateFormat("dd/MM/yyyy").format(dt);
-                if (!presenca.isWithError()) {
-                    convertView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View o) {
-                            AppContext.DATA_VALIDACAO_SELECTED = presenca.getDataValidacao();
-                            aulasActivity.startActivity(new Intent(aulasActivity, DetalhamentoAulaActivity.class));
-                        }
-                    });
-                    text += " - " + presenca.getNomeTurma();
-                } else {
-                    dataSaida.setEnabled(false);
-                }
-
+                convertView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View o) {
+                        AppContext.DATA_VALIDACAO_SELECTED = presenca.getDataValidacao();
+                        aulasActivity.startActivity(new Intent(aulasActivity, DetalhamentoAulaActivity.class));
+                    }
+                });
+                text += " - " + presenca.getNomeTurma();
                 dataSaida.setText(text);
+            } else {
+                dataSaida.setEnabled(false);
+                dataSaida.setText("Nenhum registro encontrado");
             }
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
 
         return convertView;
     }

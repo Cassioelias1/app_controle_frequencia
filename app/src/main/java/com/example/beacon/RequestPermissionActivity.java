@@ -244,7 +244,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //                                    beaconMediaRssiMap.put("fda50693-a4e2-4fb1-afcf-c6eb0764782512", -70);
 //                                    beaconMediaRssiMap.put("0x0077656c6c636f726573736407", -74);
                                     presenca.setPosicaoAcademicoHorarioAulaAndSetStatus(BeaconService.instance().academicoEstaDentroSalaAula(beaconMediaRssiMap, context));
-                                    validarPresencaApi(presenca, materialCardView, textView, nameMaterialCard, nameTextView);
+                                    //Se posicaoX ou posicao Y ou Z foram nulas significa que o método de trilateracao nao tinha dados suficientes para calcular, logo a requisição não precisar ser feita.
+                                    if (presenca.getPosicaoX() != null){
+                                        validarPresencaApi(presenca, materialCardView, textView, nameMaterialCard, nameTextView);
+                                    }
                                 }
                             //}
                         } catch (Exception e) {

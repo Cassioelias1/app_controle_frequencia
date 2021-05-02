@@ -41,7 +41,7 @@ public class AulasActivity extends AppCompatActivity {
                     listAdapterAulas = new ListAdapterAulas(getApplicationContext(), aulasActivity, presencasAulasWrapperList);
                     listAulas.setAdapter(listAdapterAulas);
                 } else {
-                    PresencasAulasWrapper presencasAulasWrapper = new PresencasAulasWrapper("Nenhum registro encontrado", "");
+                    PresencasAulasWrapper presencasAulasWrapper = new PresencasAulasWrapper(null, null);
                     presencasAulasWrapper.setWithError(true);
 
                     listAdapterAulas = new ListAdapterAulas(getApplicationContext(), aulasActivity, Collections.singletonList(presencasAulasWrapper));
@@ -51,7 +51,7 @@ public class AulasActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<PresencasAulasWrapper>> call, Throwable t) {
-                PresencasAulasWrapper presencasAulasWrapper = new PresencasAulasWrapper("Nenhum registro encontrado", "");
+                PresencasAulasWrapper presencasAulasWrapper = new PresencasAulasWrapper(null, null);
                 presencasAulasWrapper.setWithError(true);
 
                 listAdapterAulas = new ListAdapterAulas(getApplicationContext(), aulasActivity, Collections.singletonList(presencasAulasWrapper));
