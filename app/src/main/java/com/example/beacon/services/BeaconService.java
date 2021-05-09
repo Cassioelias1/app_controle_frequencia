@@ -29,8 +29,6 @@ public class BeaconService {
     public PosicaoAcademico academicoEstaDentroSalaAula(Map<String, Integer> beaconMediaRssiMap, Context context){
         if(beaconMediaRssiMap.size() < 4){
             int size = beaconMediaRssiMap.size();
-            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            Util.sendNotification("RSSI", "Não tem 4 beacons e sim: "+size, notificationManager, context);
             return null;//se não está captando pelo menos 4 beacons significa que o academico não está em sala de aula.
         }
 
@@ -91,6 +89,12 @@ public class BeaconService {
         BigDecimal posicaoZAcademico = getPosicaoZ(beaconDistancia1, beaconDistancia4, posicaoXAcademico, posicaoYAcademico);//TODO: Na verdade isso está entregando o X pois mudei as posições do beacon
 
         PosicaoAcademico posicaoAcademico = new PosicaoAcademico(posicaoZAcademico, posicaoYAcademico, posicaoXAcademico);
+
+        BigDecimal cmTolerancia = new BigDecimal("0.20");
+
+//        medidaLadoX = medidaLadoX.add(cmTolerancia);
+//        medidaLadoY = medidaLadoY.add(cmTolerancia);
+//        medidaLadoZ = medidaLadoZ.add(cmTolerancia);
 
         //Caso algumas das posições calculadas seja maior que o total da sala.
         if (posicaoAcademico.getPosicaoX().compareTo(medidaLadoX) > 0 || posicaoAcademico.getPosicaoY().compareTo(medidaLadoY) > 0 || posicaoAcademico.getPosicaoZ().compareTo(medidaLadoZ) > 0) {

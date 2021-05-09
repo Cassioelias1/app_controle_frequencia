@@ -48,6 +48,7 @@ import org.altbeacon.beacon.Region;
 import org.altbeacon.beacon.powersave.BackgroundPowerSaver;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -146,10 +147,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 //        SegundoPlano segundoPlano2140 = new SegundoPlano(materialCardView2140, textView2140, 23, 29, AppContext.getThread2140(), "card_21_40", "textView2140", handler, context);
 //        segundoPlano2140.execute();
 
-        onInitThread(materialCardView1915, textView1915, 21, 30, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
-//        onInitThread(materialCardView2015, textView2015, 21, 5, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
-//        onInitThread(materialCardView2100, textView2100, 19, 40, AppContext.getThread2100(), "card_21_00", "textView2100", 2);
-//        onInitThread(materialCardView2140, textView2140, 19, 45, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
+//        onInitThread(materialCardView1915, textView1915, 19, 15, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
+//        onInitThread(materialCardView2015, textView2015, 19, 16, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
+//        onInitThread(materialCardView2100, textView2100, 19, 17, AppContext.getThread2100(), "card_21_00", "textView2100", 2);
+//        onInitThread(materialCardView2140, textView2140, 19, 42, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
 
         TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
         textViewNomeDisciplica.setText(Shared.getString(context, "nome_turma"));
@@ -335,18 +336,25 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                             Shared.putString(context, "medida_lado_Y", null);
                             Shared.putString(context, "medida_lado_Z", null);
 
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    for (MaterialCardView materialCardView : materialCardViews) {
-                                        materialCardView.setBackgroundColor(Color.parseColor("#E7731E"));
-                                    }
+                            Shared.putString(context, "academico_id", null);
+                            Shared.putString(context, "turma_id", null);
+                            Shared.putString(context,"nome_turma", null);
 
-                                    for (TextView textView : textViews) {
-                                        textView.setText("Aguardando Horário");
-                                    }
-                                }
-                            });
+                            //Faz o redirect para a tela inicial para que o login seja feito novamente
+                            Intent itImc = new Intent(RequestPermissionActivity.this, MainActivity.class);
+                            startActivity(itImc);
+//                            handler.post(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    for (MaterialCardView materialCardView : materialCardViews) {
+//                                        materialCardView.setBackgroundColor(Color.parseColor("#E7731E"));
+//                                    }
+//
+//                                    for (TextView textView : textViews) {
+//                                        textView.setText("Aguardando Horário");
+//                                    }
+//                                }
+//                            });
 
                         }
                     }
@@ -631,8 +639,23 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
 
             @Override
             public void onFailure(Call<List<Turma>> call, Throwable t) {
+                String turmaId = Shared.getString(context, "turma_id");
+                String nomeTurma = Shared.getString(context, "nome_turma");
+                String idBeacon1 = Shared.getString(context, "id_beacon_1");
+                String idBeacon2 = Shared.getString(context, "id_beacon_2");
+                String idBeacon3 = Shared.getString(context, "id_beacon_3");
+                String idBeacon4 = Shared.getString(context, "id_beacon_4");
+                String medidaLadoX = Shared.getString(context, "medida_lado_x");
+                String medidaLadoY = Shared.getString(context, "medida_lado_y");
+                String medidaLadoZ = Shared.getString(context, "medida_lado_z");
+
                 TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
-                textViewNomeDisciplica.setText("Você não possui aula hoje");
+                if (turmaId == null || nomeTurma == null || idBeacon1 == null || idBeacon2 == null ||
+                        idBeacon3 == null || idBeacon4 == null || medidaLadoX == null || medidaLadoY == null || medidaLadoZ == null){
+                    textViewNomeDisciplica.setText("Você não possui aula hoje");
+                } else {
+                    textViewNomeDisciplica.setText(nomeTurma);
+                }
             }
         }, Shared.getString(context, "academico_id"), LocalDate.now().getDayOfWeek().toString());
     }

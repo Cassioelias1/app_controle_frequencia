@@ -45,13 +45,23 @@ public class MainActivity extends Activity {
         //AppContext.setNotificationManager((NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE));
 
         EditText editText = findViewById(R.id.editEmail);
-        editText.setText("95082");
+        editText.setText("95081");
         EditText editText2 = findViewById(R.id.editPassword);
-        editText2.setText("95082");
+        editText2.setText("95081");
 
         //TODO: setar no AppContext null em turmaId e academicoId
 
         initButtons();
+        checkUserAuthInDay();
+    }
+
+    //Se o usuário já foi autenticado uma vez no dia, não é necessário realizar a autenticação dele novamente
+    private void checkUserAuthInDay(){
+        String academicoId = Shared.getString(context, "academico_id");
+        if (academicoId != null && academicoId.length() > 0){
+            Intent itImc = new Intent(MainActivity.this, RequestPermissionActivity.class);
+            startActivity(itImc);
+        }
     }
 
     private void initButtons(){
