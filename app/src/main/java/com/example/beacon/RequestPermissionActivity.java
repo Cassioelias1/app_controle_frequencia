@@ -82,7 +82,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     protected final String TAG = RequestPermissionActivity.this.getClass().getSimpleName();
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private static final int REQUEST_ENABLE_BLUETOOTH = 1;
-    private static final long DEFAULT_SCAN_PERIOD_MS = 20000;
+    private static final long DEFAULT_SCAN_PERIOD_MS = 5000;
     private static final String ALL_BEACONS_REGION = "AllBeaconsRegion";
     private static final String I_BEACON = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24";
 
@@ -135,25 +135,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         MaterialCardView materialCardView2140 = findViewById(R.id.card_21_40);
         TextView textView2140 = findViewById(R.id.textView2140);
 
-//        SegundoPlano segundoPlano1915 = new SegundoPlano(materialCardView1915, textView1915, 23, 0, AppContext.getThread1915(), "card_19_15", "textView1915", handler, context);
-//        segundoPlano1915.execute();
-
-//        SegundoPlano segundoPlano2015 = new SegundoPlano(materialCardView2015, textView2015, 23, 27, AppContext.getThread2015(), "card_20_15", "textView2015", handler, context);
-//        segundoPlano2015.execute();
-
-//        SegundoPlano segundoPlano2100 = new SegundoPlano(materialCardView2100, textView2100, 23, 28, AppContext.getThread2100(), "card_21_00", "textView2100", handler, context);
-//        segundoPlano2100.execute();
-
-//        SegundoPlano segundoPlano2140 = new SegundoPlano(materialCardView2140, textView2140, 23, 29, AppContext.getThread2140(), "card_21_40", "textView2140", handler, context);
-//        segundoPlano2140.execute();
-
-//        onInitThread(materialCardView1915, textView1915, 19, 15, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
-//        onInitThread(materialCardView2015, textView2015, 19, 16, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
-//        onInitThread(materialCardView2100, textView2100, 19, 17, AppContext.getThread2100(), "card_21_00", "textView2100", 2);
-//        onInitThread(materialCardView2140, textView2140, 19, 42, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
-
-        TextView textViewNomeDisciplica = findViewById(R.id.nomeDisciplinaHoje);
-        textViewNomeDisciplica.setText(Shared.getString(context, "nome_turma"));
+        onInitThread(materialCardView1915, textView1915, 21, 22, AppContext.getThread1915(), "card_19_15", "textView1915", 0);
+        onInitThread(materialCardView2015, textView2015, 21, 30, AppContext.getThread2015(), "card_20_15", "textView2015", 1);
+        onInitThread(materialCardView2100, textView2100, 21, 4, AppContext.getThread2100(), "card_21_00", "textView2100", 2);
+        onInitThread(materialCardView2140, textView2140, 21, 14, AppContext.getThread2140(), "card_21_40", "textView2140", 3);
 
         List<MaterialCardView> materialCardViews = new ArrayList<>();
         materialCardViews.add(materialCardView1915);
@@ -528,30 +513,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         } catch (RemoteException e) {   }
     }
 
-    private void metodoSemTecnicaMelhorarAcuracia(Collection<Beacon> beacons){
-        if (!beaconMediaRssiMap.isEmpty()){
-            beaconMediaRssiMap.clear();
-        }
-
-        String idFinal;
-        String id1 = null;
-        String id2 = null;
-        String id3 = null;
-        BeaconService beaconService = BeaconService.instance();
-
-        for (Beacon beacon : beacons) {
-            id1 = beacon.getId1() != null ? beacon.getId1().toString() : "";
-            if (beacon.getIdentifiers().size() > 3) {//Alguns beacons não possuem id2 e id3
-                id2 = beacon.getId2() != null ? beacon.getId2().toString() : "";
-                id3 = beacon.getId3() != null ? beacon.getId3().toString() : "";
-            }
-            //Utilizar os 3 ids, pois alguns beacons podem conter id1 iguais.
-            idFinal = id1 + Util.getEmptyIfNull(id2) + Util.getEmptyIfNull(id3);
-
-            beaconMediaRssiMap.put(idFinal, beacon.getRssi());
-        }
-    }
-
     private void metodoComTecnicaMelhoraAcuracia(Collection<Beacon> beacons){
 //        if (!beaconMediaRssiMap.isEmpty()){
 //            beaconMediaRssiMap.clear();
@@ -600,7 +561,6 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
         }
     }
 
-    //TODO: Retornar as medidas da sala de aula aqui tbm.
     private void getAulaDiaAcademico(){
         API.getAulaDiaAcademico(new Callback<List<Turma>>() {
             @Override

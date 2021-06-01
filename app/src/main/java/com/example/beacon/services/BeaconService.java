@@ -1,6 +1,5 @@
 package com.example.beacon.services;
 
-import android.app.NotificationManager;
 import android.content.Context;
 
 import com.example.beacon.api.models.PosicaoAcademico;
@@ -28,7 +27,6 @@ public class BeaconService {
     //este método deve ser responsavel por aplicar a trilateração com 4 beacons -> https://eg.uc.pt/bitstream/10316/31758/1/Tese_AnaRitaPereira.pdf
     public PosicaoAcademico academicoEstaDentroSalaAula(Map<String, Integer> beaconMediaRssiMap, Context context){
         if(beaconMediaRssiMap.size() < 4){
-            int size = beaconMediaRssiMap.size();
             return null;//se não está captando pelo menos 4 beacons significa que o academico não está em sala de aula.
         }
 
@@ -88,6 +86,7 @@ public class BeaconService {
         BigDecimal posicaoYAcademico = getPosicaoY(beaconDistancia1, beaconDistancia3, posicaoXAcademico);
         BigDecimal posicaoZAcademico = getPosicaoZ(beaconDistancia1, beaconDistancia4, posicaoXAcademico, posicaoYAcademico);//TODO: Na verdade isso está entregando o X pois mudei as posições do beacon
 
+        //TODO: AQUI O CONSTRUTOR ESTA CORRETO
         PosicaoAcademico posicaoAcademico = new PosicaoAcademico(posicaoZAcademico, posicaoYAcademico, posicaoXAcademico);
 
         BigDecimal cmTolerancia = new BigDecimal("0.20");
@@ -199,30 +198,24 @@ public class BeaconService {
     }
 
     public double calcularDistanciaByRssi(Integer mediaRssi) {
-        double rssiBaseUmMetro = -59;//TODO: Esse txPower é na verdade o RSSI médido a tal distância no "Iphone"
+        double rssiBaseUmMetro = -59;
 
         if(mediaRssi == null || mediaRssi == 0){
             return -1;
         }
 
         double A, B, C;
-        if (COMAJUSTECONSTANTES) {
-            ContantesDistancia constantesDistancia = getConstantesByRssi(mediaRssi);
-            if (constantesDistancia == null) {
-                return -1;
-            }
+//      A = 1.20090834192006;
+        A = 1.21048799471367;
+//      B = 3.85094187965639;
+        B = 3.80426309935817;
+//      C = -0.2009083419;
+        C = -0.2104879947;
 
-            A = constantesDistancia.getConstanteA();
-            B = constantesDistancia.getConstanteB();
-            C = constantesDistancia.getConstanteC();
-            rssiBaseUmMetro = constantesDistancia.getRssiUmMetro();
-        } else {
-            A = 1.20090834192006;
-            B = 3.85094187965639;
-            C = -0.2009083419;
+        double razao = mediaRssi / rssiBaseUmMetro;
+        if (mediaRssi > -62){//valores de rssi maiores que -62 são de distancia proximas, -59, -58, -57, etc.
+            return A * Math.pow(razao, B);
         }
-
-        double razao = mediaRssi * 1.0 / rssiBaseUmMetro;
         return A * Math.pow(razao, B) + C;
     }
 

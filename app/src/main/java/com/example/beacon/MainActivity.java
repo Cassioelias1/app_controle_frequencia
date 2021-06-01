@@ -45,9 +45,9 @@ public class MainActivity extends Activity {
         //AppContext.setNotificationManager((NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE));
 
         EditText editText = findViewById(R.id.editEmail);
-        editText.setText("95081");
+        editText.setText("95082");
         EditText editText2 = findViewById(R.id.editPassword);
-        editText2.setText("95081");
+        editText2.setText("95082");
 
         //TODO: setar no AppContext null em turmaId e academicoId
 
