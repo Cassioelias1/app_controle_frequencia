@@ -66,7 +66,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RequestPermissionActivity extends AppCompatActivity implements BeaconConsumer /*RangeNotifier*/ {
+public class RequestPermissionActivity extends AppCompatActivity implements BeaconConsumer {
     //y = 3,70 | x= 4,55 | z = 2,60
     //0 é em metros o ponto x
     //0 é em metros o ponto y
@@ -209,7 +209,7 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                         try {
                             LocalDateTime agora = LocalDateTime.now();
                             LocalDateTime primeiroHorario = LocalDateTime.of(agora.getYear(), agora.getMonth(), agora.getDayOfMonth(), hour, minute);
-                            //if (agora.getDayOfWeek() != DayOfWeek.SATURDAY && agora.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                            if (agora.getDayOfWeek() != DayOfWeek.SATURDAY && agora.getDayOfWeek() != DayOfWeek.SUNDAY) {
                                 if (agora.getHour() == primeiroHorario.getHour() && agora.getMinute() == primeiroHorario.getMinute()) {
                                     validarPresencaDia[posicaoThread] = false;
 
@@ -225,17 +225,10 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                                     }
 
                                     Presenca presenca = new Presenca(academicoId, turmaId, LocalDateTime.now().toString(), nameMaterialCard, nameTextView);
-//                                    beaconMediaRssiMap.put("a52d6b05-24ec-46b7-b3c1-cb853a6e20b2", -79);
-//                                    beaconMediaRssiMap.put("fda50693-a4e2-4fb1-afcf-c6eb0764782556", -65);
-//                                    beaconMediaRssiMap.put("fda50693-a4e2-4fb1-afcf-c6eb0764782512", -70);
-//                                    beaconMediaRssiMap.put("0x0077656c6c636f726573736407", -74);
                                     presenca.setPosicaoAcademicoHorarioAulaAndSetStatus(BeaconService.instance().academicoEstaDentroSalaAula(beaconMediaRssiMap, context));
-                                    //Se posicaoX ou posicao Y ou Z foram nulas significa que o método de trilateracao nao tinha dados suficientes para calcular, logo a requisição não precisar ser feita.
-                                    if (presenca.getPosicaoX() != null){
-                                        validarPresencaApi(presenca, materialCardView, textView, nameMaterialCard, nameTextView);
-                                    }
+                                    validarPresencaApi(presenca, materialCardView, textView, nameMaterialCard, nameTextView);
                                 }
-                            //}
+                            }
                         } catch (Exception e) {
                         }
                     }
@@ -494,30 +487,17 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
     @Override
     public void onBeaconServiceConnect() {
         RangeNotifier rangeNotifier = (beacons, region) -> {
-//            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-//            Util.sendNotification("Lendo Beacons", ""+beacons.size(), notificationManager, context);
             if (beacons.size() > 0){
                 metodoComTecnicaMelhoraAcuracia(beacons);
-//                metodoSemTecnicaMelhorarAcuracia(beacons);
-//                for (Beacon beacon : beacons) {
-//                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-//                    Util.sendNotification("RSSI", beacon.getRssi()+"", notificationManager, context);
-//                }
             }
         };
         try {
             mBeaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
             mBeaconManager.addRangeNotifier(rangeNotifier);
-//            mBeaconManager.startRangingBeaconsInRegion(new Region("myRangingUniqueId", null, null, null));
-//            mBeaconManager.addRangeNotifier(rangeNotifier);
         } catch (RemoteException e) {   }
     }
 
     private void metodoComTecnicaMelhoraAcuracia(Collection<Beacon> beacons){
-//        if (!beaconMediaRssiMap.isEmpty()){
-//            beaconMediaRssiMap.clear();
-//        }
-
         String idFinal;
         String id1;
         String id2 = "";
@@ -568,23 +548,14 @@ public class RequestPermissionActivity extends AppCompatActivity implements Beac
                 List<Turma> turmas = response.body();
                 if (turmas != null && !turmas.isEmpty()) {
                     Turma turma = turmas.get(0);//A query vai retorna um resultado, foi tratado como list por conta de um erro relacionado a como o mysql retorna os valores
-//                        AppContext.setTurmaId(turma.getId().toString());
-//                        AppContext.setNomeTurma(turma.getDescricao());
                     Shared.putString(context,"turma_id", turma.getId().toString());
                     Shared.putString(context,"nome_turma", turma.getDescricao());
 
-//                        AppContext.setIdBeacon1(turma.getIdBeacon1());
-//                        AppContext.setIdBeacon2(turma.getIdBeacon2());
-//                        AppContext.setIdBeacon3(turma.getIdBeacon3());
-//                        AppContext.setIdBeacon4(turma.getIdBeacon4());
                     Shared.putString(context,"id_beacon_1", turma.getIdBeacon1());
                     Shared.putString(context,"id_beacon_2", turma.getIdBeacon2());
                     Shared.putString(context,"id_beacon_3", turma.getIdBeacon3());
                     Shared.putString(context,"id_beacon_4", turma.getIdBeacon4());
 
-//                        AppContext.setMedidaLadoX(new BigDecimal(turma.getMedidaLadoX()));
-//                        AppContext.setMedidaLadoY(new BigDecimal(turma.getMedidaLadoY()));
-//                        AppContext.setMedidaLadoZ(new BigDecimal(turma.getMedidaLadoZ()));
                     Shared.putString(context,"medida_lado_x", turma.getMedidaLadoX());
                     Shared.putString(context,"medida_lado_y", turma.getMedidaLadoY());
                     Shared.putString(context,"medida_lado_z", turma.getMedidaLadoZ());
